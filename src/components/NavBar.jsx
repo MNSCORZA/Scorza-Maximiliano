@@ -11,16 +11,23 @@ const categorias = [
 export const NavBar = () => {
   return (
     <nav className="bg-blue-400 flex items-center justify-between p-4">
-      <CartWidget />
+      <h1 className="text-2xl text-white font-bold p-2">
+        DE LA HUERTA A TU MESA
+      </h1>
+
       <div className="flex-grow flex justify-center">
         <ul className="flex gap-14">
           {categorias.map((categoria) => (
-            <li key={categoria.id} className="text-white hover:shadow-black transition-all hover:text-blue-800 cursor-pointer">
+            <li
+              key={categoria.id}
+              className="text-white hover:shadow-black transition-all hover:text-blue-800 cursor-pointer"
+            >
               {categoria.nombre}
             </li>
           ))}
         </ul>
       </div>
+      <CartWidget />
     </nav>
   );
 };

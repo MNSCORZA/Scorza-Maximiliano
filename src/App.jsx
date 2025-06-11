@@ -4,7 +4,7 @@ function App() {
   return (
     <div className=" bg-blue-500 ">
       <NavBar />
-      <ItemListContainer />
+      <ItemListContainer text="texto enviado por una props" />
     </div>
   );
 }
