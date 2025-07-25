@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { ItemList } from "./ItemList";
 import { useParams } from "react-router";
 import { Loader } from "./Loader";
+import { getItems, getItemsByCategory } from "../fireBase/dataBase";
+import { NotFound } from "./NotFound";
 
 export const ItemListContainer = () => {
   const [items, setItems] = useState([]);
@@ -10,18 +12,26 @@ export const ItemListContainer = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    const url = "https://dummyjson.com/products";
-    const urlCategory = `https://dummyjson.com/products/category/${categoryName}`;
-    fetch(categoryName ? urlCategory : url)
-      .then((response) => response.json())
-      .then((data) => {
-        setItems(data.products);
+
+    const fetchItems = categoryName
+      ? getItemsByCategory(categoryName)
+      : getItems();
+
+    fetchItems
+      .then((res) => {
+        setItems(res);
+      })
+      .catch((error) => {
+        (<NotFound />), error;
+        setItems([]);
+      })
+      .finally(() => {
         setIsLoading(false);
       });
   }, [categoryName]);
 
   return (
-    <div className="flex flex-wrap justify-center gap-3 ">
+    <div className="flex bg-gray-100 flex-wrap justify-center gap-3 ">
       {isLoading ? <Loader /> : <ItemList items={items} />}
     </div>
   );

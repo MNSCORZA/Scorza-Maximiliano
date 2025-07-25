@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { CartWidget } from "./CartWidget";
-import { Link, useNavigate } from "react-router";
-import  Logo from "../assets/images/Logo.png"
+import { NavLink, useNavigate } from "react-router";
+import Logo from "../assets/images/Logo.png";
+import { Banner } from "./Banner";
+import { getCategories } from "../fireBase/dataBase";
 
 export function NavBar() {
   const navigate = useNavigate();
   const [sideBar, setSideBar] = useState(false);
-  const [nav, setnav] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   const useCollapse = () => {
     const [open, setOpen] = useState(false);
@@ -34,18 +37,32 @@ export function NavBar() {
   };
 
   useEffect(() => {
-    fetch("https://dummyjson.com/products/category-list")
-      .then((data) => data.json())
-      .then((data) => setnav(data));
-  }, []);
+    setIsLoadingCategories(true);
+    getCategories()
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.error("Error al cargar las categorías desde Firebase:", error);
+        setCategories([]);
+      })
+      .finally(() => {
+        setIsLoadingCategories(false);
+      });
+  }, []); // Depende
 
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <img onClick={()=>navigate("/")} className="size-40 cursor-pointer" src={Logo} alt="Logo" />
+    <div className="bg-gray-100 w-full">
+      <div className="  flex items-center justify-between">
+        <img
+          onClick={() => navigate("/")}
+          className="size-40 cursor-pointer"
+          src={Logo}
+          alt="Logo"
+        />
         <CartWidget />
       </div>
-
+      <Banner />
       <div className=" flex">
         <nav
           className={`fixed top-0 left-0 z-1 h-full pb-10 overflow-x-hidden overflow-y-auto transition origin-left transform bg-gray-900 w-60 ${
@@ -86,7 +103,7 @@ export function NavBar() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span onClick={()=>navigate("/cart")} >Carrito</span>
+              <span onClick={() => navigate("/cart")}>Carrito</span>
             </a>
             <div {...productos.trigger}>
               <div className="flex items-center justify-between px-4 py-3 transition cursor-pointer group hover:bg-gray-800 hover:text-gray-200">
@@ -118,14 +135,24 @@ export function NavBar() {
               </div>
               <div className="mb-4" {...productos.collapse}>
                 <ul className="flex-col p-2">
-                  {nav.map((categoria) => (
-                    <li
-                      key={categoria}
-                      className="text-white py-2 hover:bg-blue-500 rounded-md transition-colors cursor-pointer"
-                    >
-                      <Link to={`/categoria/${categoria}`}>{categoria}</Link>
+                  {isLoadingCategories ? (
+                    <li className="text-white py-2">Cargando categorías...</li>
+                  ) : categories.length > 0 ? (
+                    categories.map((categoria) => (
+                      <li
+                        key={categoria}
+                        className="text-white py-2 hover:bg-blue-500 rounded-md transition-colors cursor-pointer"
+                      >
+                        <NavLink to={`/categoria/${categoria}`}>
+                          {categoria}
+                        </NavLink>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-white py-2">
+                      No se encontraron categorías.
                     </li>
-                  ))}
+                  )}
                 </ul>
               </div>
             </div>
@@ -149,6 +176,6 @@ export function NavBar() {
           </button>
         </header>
       </div>
-    </>
+    </div>
   );
 }
