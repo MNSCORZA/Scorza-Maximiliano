@@ -1,4 +1,3 @@
-// src/components/FormularioCompraFinal.jsx
 import { useState, useContext, useEffect } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
@@ -78,7 +77,8 @@ export function Formulario() {
       navigate(`/orden-confirmacion/${orderId}`);
     } catch (error) {
       toast.error(
-        "Hubo un error al finalizar tu compra. Por favor, inténtalo de nuevo."
+        "Hubo un error al finalizar tu compra. Por favor, inténtalo de nuevo.",
+        error
       );
     } finally {
       setLoading(false);

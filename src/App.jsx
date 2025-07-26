@@ -10,7 +10,7 @@ import { OrdenConfirmacion } from "./components/OrdenConfirmacion";
 
 function App() {
   return (
-    <div className="bg-gray-100 h-screen">
+    <div>
       <BrowserRouter>
         <NavBar />
 

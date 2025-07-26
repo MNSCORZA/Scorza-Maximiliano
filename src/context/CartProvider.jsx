@@ -70,14 +70,11 @@ export function CartProvider({ children }) {
   };
 
   const removeItem = (productId) => {
-    
     const updatedCart = cart.filter((product) => product.id !== productId);
-    setCart(updatedCart); 
+    setCart(updatedCart);
   };
 
   const emptyCart = () => setCart([]);
-
-  
 
   return (
     <CartContext.Provider
