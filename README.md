@@ -76,9 +76,9 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu máquina local:
 
 ## Despliegue
 
-Este proyecto se desplegará en Vercel. El enlace de la aplicación en vivo estará disponible aquí una vez que se haya completado el despliegue:
+Este proyecto está desplegado en Vercel. Puedes ver la aplicación en vivo aquí:
 
-[Enlace de Despliegue en Vercel - Próximamente]
+[De Todo E-commerce en Vercel](https://de-todo-e-commerce.vercel.app/)
 
 ## Autor
 
