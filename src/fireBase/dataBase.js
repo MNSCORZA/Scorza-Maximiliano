@@ -27,7 +27,6 @@ export const getItemsByCategory = async (categoria) => {
     collection(db, "productos"),
     where("categoria", "==", categoria)
   );
-
   const querySnapshot = await getDocs(q);
   const items = [];
   querySnapshot.forEach((doc) => {
@@ -39,22 +38,18 @@ export const getItemsByCategory = async (categoria) => {
 export const getCategories = async () => {
   const querySnapshot = await getDocs(collection(db, "productos"));
   const categories = new Set();
-
   querySnapshot.forEach((doc) => {
-    const productData = doc.data();
-    if (productData && productData.categoria) {
-      categories.add(productData.categoria);
+    const data = doc.data();
+    if (data && data.categoria) {
+      categories.add(data.categoria);
     }
   });
-
   return Array.from(categories);
 };
 
 export const getItemId = async (id) => {
   const docRef = doc(db, "productos", id);
-
   const docSnap = await getDoc(docRef);
-
   if (docSnap.exists()) {
     return { ...docSnap.data(), id: docSnap.id };
   } else {
@@ -69,16 +64,12 @@ export const createOrder = async (buyerData, items, total) => {
     precio: item.precio,
     cantidad: item.cantidad,
   }));
-
   const order = {
     buyer: buyerData,
     items: orderItems,
     total: total,
     date: serverTimestamp(),
   };
-
-  const ordersCollectionRef = collection(db, "orders");
-  const docRef = await addDoc(ordersCollectionRef, order);
-
+  const docRef = await addDoc(collection(db, "orders"), order);
   return docRef.id;
 };

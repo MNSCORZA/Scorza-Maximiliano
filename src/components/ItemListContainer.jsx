@@ -11,6 +11,7 @@ export const ItemListContainer = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     setIsLoading(true);
 
     const fetchItems = categoryName
@@ -19,20 +20,47 @@ export const ItemListContainer = () => {
 
     fetchItems
       .then((res) => {
-        setItems(res);
+        if (isMounted) setItems(res);
       })
-      .catch((error) => {
-        (<NotFound />), error;
-        setItems([]);
+      .catch(() => {
+        if (isMounted) setItems([]);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [categoryName]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex bg-gray-100 flex-wrap justify-center gap-3 ">
-      {isLoading ? <Loader /> : <ItemList items={items} />}
-    </div>
+    <main className="min-h-screen bg-gray-50 py-10 px-4 sm:px-8 lg:px-12">
+      <div className="max-w-[1400px] mx-auto">
+        {categoryName && (
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 capitalize border-b pb-4">
+            Categoría: {categoryName}
+          </h2>
+        )}
+        
+        {items.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <ItemList items={items} />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
+            <NotFound />
+          </div>
+        )}
+      </div>
+    </main>
   );
 };
