@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Loader2 } from 'lucide-react';
-import { db } from '../firebase/config';
+import { db } from '../fireBase/config';
 import { collection, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router';
 
