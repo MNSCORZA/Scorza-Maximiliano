@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase/config';
+import {db} from '../fireBase/config';  
 import { collection, getDocs } from 'firebase/firestore';
 
 const Categories = () => {
