@@ -2,7 +2,6 @@ import React from 'react';
 import PromoBanner from './PromoBanner';
 import Hero from './Hero';
 import TrustGrid from './TrustGrid';
-import Categories from './Categories';
 import ProductGrid from './ProductGrid';
 
 
@@ -14,7 +13,7 @@ const HomeContent = () => {
       <PromoBanner />
       <Hero />
       <TrustGrid />
-      <Categories />
+    
       <ProductGrid />
    
     </main>
