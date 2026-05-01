@@ -6,7 +6,7 @@ export const Loader = () => {
         <div className="absolute top-0 left-0 w-16 h-16 rounded-full border-4 border-t-indigo-600 animate-spin"></div>
       </div>
       <span className="text-gray-500 font-medium animate-pulse tracking-widest uppercase text-xs">
-        Cargando
+        Cargando...
       </span>
     </div>
   );

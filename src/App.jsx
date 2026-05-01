@@ -7,6 +7,8 @@ import { NotFound } from "./components/NotFound";
 import { Toaster } from "sonner";
 import { Formulario } from "./components/Formulario";
 import { OrdenConfirmacion } from "./components/OrdenConfirmacion";
+import { Footer } from "./components/Footer";
+import HomeContent from "./components/HomeContent";
 
 function App() {
   return (
@@ -15,7 +17,8 @@ function App() {
         <NavBar />
 
         <Routes>
-          <Route path="/" element={<ItemListContainer />} />
+          <Route path="/" element={<HomeContent />} />
+          <Route path="/Catalogo" element={<ItemListContainer />} />
           <Route
             path="/categoria/:categoryName"
             element={<ItemListContainer />}
@@ -29,6 +32,7 @@ function App() {
             element={<OrdenConfirmacion />}
           />
         </Routes>
+        <Footer/>
       </BrowserRouter>
       <Toaster position="top-right" richColors />
     </div>

@@ -52,7 +52,7 @@ export function NavBar() {
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         <img
           onClick={() => navigate("/")}
-          className="h-16 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+          className="h-22 w-auto cursor-pointer hover:opacity-80 transition-opacity"
           src={Logo}
           alt="Logo"
         />
