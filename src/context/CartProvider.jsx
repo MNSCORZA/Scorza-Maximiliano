@@ -1,8 +1,15 @@
 import { CartContext } from "./CartContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (productToAdd) => {
     const existingProductIndex = cart.findIndex(
@@ -12,9 +19,7 @@ export function CartProvider({ children }) {
     if (existingProductIndex !== -1) {
       const updatedCart = cart.map((item, index) => {
         if (index === existingProductIndex) {
-          const quantityToAdd = productToAdd.cantidad
-            ? productToAdd.cantidad
-            : 1;
+          const quantityToAdd = productToAdd.cantidad || 1;
           return {
             ...item,
             cantidad: (item.cantidad || 0) + quantityToAdd,
@@ -31,14 +36,9 @@ export function CartProvider({ children }) {
       setCart([...cart, newProduct]);
     }
   };
+
   const updateItemQuantity = (productId, newQuantity) => {
-    if (
-      typeof newQuantity !== "number" ||
-      newQuantity < 0 ||
-      isNaN(newQuantity)
-    ) {
-      return;
-    }
+    if (typeof newQuantity !== "number" || newQuantity < 0 || isNaN(newQuantity)) return;
 
     if (newQuantity === 0) {
       removeItem(productId);
@@ -55,23 +55,14 @@ export function CartProvider({ children }) {
   };
 
   const getCantidad = () => {
-    if (cart.length === 0) {
-      return 0;
-    }
-
-    const suma = cart.reduce((acc, product) => {
-      const cantidadDelProducto =
-        typeof product.cantidad === "number"
-          ? product.cantidad
-          : parseInt(product.cantidad) || 0;
-      return acc + cantidadDelProducto;
+    return cart.reduce((acc, product) => {
+      const cantidad = typeof product.cantidad === "number" ? product.cantidad : parseInt(product.cantidad) || 0;
+      return acc + cantidad;
     }, 0);
-    return suma;
   };
 
   const removeItem = (productId) => {
-    const updatedCart = cart.filter((product) => product.id !== productId);
-    setCart(updatedCart);
+    setCart(cart.filter((product) => product.id !== productId));
   };
 
   const emptyCart = () => setCart([]);

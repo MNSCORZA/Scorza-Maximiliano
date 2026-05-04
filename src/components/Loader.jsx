@@ -1,13 +1,33 @@
+import React from 'react';
+
 export const Loader = () => {
   return (
-    <div className="flex flex-col justify-center items-center min-h-[40vh] gap-4">
-      <div className="relative">
-        <div className="w-16 h-16 rounded-full border-4 border-gray-200"></div>
-        <div className="absolute top-0 left-0 w-16 h-16 rounded-full border-4 border-t-indigo-600 animate-spin"></div>
+    <div className="flex flex-col items-center justify-center min-h-[400px] w-full bg-transparent">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute animate-ping h-16 w-16 rounded-full bg-indigo-400 opacity-20"></div>
+        
+        <div className="relative flex gap-1">
+          <div className="w-4 h-12 bg-indigo-600 rounded-full animate-[bounce_1s_infinite_0ms]"></div>
+          <div className="w-4 h-12 bg-indigo-500 rounded-full animate-[bounce_1s_infinite_200ms]"></div>
+          <div className="w-4 h-12 bg-indigo-400 rounded-full animate-[bounce_1s_infinite_400ms]"></div>
+        </div>
       </div>
-      <span className="text-gray-500 font-medium animate-pulse tracking-widest uppercase text-xs">
-        Cargando...
-      </span>
+      
+      <div className="mt-8 flex flex-col items-center">
+        <p className="text-indigo-900 font-black text-xl tracking-tighter uppercase animate-pulse">
+          Cargando De Todo
+        </p>
+        <div className="w-48 h-1 bg-gray-100 rounded-full mt-2 overflow-hidden">
+          <div className="h-full bg-indigo-600 rounded-full animate-[shimmer_2s_infinite] w-full origin-left"></div>
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}} />
     </div>
   );
 };

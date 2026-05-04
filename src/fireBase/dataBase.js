@@ -1,20 +1,20 @@
-import {
-  collection,
-  getDocs,
-  getFirestore,
-  query,
-  where,
-  getDoc,
-  doc,
-  addDoc,
+import { 
+  collection, 
+  getDocs, 
+  getFirestore, 
+  query, 
+  where, 
+  getDoc, 
+  doc, 
   serverTimestamp,
+  writeBatch
 } from "firebase/firestore";
 import { app } from "./config.js";
 
 const db = getFirestore(app);
 
 export const getItems = async () => {
-  const querySnapshot = await getDocs(collection(db, "productos"));
+  const querySnapshot = await getDocs(collection(db, 'productos'));
   const items = [];
   querySnapshot.forEach((doc) => {
     items.push({ ...doc.data(), id: doc.id });
@@ -25,7 +25,7 @@ export const getItems = async () => {
 export const getItemsByCategory = async (categoria) => {
   const q = query(
     collection(db, "productos"),
-    where("categoria", "==", categoria)
+    where('categoria', '==', categoria)
   );
   const querySnapshot = await getDocs(q);
   const items = [];
@@ -40,9 +40,7 @@ export const getCategories = async () => {
   const categories = new Set();
   querySnapshot.forEach((doc) => {
     const data = doc.data();
-    if (data && data.categoria) {
-      categories.add(data.categoria);
-    }
+    if (data?.categoria) categories.add(data.categoria);
   });
   return Array.from(categories);
 };
@@ -50,26 +48,37 @@ export const getCategories = async () => {
 export const getItemId = async (id) => {
   const docRef = doc(db, "productos", id);
   const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return { ...docSnap.data(), id: docSnap.id };
-  } else {
-    return null;
-  }
+  return docSnap.exists() ? { ...docSnap.data(), id: docSnap.id } : null;
 };
 
 export const createOrder = async (buyerData, items, total) => {
+  const batch = writeBatch(db);
+  const ordersCollection = collection(db, "orders");
+  
   const orderItems = items.map((item) => ({
     id: item.id,
     titulo: item.titulo,
     precio: item.precio,
     cantidad: item.cantidad,
   }));
+
   const order = {
     buyer: buyerData,
     items: orderItems,
     total: total,
     date: serverTimestamp(),
   };
-  const docRef = await addDoc(collection(db, "orders"), order);
-  return docRef.id;
+
+  const newOrderRef = doc(ordersCollection);
+  batch.set(newOrderRef, order);
+
+  items.forEach((item) => {
+    const productRef = doc(db, "productos", item.id);
+    batch.update(productRef, {
+      stock: item.stock - item.cantidad
+    });
+  });
+
+  await batch.commit();
+  return newOrderRef.id;
 };
