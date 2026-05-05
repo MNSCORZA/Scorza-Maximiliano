@@ -1,66 +1,121 @@
-import { useEffect, useState } from "react";
-import { ItemList } from "./ItemList";
-import { useParams } from "react-router";
-import { Loader } from "./Loader";
-import { getItems, getItemsByCategory } from "../fireBase/dataBase";
-import { NotFound } from "./NotFound";
+import React, { useState, useMemo } from 'react';
+import { useParams, useSearchParams, Link } from 'react-router';
+import { useProducts } from '../hooks/useProducts';
+import ProductCard from './ProductCard';
+import { Truck, Home, LayoutGrid } from 'lucide-react';
 
-export const ItemListContainer = () => {
-  const [items, setItems] = useState([]);
+const ItemListContainer = () => {
   const { categoryName } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
+  const { products, loading } = useProducts(categoryName, searchQuery);
+  const [onlyFreeShipping, setOnlyFreeShipping] = useState(false);
+  const [sortOrder, setSortOrder] = useState("");
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
+  const finalProducts = useMemo(() => {
+    let result = [...products];
+    if (onlyFreeShipping) result = result.filter(p => p.envioGratis);
+    if (sortOrder === "asc") result.sort((a, b) => a.precio - b.precio);
+    else if (sortOrder === "desc") result.sort((a, b) => b.precio - a.precio);
+    return result;
+  }, [products, onlyFreeShipping, sortOrder]);
 
-    const fetchItems = categoryName
-      ? getItemsByCategory(categoryName)
-      : getItems();
-
-    fetchItems
-      .then((res) => {
-        if (isMounted) setItems(res);
-      })
-      .catch(() => {
-        if (isMounted) setItems([]);
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [categoryName]);
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Loader />
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <p className="mt-4 text-gray-500 font-medium">Cargando productos...</p>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4 sm:px-8 lg:px-12">
-      <div className="max-w-[1400px] mx-auto">
-        {categoryName && (
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 capitalize border-b pb-4">
-            Categoría: {categoryName}
-          </h2>
-        )}
+    <section className="py-8 bg-[#f9f9f9] min-h-screen">
+      <div className="container mx-auto px-4">
         
-        {items.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <ItemList items={items} />
+        {/* Mallas de pan (Breadcrumbs) Mejoradas */}
+        <nav className="flex items-center gap-2 text-[11px] font-bold text-gray-500 mb-8 bg-white w-fit px-4 py-2.5 rounded-full shadow-sm border border-gray-100">
+          <Link 
+            to="/" 
+            className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors"
+          >
+            <Home size={14} strokeWidth={2.5} /> 
+            <span>INICIO</span>
+          </Link>
+          
+          <span className="text-gray-300 font-light text-sm">/</span>
+          
+          <Link 
+            to="/Catalogo" 
+            className={`flex items-center gap-1.5 hover:text-indigo-600 transition-colors ${!categoryName ? "text-indigo-600" : ""}`}
+          >
+            <LayoutGrid size={14} strokeWidth={2.5} />
+            <span>CATÁLOGO</span>
+          </Link>
+
+          {categoryName && (
+            <>
+              <span className="text-gray-300 font-light text-sm">/</span>
+              <span className="text-indigo-600 uppercase tracking-wider">{categoryName}</span>
+            </>
+          )}
+        </nav>
+
+        {/* Encabezado y Filtros */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div>
+            <h1 className="text-3xl font-black text-gray-900 leading-tight">
+              {categoryName || (searchQuery ? `Resultados: "${searchQuery}"` : "Catálogo Completo")}
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">{finalProducts.length} productos encontrados</p>
+          </div>
+
+          <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+            <select 
+              value={sortOrder} 
+              onChange={(e) => setSortOrder(e.target.value)} 
+              className="flex-1 lg:flex-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-[12px] font-bold outline-none focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="">ORDENAR POR</option>
+              <option value="asc">Menor precio</option>
+              <option value="desc">Mayor precio</option>
+            </select>
+
+            <button 
+              onClick={() => setOnlyFreeShipping(!onlyFreeShipping)} 
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl border font-bold text-[12px] transition-all ${
+                onlyFreeShipping 
+                ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200' 
+                : 'bg-white border-gray-200 text-gray-600 hover:border-indigo-600 hover:text-indigo-600'
+              }`}
+            >
+              <Truck size={16} /> 
+              ENVÍO GRATIS
+            </button>
+          </div>
+        </div>
+
+        {/* Grilla de Productos */}
+        {finalProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {finalProducts.map((p, i) => (
+              <ProductCard key={p.id} product={p} index={i} />
+            ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
-            <NotFound />
+          <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
+            <p className="text-gray-500 text-lg">No encontramos productos que coincidan con tu búsqueda.</p>
+            <button 
+              onClick={() => {setOnlyFreeShipping(false); setSortOrder("");}}
+              className="mt-4 text-indigo-600 font-bold hover:underline"
+            >
+              Limpiar filtros
+            </button>
           </div>
         )}
       </div>
-    </main>
+    </section>
   );
 };
+
+export default ItemListContainer;

@@ -1,7 +1,8 @@
-import { useParams } from "react-router";
 import { useState, useEffect } from "react";
+import { useParams } from "react-router";
+import { db } from "../fireBase/config";
+import { doc, getDoc } from "firebase/firestore";
 import { ItemDetail } from "./ItemDetail";
-import { getItemId } from "../fireBase/dataBase";
 import { Loader } from "./Loader";
 
 export const ItemDetailContainer = () => {
@@ -11,13 +12,13 @@ export const ItemDetailContainer = () => {
 
   useEffect(() => {
     setLoading(true);
+    const docRef = doc(db, "productos", id);
     
-    getItemId(id)
-      .then((data) => {
-        setItem(data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener producto:", error);
+    getDoc(docRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setItem({ ...snapshot.data(), id: snapshot.id });
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -25,12 +26,16 @@ export const ItemDetailContainer = () => {
   }, [id]);
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {item ? <ItemDetail item={item} /> : <p className="text-center py-20">Producto no encontrado</p>}
+    <div className="min-h-screen bg-gray-50">
+      {item && <ItemDetail item={item} />}
     </div>
   );
 };
