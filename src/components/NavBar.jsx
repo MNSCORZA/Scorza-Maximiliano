@@ -3,8 +3,9 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router';
 import { Search, ShoppingCart, Menu, X, ChevronRight, ChevronDown } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
-import { db } from '../firebase/config'; 
-import { collection, getDocs } from 'fireBase/firestore';
+import { db } from '../fireBase/config';
+import { collection, getDocs } from 'firebase/firestore';
+import { Loader } from './Loader';
 import logoImg from '../assets/images/Logo.png';
 
 const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSearch, categorias }) => {
