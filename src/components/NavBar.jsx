@@ -41,7 +41,6 @@ export const NavBar = () => {
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          
           <div className="flex items-center gap-6">
             <button 
               onClick={() => setIsOpen(true)}
@@ -96,14 +95,14 @@ export const NavBar = () => {
         </div>
       </div>
 
-      <div className={`fixed inset-0 z-[110] lg:hidden transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
+      <div className={`fixed inset-0 z-[150] lg:hidden transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
         <div 
           className={`absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsOpen(false)}
         />
         
-        <div className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="flex flex-col h-full p-8">
+        <div className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full p-8 bg-white">
             <div className="flex items-center justify-between mb-10">
               <span className="font-black text-xs tracking-[0.3em] text-gray-400 uppercase">Menú Principal</span>
               <button onClick={() => setIsOpen(false)} className="p-2 text-gray-900 bg-gray-100 rounded-xl hover:bg-red-50 hover:text-red-500 transition-colors">
@@ -118,7 +117,7 @@ export const NavBar = () => {
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="BUSCAR..." 
-                className="w-full bg-gray-100 border-none rounded-2xl py-4 pl-12 pr-4 text-xs font-black focus:ring-2 focus:ring-indigo-600/10 focus:bg-white transition-all uppercase tracking-widest"
+                className="w-full bg-gray-50 border-none rounded-2xl py-4 pl-12 pr-4 text-xs font-black focus:ring-2 focus:ring-indigo-600/10 focus:bg-white transition-all uppercase tracking-widest"
               />
             </form>
 
@@ -134,10 +133,10 @@ export const NavBar = () => {
             </div>
 
             <div className="mt-auto pt-8">
-              <div className="bg-indigo-600 rounded-[2rem] p-6 text-white relative overflow-hidden">
+              <div className="bg-indigo-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-xl">
                 <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Tu Cuenta</p>
                 <h4 className="text-lg font-black leading-tight mb-4">¡Hola de nuevo!</h4>
-                <button className="bg-white text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all">
+                <button className="bg-white text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-md">
                   Iniciar Sesión
                 </button>
                 <User className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 rotate-12" />
