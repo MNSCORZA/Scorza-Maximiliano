@@ -91,26 +91,25 @@ export const NavBar = () => {
         </div>
       </div>
 
-      {/* Menú Lateral (Mobile) */}
-      <div className={`fixed inset-0 z-[150] lg:hidden transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
-        {/* Overlay oscuro */}
+      {/* Menú Lateral con Z-INDEX corregido */}
+      <div className={`fixed inset-0 z-[999] lg:hidden transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
         <div 
           className={`absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsOpen(false)}
         />
         
-        {/* Contenedor del Menú Blanco */}
-        <div className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) h-full ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          {/* Contenido con scroll interno y fondo blanco forzado */}
-          <div className="flex flex-col h-full bg-white overflow-y-auto">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-10">
-                <span className="font-black text-xs tracking-[0.3em] text-gray-400 uppercase">Menú Principal</span>
-                <button onClick={() => setIsOpen(false)} className="p-2 text-gray-900 bg-gray-100 rounded-xl hover:bg-red-50 hover:text-red-500 transition-colors">
-                  <X size={20} />
-                </button>
-              </div>
+        <div className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full bg-white">
+            {/* Header del menú fijo arriba */}
+            <div className="flex items-center justify-between p-8 pb-4 bg-white">
+              <span className="font-black text-xs tracking-[0.3em] text-gray-400 uppercase">Menú Principal</span>
+              <button onClick={() => setIsOpen(false)} className="p-2 text-gray-900 bg-gray-100 rounded-xl hover:bg-red-50 hover:text-red-500 transition-colors">
+                <X size={20} />
+              </button>
+            </div>
 
+            {/* Contenido con scroll */}
+            <div className="flex-1 overflow-y-auto px-8 py-4">
               <form onSubmit={handleSearch} className="mb-10 relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
                 <input 
@@ -133,7 +132,7 @@ export const NavBar = () => {
                 </Link>
               </div>
 
-              <div className="mt-10">
+              <div className="mt-10 mb-8">
                 <div className="bg-indigo-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-xl">
                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Tu Cuenta</p>
                   <h4 className="text-lg font-black leading-tight mb-4">¡Hola de nuevo!</h4>
