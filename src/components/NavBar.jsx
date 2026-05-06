@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Search, ShoppingCart, Menu, X, ChevronRight, User } from 'lucide-react';
-import { useCart } from '../hooks/useCart';
+import { useCart } from '../context/CartContext';
 
 export const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
