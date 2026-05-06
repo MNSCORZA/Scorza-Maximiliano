@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Search, ShoppingCart, Menu, X, ChevronRight, User } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { CartContext } from '../context/CartContext';
 
 export const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const { getItemCount } = useCart();
+  const { getCantidad } = useContext(CartContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,9 +75,9 @@ export const NavBar = () => {
             
             <Link to="/cart" className="relative p-2.5 text-gray-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-all group">
               <ShoppingCart size={22} strokeWidth={2.5} />
-              {getItemCount() > 0 && (
+              {getCantidad() > 0 && (
                 <span className="absolute top-1 right-1 bg-indigo-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in">
-                  {getItemCount()}
+                  {getCantidad()}
                 </span>
               )}
             </Link>
