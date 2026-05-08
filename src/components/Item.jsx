@@ -9,11 +9,14 @@ export const Item = ({ item }) => {
       onClick={() => hasStock && navigate(`/item/${item?.id}`)}
       className={`flex flex-col w-full max-w-sm bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer active:scale-[0.98] ${!hasStock ? 'opacity-75' : ''}`}
     >
-      <div className="relative aspect-square overflow-hidden bg-gray-50">
+      {/* Contenedor optimizado con aspect-square */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
         <img
           className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500 ease-in-out"
           src={item?.imagenUrl}
           alt={item?.titulo}
+          loading="lazy"
+          decoding="async"
           onError={(e) => {
             e.target.src = "https://via.placeholder.com/400?text=Sin+Imagen";
           }}
