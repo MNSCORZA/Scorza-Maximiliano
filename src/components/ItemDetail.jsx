@@ -7,7 +7,7 @@ export const ItemDetail = ({ item }) => {
   return (
     <div className="py-8 animate-in fade-in duration-700 bg-[#f9f9f9]">
       <div className="container mx-auto px-4">
-        
+
         <nav className="flex items-center gap-2 text-[11px] font-bold text-gray-500 mb-8 bg-white w-fit px-4 py-2.5 rounded-full shadow-sm border border-gray-100">
           <Link to="/" className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
             <Home size={14} strokeWidth={2.5} /> <span>INICIO</span>
@@ -22,13 +22,15 @@ export const ItemDetail = ({ item }) => {
 
         <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-2">
-            
+
             <div className="bg-white p-12 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-50">
-              <div className="relative group">
+              {/* Contenedor con aspect-square para estabilidad */}
+              <div className="relative group w-full aspect-square flex items-center justify-center">
                 <img 
                   src={item.imagenUrl} 
                   alt={item.titulo} 
-                  className="max-h-[500px] w-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                  decoding="async"
+                  className="max-h-full w-auto object-contain transition-transform duration-700 group-hover:scale-105"
                   onError={(e) => {
                     e.target.src = "https://via.placeholder.com/500?text=Imagen+No+Disponible";
                   }}
@@ -65,7 +67,7 @@ export const ItemDetail = ({ item }) => {
                   </span>
                 )}
               </div>
-              
+
               <p className="text-[10px] font-black text-gray-400 mb-10 tracking-[0.2em] uppercase">
                 Stock: {item.stock} unidades
               </p>
@@ -92,6 +94,7 @@ export const ItemDetail = ({ item }) => {
           </div>
         </div>
 
+        {/* Las tarjetas de abajo ya están muy bien maquetadas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           <div className="bg-indigo-600 rounded-[32px] p-10 text-white relative overflow-hidden group">
             <div className="relative z-10">
