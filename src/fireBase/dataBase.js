@@ -7,32 +7,20 @@ import {
   getDoc, 
   doc, 
   serverTimestamp,
-  writeBatch
+  writeBatch,
+  increment
 } from "firebase/firestore";
-import { app } from "./config.js";
-
-const db = getFirestore(app);
+import { db } from "./config.js";
 
 export const getItems = async () => {
   const querySnapshot = await getDocs(collection(db, 'productos'));
-  const items = [];
-  querySnapshot.forEach((doc) => {
-    items.push({ ...doc.data(), id: doc.id });
-  });
-  return items;
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
 export const getItemsByCategory = async (categoria) => {
-  const q = query(
-    collection(db, "productos"),
-    where('categoria', '==', categoria)
-  );
+  const q = query(collection(db, "productos"), where('categoria', '==', categoria));
   const querySnapshot = await getDocs(q);
-  const items = [];
-  querySnapshot.forEach((doc) => {
-    items.push({ ...doc.data(), id: doc.id });
-  });
-  return items;
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
 export const getCategories = async () => {
@@ -54,28 +42,26 @@ export const getItemId = async (id) => {
 export const createOrder = async (buyerData, items, total) => {
   const batch = writeBatch(db);
   const ordersCollection = collection(db, "orders");
-  
-  const orderItems = items.map((item) => ({
-    id: item.id,
-    titulo: item.titulo,
-    precio: item.precio,
-    cantidad: item.cantidad,
-  }));
+  const newOrderRef = doc(ordersCollection);
 
   const order = {
     buyer: buyerData,
-    items: orderItems,
+    items: items.map(item => ({
+      id: item.id,
+      titulo: item.titulo,
+      precio: item.precio,
+      cantidad: item.cantidad
+    })),
     total: total,
     date: serverTimestamp(),
   };
 
-  const newOrderRef = doc(ordersCollection);
   batch.set(newOrderRef, order);
 
   items.forEach((item) => {
     const productRef = doc(db, "productos", item.id);
     batch.update(productRef, {
-      stock: item.stock - item.cantidad
+      stock: increment(-item.cantidad)
     });
   });
 
