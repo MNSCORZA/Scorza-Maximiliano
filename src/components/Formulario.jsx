@@ -28,7 +28,7 @@ export function Formulario() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validación de entrada para evitar caracteres inválidos mientras escribe
+    
     if (name === "nombre" || name === "apellido") {
       if (/[0-9]/.test(value)) return;
     }
@@ -95,7 +95,7 @@ export function Formulario() {
               <span className="text-[10px] text-gray-400 mt-1 uppercase font-semibold">Sin números ni símbolos</span>
             </div>
 
-            {/* Apellido */}
+           
             <div className="flex flex-col">
               <label className="text-sm font-bold text-gray-700 mb-1">Apellido</label>
               <input
@@ -112,7 +112,7 @@ export function Formulario() {
             </div>
           </div>
 
-          {/* Email */}
+          
           <div className="flex flex-col">
             <label className="text-sm font-bold text-gray-700 mb-1">Correo Electrónico</label>
             <input
@@ -128,7 +128,7 @@ export function Formulario() {
             <span className="text-[10px] text-gray-400 mt-1 uppercase font-semibold">Ej: nombre@empresa.com</span>
           </div>
 
-          {/* Teléfono */}
+          
           <div className="flex flex-col">
             <label className="text-sm font-bold text-gray-700 mb-1">Teléfono de Contacto</label>
             <input

@@ -1,6 +1,6 @@
+import { BrowserRouter, Routes, Route } from "react-router";
 import { NavBar } from "./components/NavBar";
 import ItemListContainer from "./components/ItemListContainer";
-import { BrowserRouter, Routes, Route } from "react-router";
 import { ItemDetailContainer } from "./components/ItemDetailContainer";
 import { Cart } from "./components/Cart";
 import { NotFound } from "./components/NotFound";
@@ -10,23 +10,27 @@ import { OrdenConfirmacion } from "./components/OrdenConfirmacion";
 import { Footer } from "./components/Footer";
 import HomeContent from "./components/HomeContent";
 import { ScrollToTop } from "./components/ScrollToTop";
+import WhatsAppBtn from "./components/WhatsAppBtn";
 
 function App() {
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <BrowserRouter>
         <NavBar />
-        <Routes>
-          <Route path="/" element={<HomeContent />} />
-          <Route path="/Catalogo" element={<ItemListContainer />} />
-          <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
-          <Route path="/item/:id" element={<ItemDetailContainer />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/*" element={<NotFound />} />
-          <Route path="/form" element={<Formulario />} />
-          <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
-        </Routes>
-        <Footer/>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomeContent />} />
+            <Route path="/Catalogo" element={<ItemListContainer />} />
+            <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
+            <Route path="/item/:id" element={<ItemDetailContainer />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/form" element={<Formulario />} />
+            <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
+            <Route path="/*" element={<NotFound />} />
+          </Routes>
+        </main>
+        <Footer />
+        <WhatsAppBtn />
         <ScrollToTop />
       </BrowserRouter>
       <Toaster position="top-right" richColors />
