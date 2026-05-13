@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../hooks/useAdmin';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { db, auth } from '../firebase/config';
+import { db, auth } from '../fireBase/config';
 import { doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { Lock } from 'lucide-react';
 
