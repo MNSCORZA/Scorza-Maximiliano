@@ -29,9 +29,26 @@ const AdminContainer = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (loading) return <div className="p-20 text-center font-black text-gray-300 uppercase">Cargando De Todo...</div>;
+  if (loading || (user && !userData)) {
+    return (
+      <div className="p-20 text-center flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="font-black text-gray-300 uppercase tracking-widest text-[10px]">Verificando credenciales...</p>
+      </div>
+    );
+  }
 
-  if (!user || !userData?.permisos) return <div className="text-center p-20 font-black uppercase text-red-500"><Lock className="mx-auto mb-4"/> Acceso Denegado</div>;
+  if (!user || !userData?.permisos) {
+    return (
+      <div className="text-center p-20 flex flex-col items-center">
+        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-[32px] flex items-center justify-center mb-6">
+          <Lock size={40}/>
+        </div>
+        <h2 className="font-black uppercase text-red-500 tracking-tighter text-2xl">Acceso Denegado</h2>
+        <p className="text-gray-400 text-[10px] font-bold uppercase mt-2 tracking-widest">No tienes permisos para ver esta sección</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 min-h-screen bg-gray-50">
