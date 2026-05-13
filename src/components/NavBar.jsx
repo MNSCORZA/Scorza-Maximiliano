@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, X, ChevronRight, ChevronDown, LogIn, LogOut, Settings, User } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -35,24 +35,45 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
             <X size={20} />
           </button>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto p-8 bg-white">
-          {/* SECCIÓN DE USUARIO EN MÓVIL */}
           <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
             {user ? (
               <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-indigo-600 p-2 rounded-xl text-white">
-                    <User size={20} />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-indigo-600 p-2 rounded-xl text-white">
+                      <User size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-indigo-600 leading-none">Hola,</p>
+                      <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase text-indigo-600 leading-none">Hola,</p>
-                    <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
-                  </div>
+                  {userData?.rol === 'admin' && (
+                    <Link 
+                      to="/admin" 
+                      onClick={() => setIsOpen(false)}
+                      className="p-2 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors"
+                    >
+                      <Settings size={18} />
+                    </Link>
+                  )}
                 </div>
-                <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-600 transition-colors">
-                  <LogOut size={16} /> Cerrar Sesión
-                </button>
+                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                  {userData?.rol === 'admin' && (
+                    <Link 
+                      to="/admin" 
+                      onClick={() => setIsOpen(false)}
+                      className="text-[11px] font-black uppercase tracking-tighter text-indigo-600 hover:underline"
+                    >
+                      Ir al Panel Admin
+                    </Link>
+                  )}
+                  <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-600 transition-colors ml-auto">
+                    <LogOut size={16} /> Cerrar Sesión
+                  </button>
+                </div>
               </div>
             ) : (
               <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-2 w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest">
@@ -169,7 +190,6 @@ export const NavBar = () => {
             </form>
 
             <div className="flex items-center gap-2 shrink-0">
-              {/* BOTÓN DE LOGIN / PERFIL EN DESKTOP */}
               <div className="hidden sm:flex items-center">
                 {user ? (
                   <div className="flex items-center gap-3 bg-gray-50 p-1 pr-4 rounded-full border border-gray-100">
