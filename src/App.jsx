@@ -14,11 +14,16 @@ import WhatsAppBtn from "./components/WhatsAppBtn";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AdminContainer from "./pages/AdminContainer";
 import { Login } from "./pages/Login";
+import { SignUp } from "./pages/SignUp";
+import { ResetPassword } from "./pages/ResetPassword";
+import UserPanel from "./pages/UserPanel";
 
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const { user, userData, loading } = useAuth();
   if (loading) return null;
-  return user ? children : <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+  if (adminOnly && userData?.rol !== 'admin') return <Navigate to="/" />;
+  return children;
 };
 
 const WhatsAppWrapper = () => {
@@ -43,7 +48,10 @@ function App() {
               <Route path="/form" element={<Formulario />} />
               <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<ProtectedRoute><AdminContainer /></ProtectedRoute>} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
+              <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
               <Route path="/*" element={<NotFound />} />
             </Routes>
           </main>
