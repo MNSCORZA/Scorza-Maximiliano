@@ -1,10 +1,9 @@
 import React from 'react';
-import { Mail, Trash2, Shield, User, Lock } from 'lucide-react';
+import { Mail, Trash2, Shield, User } from 'lucide-react';
 
 const UserTable = ({ users, currentUser, onUpdatePerms, onDelete, onResetPass }) => {
   return (
     <div className="overflow-hidden">
-      {/* Vista Desktop (Oculta en mobile) */}
       <div className="hidden md:block">
         <table className="w-full text-left">
           <thead className="bg-gray-50/50 text-[10px] font-black uppercase text-gray-400">
@@ -63,7 +62,6 @@ const UserTable = ({ users, currentUser, onUpdatePerms, onDelete, onResetPass })
         </table>
       </div>
 
-      {/* Vista Mobile (Se activa en pantallas chicas) */}
       <div className="md:hidden divide-y divide-gray-100">
         {users.map((u) => (
           <div key={u.id} className="p-6 bg-white space-y-6">
