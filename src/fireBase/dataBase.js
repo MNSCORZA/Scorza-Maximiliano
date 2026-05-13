@@ -1,7 +1,6 @@
 import { 
   collection, 
   getDocs, 
-  getFirestore, 
   query, 
   where, 
   getDoc, 
@@ -39,13 +38,14 @@ export const getItemId = async (id) => {
   return docSnap.exists() ? { ...docSnap.data(), id: docSnap.id } : null;
 };
 
-export const createOrder = async (buyerData, items, total) => {
+export const createOrder = async (buyerData, items, total, userId = null) => {
   const batch = writeBatch(db);
   const ordersCollection = collection(db, "orders");
   const newOrderRef = doc(ordersCollection);
 
   const order = {
     buyer: buyerData,
+    userId: userId,
     items: items.map(item => ({
       id: item.id,
       titulo: item.titulo,
@@ -53,6 +53,7 @@ export const createOrder = async (buyerData, items, total) => {
       cantidad: item.cantidad
     })),
     total: total,
+    status: "generada",
     date: serverTimestamp(),
   };
 
@@ -67,4 +68,10 @@ export const createOrder = async (buyerData, items, total) => {
 
   await batch.commit();
   return newOrderRef.id;
+};
+
+export const getOrdersByUserId = async (userId) => {
+  const q = query(collection(db, "orders"), where("userId", "==", userId));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
