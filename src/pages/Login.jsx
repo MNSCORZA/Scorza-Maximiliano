@@ -28,7 +28,7 @@ export const Login = () => {
           <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <LogIn className="text-indigo-600" size={32} />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Acceso Administrador</h2>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Acceso</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <div className="bg-red-50 text-red-600 text-xs font-bold p-4 rounded-xl">{error}</div>}
