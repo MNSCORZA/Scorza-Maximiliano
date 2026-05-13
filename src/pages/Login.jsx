@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router";
-import { LogIn, Mail, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { LogIn, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -17,31 +18,75 @@ export const Login = () => {
       await login(email, pass);
       navigate("/admin");
     } catch (err) {
-      setError("Credenciales incorrectas");
+      setError("Credenciales incorrectas o acceso denegado");
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-10 border border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 p-10 border border-slate-100">
+        
         <div className="text-center mb-10">
-          <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <LogIn className="text-indigo-600" size={32} />
+          <div className="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-200 rotate-3 hover:rotate-0 transition-transform duration-300">
+            <LogIn className="text-white" size={32} strokeWidth={2.5} />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Acceso</h2>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Acceso Administrador</h2>
+          <p className="text-slate-400 text-sm font-medium mt-2">Gestioná tu tienda "De Todo"</p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && <div className="bg-red-50 text-red-600 text-xs font-bold p-4 rounded-xl">{error}</div>}
-          <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input type="email" placeholder="Email" className="w-full bg-gray-50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:bg-white focus:border-indigo-600/20 transition-all" onChange={e => setEmail(e.target.value)} required />
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="bg-red-50 border border-red-100 text-red-600 text-[11px] font-black uppercase tracking-wider p-4 rounded-2xl text-center animate-shake">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">Email de acceso</label>
+            <div className="relative group">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={20} />
+              <input 
+                type="email" 
+                placeholder="nombre@detodo.com" 
+                className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-600/20 transition-all shadow-inner" 
+                onChange={e => setEmail(e.target.value)} 
+                required 
+              />
+            </div>
           </div>
-          <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input type="password" placeholder="Contraseña" className="w-full bg-gray-50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:bg-white focus:border-indigo-600/20 transition-all" onChange={e => setPass(e.target.value)} required />
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">Contraseña</label>
+            <div className="relative group">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={20} />
+              <input 
+                type={showPassword ? "text" : "password"} 
+                placeholder="••••••••" 
+                className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-12 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-600/20 transition-all shadow-inner" 
+                onChange={e => setPass(e.target.value)} 
+                required 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
-          <button className="w-full bg-gray-900 text-white font-black uppercase tracking-widest text-[11px] py-5 rounded-2xl hover:bg-indigo-600 transition-all">Entrar al Panel</button>
+
+          <button className="w-full bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-[11px] py-5 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3 group mt-4">
+            Entrar al Panel
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </form>
+
+        <div className="mt-8 text-center">
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
+                Seguridad Protegida por Firebase
+            </p>
+        </div>
       </div>
     </div>
   );
