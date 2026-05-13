@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { Search, ShoppingCart, Menu, X, ChevronRight, ChevronDown, LogIn, LogOut, Settings, User } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
