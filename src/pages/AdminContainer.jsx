@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../hooks/useAdmin';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../fireBase/config';
-import { doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { Lock } from 'lucide-react';
 
 import ProductForm from '../components/admin/ProductForm';
@@ -16,7 +16,7 @@ import UserModal from '../components/admin/UserModal';
 const AdminContainer = () => {
   const { user, userData, loading } = useAuth();
   const admin = useAdmin(user, userData, loading);
-  
+
   const [activeTab, setActiveTab] = useState('productos');
   const [showUserModal, setShowUserModal] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
@@ -36,7 +36,7 @@ const AdminContainer = () => {
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 min-h-screen bg-gray-50">
       <ConfirmModal {...confirmConfig} onClose={() => setConfirmConfig(p => ({...p, isOpen: false}))} />
-      
+
       <UserModal 
         isOpen={showUserModal} onClose={() => setShowUserModal(false)} 
         newUser={newUser} setNewUser={setNewUser} 
