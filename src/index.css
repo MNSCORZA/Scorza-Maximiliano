@@ -1,17 +1,9 @@
 @import "tailwindcss";
 
-
 @keyframes fade-in-up {
-  0% { 
-    opacity: 0; 
-    transform: translateY(20px); 
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
-
 
 @keyframes custom-ping {
   0% { transform: scale(1); opacity: 0.5; }
@@ -25,4 +17,11 @@
 
 .animate-custom-ping {
   animation: custom-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media print {
+  .no-print, nav, footer, header, .whatsapp-button, button, a { display: none !important; }
+  body, html { background: white !important; margin: 0; padding: 0; }
+  .shadow-2xl, .shadow-lg { box-shadow: none !important; }
+  .bg-gray-50, .bg-indigo-50 { background: white !important; border: 1px solid #e5e7eb !important; }
 }
