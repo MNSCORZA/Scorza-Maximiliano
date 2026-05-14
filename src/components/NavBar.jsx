@@ -40,34 +40,39 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
           <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
             {user ? (
               <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
+                <Link 
+                  to="/mi-cuenta" 
+                  onClick={() => setIsOpen(false)} 
+                  className="flex items-center justify-between group no-underline"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="bg-indigo-600 p-2 rounded-xl text-white">
+                    <div className="bg-indigo-600 p-2 rounded-xl text-white group-hover:scale-110 transition-transform">
                       <User size={20} />
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase text-indigo-600 leading-none">Hola,</p>
-                      <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
+                      <p className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{userData?.nombre || 'Usuario'}</p>
                     </div>
                   </div>
-                  {userData?.rol === 'admin' && (
+                  <ChevronRight size={18} className="text-gray-300 group-hover:text-indigo-600 transition-colors" />
+                </Link>
+
+                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                  {userData?.rol === 'admin' ? (
                     <Link 
                       to="/admin" 
                       onClick={() => setIsOpen(false)}
-                      className="p-2 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors"
+                      className="text-[11px] font-black uppercase tracking-tighter text-indigo-600 hover:underline flex items-center gap-1"
                     >
-                      <Settings size={18} />
+                      <Settings size={14} /> Panel Admin
                     </Link>
-                  )}
-                </div>
-                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
-                  {userData?.rol === 'admin' && (
+                  ) : (
                     <Link 
-                      to="/admin" 
+                      to="/mi-cuenta" 
                       onClick={() => setIsOpen(false)}
                       className="text-[11px] font-black uppercase tracking-tighter text-indigo-600 hover:underline"
                     >
-                      Ir al Panel Admin
+                      Mi Perfil
                     </Link>
                   )}
                   <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-600 transition-colors ml-auto">
@@ -194,14 +199,14 @@ export const NavBar = () => {
                 {user ? (
                   <div className="flex items-center gap-3 bg-gray-50 p-1 pr-4 rounded-full border border-gray-100">
                     <Link 
-                      to={userData?.rol === 'admin' ? "/admin" : "/"} 
+                      to={userData?.rol === 'admin' ? "/admin" : "/mi-cuenta"} 
                       className="bg-indigo-600 p-2 rounded-full text-white hover:scale-105 transition-transform shadow-md"
                     >
                       {userData?.rol === 'admin' ? <Settings size={18} /> : <User size={18} />}
                     </Link>
                     <div className="leading-tight">
                       <p className="text-[9px] font-black uppercase text-indigo-600">Bienvenido</p>
-                      <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Maximiliano'}</p>
+                      <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
                     </div>
                     <button onClick={logout} className="ml-1 text-gray-400 hover:text-red-500 transition-colors">
                       <LogOut size={18} />
