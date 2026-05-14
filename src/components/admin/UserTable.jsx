@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mail, Trash2, Shield, User } from 'lucide-react';
-import { db } from '../fireBase/config';
+import { db } from '../../fireBase/config';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
 
