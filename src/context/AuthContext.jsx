@@ -45,13 +45,19 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, extraData) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
+    
+    // Al definir el rol aquí, ningún usuario externo puede ser admin al registrarse
     await setDoc(doc(db, "usuarios", uid), {
       nombre: extraData.nombre,
       email: email,
       rol: "cliente",
       fechaRegistro: new Date(),
+      codArea: "",
       telefono: "",
-      direccion: ""
+      direccion: "",
+      depto: "",
+      cp: "",
+      entreCalles: ""
     });
     return userCredential;
   };
