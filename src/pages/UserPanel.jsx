@@ -6,18 +6,37 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { User, MapPin, Package, Save, Edit2, Hash, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 
+const InputField = ({ label, icon: Icon, name, placeholder, value, onChange, disabled, colSpan = "col-span-2" }) => (
+    <div className={colSpan}>
+        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">
+            {label}
+        </label>
+        <div className="relative">
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+            <input 
+                disabled={disabled}
+                value={value}
+                onChange={onChange}
+                name={name}
+                placeholder={placeholder}
+                className="w-full bg-slate-50 border-2 border-transparent rounded-xl py-2.5 pl-9 pr-3 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-600/20 transition-all disabled:opacity-60"
+            />
+        </div>
+    </div>
+);
+
 const UserPanel = () => {
     const { userData, user } = useAuth();
     const [pedidos, setPedidos] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        codArea: userData?.codArea || "",
-        telefono: userData?.telefono || "",
-        direccion: userData?.direccion || "",
-        depto: userData?.depto || "",
-        cp: userData?.cp || "",
-        entreCalles: userData?.entreCalles || ""
+        codArea: "",
+        telefono: "",
+        direccion: "",
+        depto: "",
+        cp: "",
+        entreCalles: ""
     });
 
     useEffect(() => {
@@ -44,6 +63,13 @@ const UserPanel = () => {
         }
     }, [userData]);
 
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
@@ -55,24 +81,6 @@ const UserPanel = () => {
             toast.error("Error al guardar los cambios");
         }
     };
-
-    const InputField = ({ label, icon: Icon, name, placeholder, colSpan = "col-span-2" }) => (
-        <div className={colSpan}>
-            <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-2 mb-1 block">
-                {label}
-            </label>
-            <div className="relative">
-                <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
-                <input 
-                    disabled={!isEditing}
-                    value={formData[name]}
-                    onChange={e => setFormData({...formData, [name]: e.target.value})}
-                    placeholder={placeholder}
-                    className="w-full bg-slate-50 border-2 border-transparent rounded-xl py-2.5 pl-9 pr-3 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-600/20 transition-all disabled:opacity-60"
-                />
-            </div>
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-slate-50 py-12 px-4">
@@ -102,18 +110,18 @@ const UserPanel = () => {
 
                         <form onSubmit={handleUpdate} className="space-y-4">
                             <div className="grid grid-cols-2 gap-3">
-                                <InputField label="Cód. Área" icon={Hash} name="codArea" placeholder="011" colSpan="col-span-1" />
-                                <InputField label="Teléfono" icon={Hash} name="telefono" placeholder="1234-5678" colSpan="col-span-1" />
+                                <InputField label="Cód. Área" icon={Hash} name="codArea" placeholder="011" value={formData.codArea} onChange={handleChange} disabled={!isEditing} colSpan="col-span-1" />
+                                <InputField label="Teléfono" icon={Hash} name="telefono" placeholder="1234-5678" value={formData.telefono} onChange={handleChange} disabled={!isEditing} colSpan="col-span-1" />
                             </div>
                             
-                            <InputField label="Dirección" icon={MapPin} name="direccion" placeholder="Calle y Altura" colSpan="col-span-2" />
+                            <InputField label="Dirección" icon={MapPin} name="direccion" placeholder="Calle y Altura" value={formData.direccion} onChange={handleChange} disabled={!isEditing} colSpan="col-span-2" />
                             
                             <div className="grid grid-cols-2 gap-3">
-                                <InputField label="Piso/Depto" icon={Navigation} name="depto" placeholder="2° B" colSpan="col-span-1" />
-                                <InputField label="CP" icon={Hash} name="cp" placeholder="1425" colSpan="col-span-1" />
+                                <InputField label="Piso/Depto" icon={Navigation} name="depto" placeholder="2° B" value={formData.depto} onChange={handleChange} disabled={!isEditing} colSpan="col-span-1" />
+                                <InputField label="CP" icon={Hash} name="cp" placeholder="1425" value={formData.cp} onChange={handleChange} disabled={!isEditing} colSpan="col-span-1" />
                             </div>
 
-                            <InputField label="Entre Calles" icon={Navigation} name="entreCalles" placeholder="Tucumán y Lavalle" colSpan="col-span-2" />
+                            <InputField label="Entre Calles" icon={Navigation} name="entreCalles" placeholder="Tucumán y Lavalle" value={formData.entreCalles} onChange={handleChange} disabled={!isEditing} colSpan="col-span-2" />
 
                             {isEditing && (
                                 <div className="flex gap-2 pt-2">
