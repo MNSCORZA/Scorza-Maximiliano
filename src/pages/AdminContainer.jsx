@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../hooks/useAdmin';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../fireBase/config';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
-import { Lock } from 'lucide-react';
+import { Lock, Users, Briefcase, UserCheck } from 'lucide-react';
 
 import ProductForm from '../components/admin/ProductForm';
 import UserTable from '../components/admin/UserTable';
@@ -18,9 +18,18 @@ const AdminContainer = () => {
   const admin = useAdmin(user, userData, loading);
 
   const [activeTab, setActiveTab] = useState('productos');
+  // Nueva sub-pestaña para separar Clientes de Staff
+  const [userSubTab, setUserSubTab] = useState('clientes');
+  
   const [showUserModal, setShowUserModal] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
   const [newUser, setNewUser] = useState({ nombre: '', email: '', password: '', permisos: { isAdmin: false, ver: true, editar: false, borrar: false } });
+
+  // Filtrar usuarios según la sub-pestaña activa
+  const filteredUsers = admin.users?.filter(u => {
+    const isStaff = u.permisos?.isAdmin || u.rol === 'empleado' || u.rol === 'admin';
+    return userSubTab === 'staff' ? isStaff : !isStaff;
+  }) || [];
 
   const handleEdit = (p) => {
     admin.setFormData(p);
@@ -60,7 +69,12 @@ const AdminContainer = () => {
         onSubmit={async (e) => {
           e.preventDefault();
           const cred = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
-          await setDoc(doc(db, "usuarios", cred.user.uid), { nombre: newUser.nombre, email: newUser.email, permisos: newUser.permisos });
+          await setDoc(doc(db, "usuarios", cred.user.uid), { 
+            nombre: newUser.nombre, 
+            email: newUser.email, 
+            permisos: newUser.permisos,
+            rol: newUser.permisos.isAdmin ? "admin" : "empleado" // Aseguramos el rol al crear
+          });
           setShowUserModal(false);
           admin.refreshUsers();
         }} 
@@ -94,12 +108,51 @@ const AdminContainer = () => {
           </div>
         </>
       ) : (
-        <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-           <div className="p-8 flex justify-between items-center border-b">
-              <h2 className="font-black uppercase text-xs tracking-widest">Gestión de Personal</h2>
-              <button onClick={() => setShowUserModal(true)} className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase">Nuevo Usuario</button>
-           </div>
-           <UserTable users={admin.users} currentUser={user} onUpdatePerms={async (id, p, v) => { await updateDoc(doc(db, "usuarios", id), {[`permisos.${p}`]: v}); admin.refreshUsers(); }} />
+        <div className="space-y-6">
+          {/* Sub-navegación de Usuarios */}
+          <div className="flex bg-white p-2 rounded-2xl border border-gray-100 shadow-sm w-fit">
+            <button 
+              onClick={() => setUserSubTab('clientes')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${userSubTab === 'clientes' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400'}`}
+            >
+              <UserCheck size={14}/> Clientes
+            </button>
+            <button 
+              onClick={() => setUserSubTab('staff')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${userSubTab === 'staff' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400'}`}
+            >
+              <Briefcase size={14}/> Staff / Empleados
+            </button>
+          </div>
+
+          <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+             <div className="p-8 flex justify-between items-center border-b">
+                <div>
+                  <h2 className="font-black uppercase text-xs tracking-widest text-slate-900">
+                    {userSubTab === 'staff' ? 'Gestión de Personal' : 'Base de Clientes'}
+                  </h2>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">
+                    {filteredUsers.length} Usuarios encontrados
+                  </p>
+                </div>
+                {userSubTab === 'staff' && (
+                  <button onClick={() => setShowUserModal(true)} className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md shadow-indigo-100 hover:scale-105 transition-transform">
+                    Nuevo Usuario Staff
+                  </button>
+                )}
+             </div>
+             
+             {/* Le pasamos filteredUsers en lugar de admin.users */}
+             <UserTable 
+               users={filteredUsers} 
+               currentUser={user} 
+               isStaffView={userSubTab === 'staff'}
+               onUpdatePerms={async (id, p, v) => { 
+                 await updateDoc(doc(db, "usuarios", id), {[`permisos.${p}`]: v}); 
+                 admin.refreshUsers(); 
+               }} 
+             />
+          </div>
         </div>
       )}
     </div>
