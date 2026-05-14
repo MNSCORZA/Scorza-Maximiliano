@@ -108,14 +108,14 @@ const AdminContainer = () => {
           </div>
 
           <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-             <div className="p-8 flex justify-between items-center border-b">
+             <div className="p-6 md:p-8 flex justify-between items-center border-b border-gray-50">
                 <div>
                   <h2 className="font-black uppercase text-xs tracking-widest text-slate-900">{userSubTab === 'staff' ? 'Gestión de Personal' : 'Base de Clientes'}</h2>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">{filteredUsers.length} Usuarios</p>
                 </div>
                 {userSubTab === 'staff' && (
-                  <button onClick={() => setShowUserModal(true)} className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md shadow-indigo-100">
-                    Nuevo Staff
+                  <button onClick={() => setShowUserModal(true)} className="bg-indigo-600 text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-black text-[10px] uppercase tracking-widest">
+                    Nuevo
                   </button>
                 )}
              </div>
