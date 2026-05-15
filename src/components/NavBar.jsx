@@ -1,150 +1,209 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router';
-import { db } from "../fireBase/config";
-import { collection, query, where, limit, getDocs, startAfter, orderBy } from "firebase/firestore";
-import { Item } from './Item';
-import { Loader } from './Loader';
-import { Home, LayoutGrid, ChevronDown, Truck } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { createPortal } from 'react-dom';
+import { Link, useNavigate } from 'react-router';
+import { Search, ShoppingCart, Menu, X, ChevronRight, ChevronDown, LogIn, LogOut, Settings, User } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { getCategories } from '../fireBase/dataBase';
+import logoImg from '../assets/images/Logo.png';
 
-export const ItemListContainer = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [lastDoc, setLastDoc] = useState(null);
-  const [onlyFreeShipping, setOnlyFreeShipping] = useState(false);
-  const [sortOrder, setSortOrder] = useState("");
-  
-  const [searchParams] = useSearchParams();
-  // El NavBar manda la categoría por searchParams (?category=...)
-  const categoryFromQuery = searchParams.get("category"); 
-  const { categoryName: paramsCategory } = useParams();
-  
-  // Priorizamos la categoría que venga, ya sea por ruta o por query string
-  const currentCategory = categoryFromQuery || paramsCategory;
+const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSearch, categorias }) => {
+  const [showCategories, setShowCategories] = useState(false);
+  const { user, userData, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const fetchProducts = async (isInitial = true) => {
-    try {
-      isInitial ? setLoading(true) : setLoadingMore(true);
-      
-      let q = collection(db, "productos");
-      let constraints = [orderBy("titulo"), limit(8)];
+  const handleCategoryClick = (cat) => {
+    navigate(`/Catalogo?category=${cat}`);
+    setIsOpen(false);
+    window.scrollTo(0, 0);
+  };
 
-      // Si hay una categoría seleccionada en el NavBar, filtramos en Firebase
-      if (currentCategory) {
-        constraints.unshift(where("categoria", "==", currentCategory));
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className={`fixed inset-0 z-[9999] transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
+      <div 
+        className={`absolute inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
+        onClick={() => setIsOpen(false)}
+      />
+      <div className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between p-8 bg-white border-b border-gray-50">
+          <span className="font-black text-[10px] tracking-[0.3em] text-gray-400 uppercase">Menú Principal</span>
+          <button onClick={() => setIsOpen(false)} className="p-2 text-gray-900 bg-gray-100 rounded-xl hover:bg-red-50 hover:text-red-500 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-8 bg-white">
+          <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+            {user ? (
+              <div className="flex flex-col gap-4">
+                <Link to="/mi-cuenta" onClick={() => setIsOpen(false)} className="flex items-center justify-between group no-underline">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-2 rounded-xl text-white group-hover:scale-110 transition-transform">
+                      <User size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-blue-600 leading-none">Hola,</p>
+                      <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{userData?.nombre || 'Usuario'}</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
+                </Link>
+                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                  {userData?.rol === 'admin' ? (
+                    <Link to="/admin" onClick={() => setIsOpen(false)} className="text-[11px] font-black uppercase tracking-tighter text-blue-600 hover:underline flex items-center gap-1">
+                      <Settings size={14} /> Panel Admin
+                    </Link>
+                  ) : (
+                    <Link to="/mi-cuenta" onClick={() => setIsOpen(false)} className="text-[11px] font-black uppercase tracking-tighter text-blue-600 hover:underline">
+                      Mi Perfil
+                    </Link>
+                  )}
+                  <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-600 transition-colors ml-auto">
+                    <LogOut size={16} /> Cerrar Sesión
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-2 w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest">
+                <LogIn size={16} /> Ingresar
+              </Link>
+            )}
+          </div>
+
+          <form onSubmit={handleSearch} className="mb-10 relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2">
+              <Search className="text-gray-400" size={18} />
+            </div>
+            <input 
+              type="text" 
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="¿Qué estás buscando?" 
+              className="w-full bg-gray-100/50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-[12px] font-bold text-gray-700 outline-none focus:bg-white focus:border-blue-600/20 shadow-inner"
+            />
+          </form>
+
+          <nav className="flex flex-col gap-1">
+            <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center justify-between py-4 px-2 border-b border-gray-50">
+              <span className="text-xs font-black uppercase tracking-widest text-gray-900">Inicio</span>
+              <ChevronRight size={16} className="text-gray-300" />
+            </Link>
+            <div className="border-b border-gray-50">
+              <button onClick={() => setShowCategories(!showCategories)} className="w-full flex items-center justify-between py-4 px-2 group">
+                <span className="text-xs font-black uppercase tracking-widest text-gray-900">Productos</span>
+                <ChevronDown size={16} className={`text-gray-300 transition-transform ${showCategories ? 'rotate-180 text-blue-600' : ''}`} />
+              </button>
+              <div className={`overflow-hidden transition-all duration-300 ${showCategories ? 'max-h-[500px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
+                {categorias.map((cat) => (
+                  <button key={cat} onClick={() => handleCategoryClick(cat)} className="w-full text-left block py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-blue-600 transition-colors border-l-2 border-transparent hover:border-blue-600 ml-2">
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+export const NavBar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [categorias, setCategorias] = useState([]);
+  const { getCantidad } = useContext(CartContext);
+  const { user, userData, logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const uniqueCats = await getCategories();
+        setCategorias(uniqueCats);
+      } catch (error) {
+        console.error(error);
       }
-      
-      if (!isInitial && lastDoc) {
-        constraints.push(startAfter(lastDoc));
-      }
+    };
+    fetchCategorias();
+  }, []);
 
-      const querySnapshot = await getDocs(query(q, ...constraints));
-      const newProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
-      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setProducts(prev => isInitial ? newProducts : [...prev, ...newProducts]);
-    } catch (e) {
-      console.error("Error al traer productos:", e);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate(`/Catalogo?search=${searchValue}`);
+      setIsOpen(false);
     }
   };
 
-  // Este useEffect es CLAVE: se dispara cada vez que cambias de categoría en el menú
-  useEffect(() => {
-    fetchProducts(true);
-    window.scrollTo(0, 0); // Volvemos arriba al filtrar
-  }, [currentCategory]);
-
-  const filteredAndSortedProducts = useMemo(() => {
-    let result = [...products];
-    if (onlyFreeShipping) result = result.filter(p => p.envioGratis);
-    if (sortOrder === "asc") result.sort((a, b) => a.precio - b.precio);
-    else if (sortOrder === "desc") result.sort((a, b) => b.precio - a.precio);
-    return result;
-  }, [products, onlyFreeShipping, sortOrder]);
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader /></div>;
-
   return (
-    <section className="py-8 bg-[#f9f9f9] min-h-screen">
-      <div className="container mx-auto px-4">
-        
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-[11px] font-bold text-gray-500 mb-6 bg-white w-fit px-4 py-2.5 rounded-full shadow-sm border border-gray-100">
-          <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
-            <Home size={14} /> <span>INICIO</span>
-          </Link>
-          <span className="text-gray-300">/</span>
-          <Link to="/Catalogo" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
-             <LayoutGrid size={14} /> <span>CATÁLOGO</span>
-          </Link>
-          {currentCategory && (
-            <>
-              <span className="text-gray-300">/</span>
-              <span className="text-blue-600 uppercase tracking-wider">{currentCategory}</span>
-            </>
-          )}
-        </nav>
+    <>
+      <nav className={`sticky top-0 z-[50] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md py-2 shadow-md' : 'bg-white py-4'}`}>
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-6 shrink-0">
+              <button onClick={() => setIsOpen(true)} className="p-2 text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
+                <Menu size={24} />
+              </button>
+              <Link to="/" className="flex items-center group">
+                <img src={logoImg} alt="Logo" className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform" />
+              </Link>
+            </div>
 
-        {/* Header de Filtros */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div>
-            <h1 className="text-2xl font-black text-gray-900 uppercase">
-              {currentCategory || "Todos los Productos"}
-            </h1>
-            <p className="text-gray-400 text-[10px] font-bold uppercase mt-1 tracking-widest">
-              Mostrando {filteredAndSortedProducts.length} resultados
-            </p>
-          </div>
+            <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-xl relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <Search size={18} className="text-gray-400 group-focus-within:text-blue-600 transition-all" />
+              </div>
+              <input 
+                type="text" 
+                value={searchValue} 
+                onChange={(e) => setSearchValue(e.target.value)} 
+                placeholder="Busca productos..." 
+                className="w-full bg-gray-100/80 border-2 border-transparent px-12 py-2.5 rounded-2xl text-[13px] font-medium text-gray-700 outline-none focus:bg-white focus:border-blue-600/30 transition-all shadow-inner"
+              />
+            </form>
 
-          <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-            <select 
-              value={sortOrder} 
-              onChange={(e) => setSortOrder(e.target.value)} 
-              className="flex-1 lg:flex-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-[11px] font-black uppercase outline-none focus:border-blue-600/30"
-            >
-              <option value="">ORDENAR POR</option>
-              <option value="asc">Menor precio</option>
-              <option value="desc">Mayor precio</option>
-            </select>
-
-            <button 
-              onClick={() => setOnlyFreeShipping(!onlyFreeShipping)} 
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl border font-black text-[11px] transition-all ${onlyFreeShipping ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100' : 'bg-white border-gray-200 text-gray-500 hover:border-blue-600 hover:text-blue-600'}`}
-            >
-              <Truck size={16} /> ENVÍO GRATIS
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="hidden sm:flex items-center">
+                {user ? (
+                  <div className="flex items-center gap-3 bg-gray-50 p-1 pr-4 rounded-full border border-gray-100">
+                    <Link to={userData?.rol === 'admin' ? "/admin" : "/mi-cuenta"} className="bg-blue-600 p-2 rounded-full text-white hover:scale-105 transition-transform shadow-md">
+                      {userData?.rol === 'admin' ? <Settings size={18} /> : <User size={18} />}
+                    </Link>
+                    <div className="leading-tight">
+                      <p className="text-[9px] font-black uppercase text-blue-600">Hola,</p>
+                      <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
+                    </div>
+                    <button onClick={logout} className="ml-1 text-gray-400 hover:text-red-500 transition-colors">
+                      <LogOut size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <Link to="/login" className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
+                    <LogIn size={18} />
+                    <span>Ingresar</span>
+                  </Link>
+                )}
+              </div>
+              <Link to="/cart" className="relative p-2.5 text-gray-900 hover:bg-blue-50 rounded-xl transition-all group">
+                <ShoppingCart size={22} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" />
+                {getCantidad() > 0 && <span className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">{getCantidad()}</span>}
+              </Link>
+            </div>
           </div>
         </div>
-
-        {/* Grilla de Productos */}
-        {filteredAndSortedProducts.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredAndSortedProducts.map((p) => (
-              <Item key={p.id} item={p} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-            <p className="font-bold text-gray-400 uppercase text-xs">No hay productos en esta categoría</p>
-          </div>
-        )}
-
-        {/* Paginación - Botón Ver Más */}
-        {lastDoc && (
-          <div className="flex justify-center mt-12">
-            <button 
-              onClick={() => fetchProducts(false)}
-              disabled={loadingMore}
-              className="bg-white border-2 border-blue-600 text-blue-600 px-10 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2 shadow-md disabled:opacity-50"
-            >
-              {loadingMore ? 'Cargando...' : <>Ver más productos <ChevronDown size={16} /></>}
-            </button>
-          </div>
-        )}
-      </div>
-    </section>
+      </nav>
+      <MobileMenu isOpen={isOpen} setIsOpen={setIsOpen} searchValue={searchValue} setSearchValue={setSearchValue} handleSearch={handleSearch} categorias={categorias} />
+    </>
   );
 };
