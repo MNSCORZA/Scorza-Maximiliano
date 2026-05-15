@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { CartContext } from '../context/CartContext';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const ProductCard = ({ product, index }) => {
   const navigate = useNavigate();
@@ -11,11 +11,26 @@ const ProductCard = ({ product, index }) => {
   const isBestSeller = product.ventas > 50;
   const isOffer = product.precioAnterior > product.precio;
 
+  const handleQuickAdd = (e) => {
+    e.stopPropagation();
+    addToCart({ ...product, cantidad: 1 });
+    
+    // Sonido Pop
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+    audio.volume = 0.5;
+    audio.play();
+
+    toast.success('¡Agregado con éxito!', {
+      description: `1x ${product.titulo} ya está en tu carrito.`,
+      style: { borderRadius: '20px', padding: '16px' },
+    });
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
       onClick={() => hasStock && navigate(`/item/${product.id}`)}
-      className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col cursor-pointer"
+      className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col cursor-pointer hover:shadow-xl transition-shadow"
     >
       <div className="h-44 relative overflow-hidden mb-3">
         <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
@@ -24,11 +39,11 @@ const ProductCard = ({ product, index }) => {
         </div>
         <img src={product.imagenUrl} alt={product.titulo} className="w-full h-full object-contain" />
       </div>
-      <h3 className="text-[14px] font-medium h-9 line-clamp-2">{product.titulo}</h3>
+      <h3 className="text-[14px] font-medium h-9 line-clamp-2 uppercase tracking-tight">{product.titulo}</h3>
       <div className="mt-auto">
         {isOffer && <span className="text-xs text-gray-400 line-through">${product.precioAnterior}</span>}
         <div className="text-2xl font-black">${product.precio?.toLocaleString('es-AR')}</div>
-        <button onClick={(e) => { e.stopPropagation(); addToCart({...product, cantidad: 1}); }} disabled={!hasStock} className="w-full mt-3 py-2 bg-indigo-600 text-white rounded font-bold text-[11px]">
+        <button onClick={handleQuickAdd} disabled={!hasStock} className="w-full mt-3 py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] tracking-widest uppercase active:scale-95 transition-transform disabled:bg-gray-200">
           {hasStock ? 'AGREGAR AL CARRITO' : 'AGOTADO'}
         </button>
       </div>
