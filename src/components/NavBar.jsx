@@ -13,7 +13,7 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
   const navigate = useNavigate();
 
   const handleCategoryClick = (cat) => {
-    navigate(`/Catalogo?category=${cat}`);
+    navigate(`/Catalogo?category=${encodeURIComponent(cat)}`);
     setIsOpen(false);
     window.scrollTo(0, 0);
   };
