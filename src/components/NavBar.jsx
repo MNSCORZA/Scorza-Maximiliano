@@ -4,8 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { Search, ShoppingCart, Menu, X, ChevronRight, ChevronDown, LogIn, LogOut, Settings, User } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../fireBase/config';
-import { collection, getDocs } from 'firebase/firestore';
+import { getCategories } from '../fireBase/database';
 import logoImg from '../assets/images/Logo.png';
 
 const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSearch, categorias }) => {
@@ -46,15 +45,15 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
                   className="flex items-center justify-between group no-underline"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="bg-indigo-600 p-2 rounded-xl text-white group-hover:scale-110 transition-transform">
+                    <div className="bg-blue-600 p-2 rounded-xl text-white group-hover:scale-110 transition-transform">
                       <User size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase text-indigo-600 leading-none">Hola,</p>
-                      <p className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{userData?.nombre || 'Usuario'}</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 leading-none">Hola,</p>
+                      <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{userData?.nombre || 'Usuario'}</p>
                     </div>
                   </div>
-                  <ChevronRight size={18} className="text-gray-300 group-hover:text-indigo-600 transition-colors" />
+                  <ChevronRight size={18} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
                 </Link>
 
                 <div className="flex items-center justify-between border-t border-gray-200 pt-3">
@@ -62,7 +61,7 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
                     <Link 
                       to="/admin" 
                       onClick={() => setIsOpen(false)}
-                      className="text-[11px] font-black uppercase tracking-tighter text-indigo-600 hover:underline flex items-center gap-1"
+                      className="text-[11px] font-black uppercase tracking-tighter text-blue-600 hover:underline flex items-center gap-1"
                     >
                       <Settings size={14} /> Panel Admin
                     </Link>
@@ -70,7 +69,7 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
                     <Link 
                       to="/mi-cuenta" 
                       onClick={() => setIsOpen(false)}
-                      className="text-[11px] font-black uppercase tracking-tighter text-indigo-600 hover:underline"
+                      className="text-[11px] font-black uppercase tracking-tighter text-blue-600 hover:underline"
                     >
                       Mi Perfil
                     </Link>
@@ -96,7 +95,7 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               placeholder="¿Qué estás buscando?" 
-              className="w-full bg-gray-100/50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-[12px] font-bold text-gray-700 outline-none focus:bg-white focus:border-indigo-600/20 shadow-inner"
+              className="w-full bg-gray-100/50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-[12px] font-bold text-gray-700 outline-none focus:bg-white focus:border-blue-600/20 shadow-inner"
             />
           </form>
 
@@ -108,11 +107,11 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
             <div className="border-b border-gray-50">
               <button onClick={() => setShowCategories(!showCategories)} className="w-full flex items-center justify-between py-4 px-2 group">
                 <span className="text-xs font-black uppercase tracking-widest text-gray-900">Productos</span>
-                <ChevronDown size={16} className={`text-gray-300 transition-transform ${showCategories ? 'rotate-180 text-indigo-600' : ''}`} />
+                <ChevronDown size={16} className={`text-gray-300 transition-transform ${showCategories ? 'rotate-180 text-blue-600' : ''}`} />
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${showCategories ? 'max-h-[500px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
                 {categorias.map((cat) => (
-                  <button key={cat} onClick={() => handleCategoryClick(cat)} className="w-full text-left block py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-indigo-600 transition-colors border-l-2 border-transparent hover:border-indigo-600 ml-2">
+                  <button key={cat} onClick={() => handleCategoryClick(cat)} className="w-full text-left block py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-blue-600 transition-colors border-l-2 border-transparent hover:border-blue-600 ml-2">
                     {cat}
                   </button>
                 ))}
@@ -148,9 +147,7 @@ export const NavBar = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "productos"));
-        const cats = querySnapshot.docs.map(doc => doc.data().categoria);
-        const uniqueCats = [...new Set(cats)].filter(c => c);
+        const uniqueCats = await getCategories();
         setCategorias(uniqueCats);
       } catch (error) {
         console.error(error);
@@ -183,14 +180,14 @@ export const NavBar = () => {
 
             <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-xl relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <Search size={18} className="text-gray-400 group-focus-within:text-indigo-600 transition-all" />
+                <Search size={18} className="text-gray-400 group-focus-within:text-blue-600 transition-all" />
               </div>
               <input 
                 type="text" 
                 value={searchValue} 
                 onChange={(e) => setSearchValue(e.target.value)} 
                 placeholder="Busca productos, marcas y más..." 
-                className="w-full bg-gray-100/80 border-2 border-transparent px-12 py-2.5 rounded-2xl text-[13px] font-medium text-gray-700 outline-none focus:bg-white focus:border-indigo-600/30 transition-all shadow-inner"
+                className="w-full bg-gray-100/80 border-2 border-transparent px-12 py-2.5 rounded-2xl text-[13px] font-medium text-gray-700 outline-none focus:bg-white focus:border-blue-600/30 transition-all shadow-inner"
               />
             </form>
 
@@ -200,12 +197,12 @@ export const NavBar = () => {
                   <div className="flex items-center gap-3 bg-gray-50 p-1 pr-4 rounded-full border border-gray-100">
                     <Link 
                       to={userData?.rol === 'admin' ? "/admin" : "/mi-cuenta"} 
-                      className="bg-indigo-600 p-2 rounded-full text-white hover:scale-105 transition-transform shadow-md"
+                      className="bg-blue-600 p-2 rounded-full text-white hover:scale-105 transition-transform shadow-md"
                     >
                       {userData?.rol === 'admin' ? <Settings size={18} /> : <User size={18} />}
                     </Link>
                     <div className="leading-tight">
-                      <p className="text-[9px] font-black uppercase text-indigo-600">Bienvenido</p>
+                      <p className="text-[9px] font-black uppercase text-blue-600">Bienvenido</p>
                       <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
                     </div>
                     <button onClick={logout} className="ml-1 text-gray-400 hover:text-red-500 transition-colors">
@@ -213,16 +210,16 @@ export const NavBar = () => {
                     </button>
                   </div>
                 ) : (
-                  <Link to="/login" className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-sm">
+                  <Link to="/login" className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
                     <LogIn size={18} />
                     <span>Ingresar</span>
                   </Link>
                 )}
               </div>
 
-              <Link to="/cart" className="relative p-2.5 text-gray-900 hover:bg-indigo-50 rounded-xl transition-all group">
+              <Link to="/cart" className="relative p-2.5 text-gray-900 hover:bg-blue-50 rounded-xl transition-all group">
                 <ShoppingCart size={22} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" />
-                {getCantidad() > 0 && <span className="absolute top-1 right-1 bg-indigo-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">{getCantidad()}</span>}
+                {getCantidad() > 0 && <span className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">{getCantidad()}</span>}
               </Link>
             </div>
           </div>
