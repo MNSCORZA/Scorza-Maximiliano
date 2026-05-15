@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { NavBar } from "./components/NavBar";
-import ItemListContainer from "./components/ItemListContainer";
+import { ItemListContainer } from "./components/ItemListContainer";
 import { ItemDetailContainer } from "./components/ItemDetailContainer";
 import { Cart } from "./components/Cart";
 import { NotFound } from "./components/NotFound";
