@@ -11,15 +11,15 @@ export const Item = ({ item }) => {
     >
       <div className="relative aspect-square overflow-hidden bg-white flex items-center justify-center p-4">
         <img
-          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-          src={item?.imagenUrl || item?.img} // Soporta ambos nombres de propiedad
+          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 ease-in-out"
+          src={item?.imagenUrl || item?.img}
           alt={item?.titulo}
           loading="lazy"
         />
 
         {!hasStock && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <span className="bg-red-600 text-white px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+            <span className="bg-red-600 text-white px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
               Sin Stock
             </span>
           </div>
@@ -41,7 +41,7 @@ export const Item = ({ item }) => {
             </span>
           </div>
 
-          <div className={`p-2 rounded-lg transition-all ${hasStock ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : 'bg-gray-100 text-gray-400'}`}>
+          <div className={`p-2 rounded-lg transition-all duration-300 ${hasStock ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : 'bg-gray-100 text-gray-400'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
