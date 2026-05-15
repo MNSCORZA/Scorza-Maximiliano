@@ -7,13 +7,39 @@ import {
   doc, 
   serverTimestamp,
   writeBatch,
-  increment
+  increment,
+  limit,
+  startAfter,
+  orderBy
 } from "firebase/firestore";
 import { db } from "./config.js";
 
 export const getItems = async () => {
   const querySnapshot = await getDocs(collection(db, 'productos'));
   return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const getPaginatedItems = async (lastVisible = null, pageSize = 8) => {
+  let q;
+  if (lastVisible) {
+    q = query(
+      collection(db, "productos"),
+      orderBy("titulo"),
+      startAfter(lastVisible),
+      limit(pageSize)
+    );
+  } else {
+    q = query(
+      collection(db, "productos"),
+      orderBy("titulo"),
+      limit(pageSize)
+    );
+  }
+  const querySnapshot = await getDocs(q);
+  return {
+    products: querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })),
+    lastDoc: querySnapshot.docs[querySnapshot.docs.length - 1]
+  };
 };
 
 export const getItemsByCategory = async (categoria) => {
