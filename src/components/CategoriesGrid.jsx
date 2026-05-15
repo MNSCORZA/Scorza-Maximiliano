@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { getCategories } from '../fireBase/dataBase';
 import { LayoutGrid, ShoppingBag, Wrench, Laptop, Home } from 'lucide-react';
 
@@ -28,6 +29,7 @@ const categoryStyleMap = {
 export const CategoriesGrid = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -74,6 +76,7 @@ export const CategoriesGrid = () => {
             return (
               <div 
                 key={catName} 
+                onClick={() => navigate(`/Catalogo?categoria=${catName}`)}
                 className="group relative h-40 rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 <img 
