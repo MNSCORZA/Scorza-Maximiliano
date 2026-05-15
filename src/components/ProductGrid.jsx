@@ -42,15 +42,19 @@ const ProductGrid = () => {
   }, []);
 
   return (
-    <section className="py-12 bg-[#f9f9f9]">
-      <div className="container mx-auto px-6 flex items-center justify-between mb-8">
-        <h2 className="text-xl font-bold text-gray-800 uppercase tracking-tighter">Destacados</h2>
+    <section className="py-16 bg-gray-50">
+      <div className="container mx-auto px-4 max-w-7xl flex items-center justify-between mb-10">
+        <h2 className="text-xl font-extrabold text-gray-900 uppercase tracking-tight relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-12 after:h-1 after:bg-blue-600">
+          Productos <span className="text-blue-600">Destacados</span>
+        </h2>
         <Link to="/Catalogo">
-          <button className="text-blue-600 text-xs font-bold hover:underline uppercase cursor-pointer">Ver todos</button>
+          <button className="text-blue-600 text-xs font-black hover:text-blue-800 uppercase tracking-wider cursor-pointer transition-colors border-b-2 border-transparent hover:border-blue-800 pb-0.5">
+            Ver todo el catálogo →
+          </button>
         </Link>
       </div>
 
-      <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="container mx-auto px-4 max-w-7xl grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading
           ? Array.from({ length: 8 }).map((_, index) => (
               <ProductSkeleton key={index} />
@@ -62,13 +66,13 @@ const ProductGrid = () => {
       </div>
 
       {lastDoc && !loading && (
-        <div className="flex justify-center mt-12">
+        <div className="flex justify-center mt-14">
           <button 
             onClick={loadMore}
             disabled={loadingMore}
-            className="bg-white border-2 border-blue-600 text-blue-600 px-10 py-2.5 rounded-md font-bold text-sm hover:bg-blue-600 hover:text-white transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+            className="bg-white border border-gray-300 text-gray-700 px-12 py-3 rounded-xl font-bold text-xs hover:border-blue-600 hover:text-blue-600 transition-all duration-300 shadow-sm hover:shadow active:scale-95 disabled:opacity-50 cursor-pointer uppercase tracking-wider"
           >
-            {loadingMore ? 'CARGANDO...' : 'MOSTRAR MÁS'}
+            {loadingMore ? 'Cargando productos...' : 'Mostrar más artículos'}
           </button>
         </div>
       )}
