@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPaginatedItems } from '../fireBase/database'; // Ajustá la ruta si es necesario
+import { getPaginatedItems } from '../fireBase/dataBase';
 import { Link } from 'react-router';
 import { ProductSkeleton } from './ProductSkeleton';
 import ProductCard from './ProductCard';
