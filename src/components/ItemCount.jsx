@@ -9,18 +9,27 @@ export const ItemCount = ({ item }) => {
 
   const handleSuma = () => setCount(count + 1);
   const handleResta = () => count > 1 && setCount(count - 1);
-  
+
   const handleAddToCart = () => {
     addToCart({ ...item, cantidad: count });
-    toast.success(`${item.nombre || item.titulo} agregado`, {
-      description: `Sumaste ${count} unidades al carrito.`,
-      duration: 2500,
+
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+    audio.volume = 0.5;
+    audio.play();
+
+    toast.success('¡Producto agregado!', {
+      description: `${count}x ${item.titulo || item.nombre} ya está en tu carrito.`,
+      duration: 3000,
+      style: {
+        borderRadius: '20px',
+        padding: '16px',
+        border: '1px solid #e5e7eb'
+      }
     });
   };
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {/* Selector de cantidad con estilo moderno */}
       <div className="flex items-center justify-between bg-white rounded-2xl p-2 border border-gray-200 shadow-sm">
         <button
           onClick={handleResta}
@@ -41,7 +50,6 @@ export const ItemCount = ({ item }) => {
         </button>
       </div>
 
-      {/* Botón de compra corregido y con efectos */}
       <button
         onClick={handleAddToCart}
         className="group relative w-full bg-indigo-600 text-white font-black py-5 px-8 rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all duration-300 overflow-hidden"
@@ -50,8 +58,6 @@ export const ItemCount = ({ item }) => {
           <ShoppingCart size={20} strokeWidth={2.5} className="group-hover:animate-bounce" />
           <span className="uppercase tracking-[0.1em] text-sm">Agregar al carrito</span>
         </div>
-        
-        {/* Efecto de brillo visual */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
       </button>
     </div>
