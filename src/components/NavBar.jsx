@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { Search, ShoppingCart, Menu, X, ChevronRight, ChevronDown, LogIn, LogOut, Settings, User } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { getCategories } from '../fireBase/database';
+import { getCategories } from '../fireBase/dataBase';
 import logoImg from '../assets/images/Logo.png';
 
 const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSearch, categorias }) => {
