@@ -46,9 +46,9 @@ export const CategoriesGrid = () => {
     fetchCategories();
   }, []);
 
-  const handleCategoryClick = (catName) => {
-    const cleanName = catName.toLowerCase().trim();
-    navigate(`/Catalogo?categoria=${cleanName}`);
+  const handleCategoryClick = (cat) => {
+    navigate(`/Catalogo?category=${encodeURIComponent(cat)}`);
+    window.scrollTo(0, 0);
   };
 
   if (loading) {
