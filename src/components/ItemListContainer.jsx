@@ -1,66 +1,73 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router';
+import { Link } from 'react-router';
 import { db } from "../fireBase/config";
-import { collection, query, where, limit, getDocs, startAfter, orderBy } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { Item } from './Item';
 import { Loader } from './Loader';
-import { Home, LayoutGrid, ChevronDown, Truck } from 'lucide-react';
+import { Home, LayoutGrid, Truck } from 'lucide-react';
 
 export const ItemListContainer = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [lastDoc, setLastDoc] = useState(null);
   const [onlyFreeShipping, setOnlyFreeShipping] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
-
-  const [searchParams] = useSearchParams();
-  const { categoryName: paramsCategory } = useParams();
-  
-  const categoryName = searchParams.get("category") || paramsCategory;
-  const searchQuery = searchParams.get("search");
-
-  const fetchProducts = async (isInitial = true) => {
-    try {
-      isInitial ? setLoading(true) : setLoadingMore(true);
-
-      let q = collection(db, "items");
-      let constraints = [orderBy("nombre"), limit(8)];
-
-      if (categoryName) {
-        constraints.unshift(where("categoria", "==", categoryName));
-      }
-
-      if (!isInitial && lastDoc) {
-        constraints.push(startAfter(lastDoc));
-      }
-
-      const querySnapshot = await getDocs(query(q, ...constraints));
-      const newProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setProducts(prev => isInitial ? newProducts : [...prev, ...newProducts]);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
+  const [urlParams, setUrlParams] = useState({ category: null, search: null });
 
   useEffect(() => {
-    fetchProducts(true);
-  }, [categoryName]);
+    const handleLocationChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setUrlParams({
+        category: params.get("category"),
+        search: params.get("search")
+      });
+    };
+
+    handleLocationChange();
+
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, [window.location.search]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const q = query(collection(db, "productos"), orderBy("titulo"));
+        const querySnapshot = await getDocs(q);
+        const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProducts(docs);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredAndSortedProducts = useMemo(() => {
     let result = [...products];
 
-    if (searchQuery) {
-      const cleanSearch = searchQuery.toLowerCase().trim();
+    const cleanText = (text) => {
+      if (!text) return "";
+      return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    };
+
+    if (urlParams.category) {
+      const cleanCategoryTarget = cleanText(urlParams.category);
+      result = result.filter(p => cleanText(p.categoria) === cleanCategoryTarget);
+    }
+
+    if (urlParams.search) {
+      const cleanSearchTarget = cleanText(urlParams.search);
       result = result.filter(p => 
-        p.nombre?.toLowerCase().includes(cleanSearch) || 
-        p.descripcion?.toLowerCase().includes(cleanSearch) ||
-        p.categoria?.toLowerCase().includes(cleanSearch)
+        cleanText(p.titulo).includes(cleanSearchTarget) || 
+        cleanText(p.descripcion).includes(cleanSearchTarget)
       );
     }
 
@@ -75,7 +82,7 @@ export const ItemListContainer = () => {
     }
 
     return result;
-  }, [products, searchQuery, onlyFreeShipping, sortOrder]);
+  }, [products, urlParams, onlyFreeShipping, sortOrder]);
 
   if (loading) return <Loader />;
 
@@ -95,9 +102,11 @@ export const ItemListContainer = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex flex-col">
             <h1 className="text-2xl font-black text-gray-900 uppercase leading-none">
-              {categoryName || (searchQuery ? `Búsqueda: ${searchQuery}` : "Catálogo")}
+              {urlParams.category || (urlParams.search ? `Búsqueda: ${urlParams.search}` : "Catálogo")}
             </h1>
-            <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">{filteredAndSortedProducts.length} productos</span>
+            <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">
+              {filteredAndSortedProducts.length} {filteredAndSortedProducts.length === 1 ? "producto" : "productos"}
+            </span>
           </div>
           <div className="flex flex-wrap gap-3 w-full lg:w-auto">
             <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="flex-1 lg:flex-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-[11px] font-black uppercase outline-none focus:border-blue-600/30">
@@ -126,14 +135,6 @@ export const ItemListContainer = () => {
             {filteredAndSortedProducts.map((p) => (
               <Item key={p.id} item={p} />
             ))}
-          </div>
-        )}
-
-        {lastDoc && !searchQuery && (
-          <div className="flex justify-center mt-12">
-            <button onClick={() => fetchProducts(false)} disabled={loadingMore} className="bg-white border-2 border-blue-600 text-blue-600 px-10 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2 shadow-md disabled:opacity-50">
-              {loadingMore ? 'Cargando...' : <>Ver más productos <ChevronDown size={16} /></>}
-            </button>
           </div>
         )}
       </div>
