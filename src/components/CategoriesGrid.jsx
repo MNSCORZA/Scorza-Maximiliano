@@ -98,7 +98,7 @@ export const CategoriesGrid = () => {
     return (
       <div className="container mx-auto px-4 max-w-7xl py-12">
         <div className="h-6 w-48 bg-gray-200 animate-pulse rounded mb-8"></div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((n) => (
             <div key={n} className="h-40 bg-gray-100 animate-pulse rounded-xl"></div>
           ))}
