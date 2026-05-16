@@ -13,6 +13,7 @@ import ProductTable from '../components/admin/ProductTable';
 import ConfirmModal from '../components/admin/ConfirmModal';
 import UserModal from '../components/admin/UserModal';
 import OrderTable from '../components/admin/OrderTable';
+import { AdminBanners } from '../components/admin/AdminBanners';
 
 const AdminContainer = () => {
   const { user, userData, loading } = useAuth();
@@ -86,7 +87,7 @@ const AdminContainer = () => {
         }} 
       />
       <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
-        {['productos', 'pedidos', 'usuarios'].map(tab => (
+        {['productos', 'pedidos', 'usuarios', 'banners'].map(tab => (
           (tab !== 'usuarios' || userData.permisos.isAdmin) && (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-gray-400 border'}`}>
               {tab}
@@ -139,6 +140,7 @@ const AdminContainer = () => {
           </div>
         </div>
       )}
+      {activeTab === 'banners' && <AdminBanners />}
     </div>
   );
 };
