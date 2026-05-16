@@ -1,4 +1,4 @@
-Import React from 'react';
+import React from 'react';
 import { Banner } from './Banner';
 import PromoBanner from './PromoBanner';
 import Hero from './Hero';
