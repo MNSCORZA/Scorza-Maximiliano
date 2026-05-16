@@ -22,11 +22,15 @@ const Hero = () => {
   return (
     <section className="relative bg-black h-[350px] md:h-[480px] flex items-center overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
-      <img 
-        src={hero?.imageUrl || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000"} 
-        alt="Hero" 
-        className="absolute inset-0 w-full h-full object-cover opacity-60"
-      />
+      
+      {hero?.imageUrl && (
+        <img 
+          src={hero.imageUrl} 
+          alt="Hero" 
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        />
+      )}
+      
       <div className="container mx-auto px-6 relative z-20 text-white">
         <h1 className="text-3xl md:text-5xl font-bold max-w-xl leading-[1.1] mb-6">
           {hero?.title ? (
