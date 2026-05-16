@@ -5,6 +5,7 @@ import {
   where, 
   getDoc, 
   doc, 
+  setDoc,
   serverTimestamp,
   writeBatch,
   increment,
@@ -100,4 +101,15 @@ export const getOrdersByUserId = async (userId) => {
   const q = query(collection(db, "orders"), where("userId", "==", userId));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const getBannerSettings = async (bannerId) => {
+  const docRef = doc(db, "banners", bannerId);
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? docSnap.data() : null;
+};
+
+export const updateBannerSettings = async (bannerId, data) => {
+  const docRef = doc(db, "banners", bannerId);
+  await setDoc(docRef, data, { merge: true });
 };
