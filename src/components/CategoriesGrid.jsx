@@ -46,6 +46,11 @@ export const CategoriesGrid = () => {
     fetchCategories();
   }, []);
 
+  const handleCategoryClick = (catName) => {
+    const cleanName = catName.toLowerCase().trim();
+    navigate(`/Catalogo?categoria=${cleanName}`);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 max-w-7xl py-12">
@@ -76,7 +81,7 @@ export const CategoriesGrid = () => {
             return (
               <div 
                 key={catName} 
-                onClick={() => navigate(`/Catalogo?categoria=${catName}`)}
+                onClick={() => handleCategoryClick(catName)}
                 className="group relative h-40 rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 <img 
