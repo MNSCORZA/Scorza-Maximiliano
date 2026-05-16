@@ -28,6 +28,10 @@ const categoryStyleMap = {
     image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=500&auto=format&fit=crop&q=60',
     icon: <Compass className="text-white" size={20} />
   },
+  juegos: {
+    image: 'https://images.unsplash.com/photo-1539627831859-a911cf04d3cd?w=500&auto=format&fit=crop&q=60',
+    icon: <Bike className="text-white" size={20} />
+  },
   juguetes: {
     image: 'https://images.unsplash.com/photo-1539627831859-a911cf04d3cd?w=500&auto=format&fit=crop&q=60',
     icon: <Bike className="text-white" size={20} />
