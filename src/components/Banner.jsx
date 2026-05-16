@@ -65,7 +65,7 @@ export const Banner = () => {
           100% { transform: translateX(-25%); }
         }
         .animate-marquee {
-          animation: marquee 25s linear infinite;
+          animation: marquee 12s linear infinite;
         }
       `}} />
     </div>
