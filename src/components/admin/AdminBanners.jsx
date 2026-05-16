@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getBannerSettings, updateBannerSettings } from '../../fireBase/dataBase';
-import { Save, Loader2, Image, Type, Link2, CheckCircle } from 'lucide-react';
+import { Save, Loader2, Image, Type, Link2, CheckCircle, X } from 'lucide-react';
 
 export const AdminBanners = () => {
   const [loading, setLoading] = useState(true);
@@ -150,17 +150,25 @@ export const AdminBanners = () => {
           </div>
 
           <div className="space-y-1 md:col-span-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">URL de la Imagen de Fondo</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase">URL de la Imagen de Fondo (Opcional)</label>
             <div className="relative">
               <Image className="absolute left-3 top-3 text-gray-400" size={16} />
               <input 
                 type="text" 
                 value={hero.imageUrl} 
                 onChange={(e) => setHero({ ...hero, imageUrl: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-xs outline-none focus:border-indigo-500"
-                placeholder="https://images.unsplash.com/..."
-                required
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-2 text-xs outline-none focus:border-indigo-500"
+                placeholder="https://images.unsplash.com/... (Dejar vacío para fondo negro)"
               />
+              {hero.imageUrl && (
+                <button 
+                  type="button" 
+                  onClick={() => setHero({ ...hero, imageUrl: '' })}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
           </div>
 
