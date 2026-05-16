@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { getBannerSettings } from '../fireBase/dataBase';
 
-export const FeaturesAndBrands = ({ productos }) => {
+export const FeaturesAndBrands = () => {
   const navigate = useNavigate();
   const [settings, setSettings] = useState(null);
   const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
@@ -47,21 +47,12 @@ export const FeaturesAndBrands = ({ productos }) => {
     return () => clearInterval(timer);
   }, [settings]);
 
-  const MARCAS_VALIDAS = [
+  const brands = [
     { name: 'Osram', slug: 'osram' },
     { name: 'Bosch', slug: 'bosch' },
     { name: 'Philips', slug: 'philips' },
     { name: 'X-28', slug: 'x-28' },
   ];
-
-  const marcasDinamicas = MARCAS_VALIDAS.filter((marca) => {
-    return productos?.some((prod) => {
-      const titulo = prod?.titulo?.toLowerCase() || '';
-      const categoria = prod?.categoria?.toLowerCase() || '';
-      const palabraClave = marca.slug.toLowerCase();
-      return prod.stock > 0 && (titulo.includes(palabraClave) || categoria.includes(palabraClave));
-    });
-  });
 
   const handleBrandClick = (slug) => {
     navigate(`/Catalogo?marca=${slug}`);
@@ -142,30 +133,28 @@ export const FeaturesAndBrands = ({ productos }) => {
           </div>
         )}
 
-        {marcasDinamicas.length > 0 && (
-          <div className="pt-4">
-            <div className="text-center max-w-xl mx-auto mb-8">
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
-              <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Trabajamos con las mejores marcas</h4>
-            </div>
-
-            <div className="flex lg:grid lg:grid-cols-4 gap-4 items-center overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-none opacity-80 hover:opacity-90 transition-opacity duration-300">
-              {marcasDinamicas.map((brand, i) => (
-                <motion.div 
-                  key={i}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleBrandClick(brand.slug)}
-                  className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] lg:w-full h-20 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer snap-center shrink-0 shadow-sm hover:shadow-md hover:border-blue-200"
-                >
-                  <span className="font-black text-gray-400 tracking-widest text-sm uppercase">
-                    {brand.name}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+        <div className="pt-4">
+          <div className="text-center max-w-xl mx-auto mb-8">
+            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
+            <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Trabajamos con las mejores marcas</h4>
           </div>
-        )}
+
+          <div className="flex lg:grid lg:grid-cols-4 gap-4 items-center overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-none opacity-80 hover:opacity-90 transition-opacity duration-300">
+            {brands.map((brand, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleBrandClick(brand.slug)}
+                className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] lg:w-full h-20 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer snap-center shrink-0 shadow-sm hover:shadow-md hover:border-blue-200"
+              >
+                <span className="font-black text-gray-400 tracking-widest text-sm uppercase">
+                  {brand.name}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </section>
