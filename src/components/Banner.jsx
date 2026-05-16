@@ -1,23 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Sparkles, Truck, Flame } from 'lucide-react';
+import { getBannerSettings } from '../fireBase/dataBase';
 
 export const Banner = () => {
+  const [dbText, setDbText] = useState(null);
+
+  useEffect(() => {
+    const fetchPromo = async () => {
+      try {
+        const data = await getBannerSettings('promo');
+        if (data && data.active && data.text) {
+          setDbText(data.text);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchPromo();
+  }, []);
+
   const bannerText = (
     <div className="flex items-center gap-8 px-4">
-      <span className="flex items-center gap-2">
-        <Flame size={14} className="text-orange-400 fill-orange-400 shrink-0" />
-        ¡Precios increíbles con ofertas exclusivas de hasta 50% OFF!
-      </span>
-      <span className="text-blue-300">•</span>
-      <span className="flex items-center gap-2">
-        <Truck size={14} className="text-blue-400 shrink-0" />
-        Envío rápido y garantizado a todo Laferrere y alrededores
-      </span>
-      <span className="text-blue-300">•</span>
-      <span className="flex items-center gap-2">
-        <Sparkles size={14} className="text-yellow-400 fill-yellow-400 shrink-0" />
-        ¡Aprovechá estas oportunidades únicas por tiempo limitado!
-      </span>
+      {dbText ? (
+        <span className="flex items-center gap-2">
+          <Flame size={14} className="text-orange-400 fill-orange-400 shrink-0" />
+          {dbText}
+        </span>
+      ) : (
+        <>
+          <span className="flex items-center gap-2">
+            <Flame size={14} className="text-orange-400 fill-orange-400 shrink-0" />
+            ¡Precios increíbles con ofertas exclusivas de hasta 50% OFF!
+          </span>
+          <span className="text-blue-300">•</span>
+          <span className="flex items-center gap-2">
+            <Truck size={14} className="text-blue-400 shrink-0" />
+            Envío rápido y garantizado a todo Laferrere y alrededores
+          </span>
+          <span className="text-blue-300">•</span>
+          <span className="flex items-center gap-2">
+            <Sparkles size={14} className="text-yellow-400 fill-yellow-400 shrink-0" />
+            ¡Aprovechá estas oportunidades únicas por tiempo limitado!
+          </span>
+        </>
+      )}
       <span className="text-blue-300">•</span>
     </div>
   );
