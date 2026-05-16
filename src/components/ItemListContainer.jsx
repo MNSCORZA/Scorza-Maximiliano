@@ -143,8 +143,8 @@ export const ItemListContainer = () => {
         ) : (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {displayedProducts.map((p) => (
-                <Item key={p.id} item={p} />
+              {displayedProducts.map((p, index) => (
+                <Item key={p.id} item={p} index={index} />
               ))}
             </div>
 
