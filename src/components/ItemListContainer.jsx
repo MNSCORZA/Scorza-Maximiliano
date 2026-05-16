@@ -12,6 +12,7 @@ export const ItemListContainer = () => {
   const [onlyFreeShipping, setOnlyFreeShipping] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
   const [urlParams, setUrlParams] = useState({ category: null, search: null });
+  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -20,6 +21,7 @@ export const ItemListContainer = () => {
         category: params.get("category"),
         search: params.get("search")
       });
+      setVisibleCount(8);
     };
 
     handleLocationChange();
@@ -84,6 +86,14 @@ export const ItemListContainer = () => {
     return result;
   }, [products, urlParams, onlyFreeShipping, sortOrder]);
 
+  const displayedProducts = useMemo(() => {
+    return filteredAndSortedProducts.slice(0, visibleCount);
+  }, [filteredAndSortedProducts, visibleCount]);
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 8);
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -131,11 +141,24 @@ export const ItemListContainer = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredAndSortedProducts.map((p) => (
-              <Item key={p.id} item={p} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {displayedProducts.map((p) => (
+                <Item key={p.id} item={p} />
+              ))}
+            </div>
+
+            {filteredAndSortedProducts.length > visibleCount && (
+              <div className="flex justify-center mt-12">
+                <button 
+                  onClick={handleLoadMore} 
+                  className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-8 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                >
+                  Ver más productos
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
