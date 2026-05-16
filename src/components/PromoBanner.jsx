@@ -8,7 +8,7 @@ const PromoBanner = () => {
   useEffect(() => {
     const fetchPromo = async () => {
       try {
-        const data = await getBannerSettings('promo');
+        const data = await getBannerSettings('promo_static');
         if (data) {
           setPromo(data);
         }
@@ -19,17 +19,18 @@ const PromoBanner = () => {
     fetchPromo();
   }, []);
 
-  if (promo && !promo.active) return null;
+  // Si en el panel se desmarca el checkbox, no se dibuja nada en pantalla
+  if (!promo || !promo.active) return null;
 
   const content = (
     <div className="bg-blue-50 border-b border-blue-100 py-2 text-center relative z-40">
       <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-900">
-        ⚡ {promo?.text || "Mejores promos ¡No te las pierdas!"}
+        ⚡ {promo.text}
       </p>
     </div>
   );
 
-  return promo?.link ? (
+  return promo.link ? (
     <Link to={promo.link} className="block hover:opacity-95 transition-opacity">
       {content}
     </Link>
