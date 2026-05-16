@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getBannerSettings, updateBannerSettings } from '../../fireBase/dataBase';
-import { Save, Loader2, Image, Type, Link2 } from 'lucide-react';
+import { Save, Loader2, Image, Type, Link2, CheckCircle } from 'lucide-react';
 
 export const AdminBanners = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [promo, setPromo] = useState({ text: '', link: '', active: true });
   const [hero, setHero] = useState({ title: '', subtitle: '', imageUrl: '', buttonText: '', link: '' });
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   useEffect(() => {
     const loadBanners = async () => {
@@ -24,12 +25,19 @@ export const AdminBanners = () => {
     loadBanners();
   }, []);
 
+  const triggerToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => {
+      setToast({ show: false, message: '' });
+    }, 3000);
+  };
+
   const handleSavePromo = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
       await updateBannerSettings('promo', promo);
-      alert('¡PromoBanner actualizado con éxito!');
+      triggerToast('PromoBanner actualizado con éxito');
     } catch (error) {
       console.error(error);
     } finally {
@@ -42,7 +50,7 @@ export const AdminBanners = () => {
     try {
       setSaving(true);
       await updateBannerSettings('hero', hero);
-      alert('¡Banner Principal actualizado con éxito!');
+      triggerToast('Banner Principal actualizado con éxito');
     } catch (error) {
       console.error(error);
     } finally {
@@ -59,7 +67,14 @@ export const AdminBanners = () => {
   }
 
   return (
-    <div className="space-y-8 p-6 max-w-4xl mx-auto">
+    <div className="space-y-8 p-6 max-w-4xl mx-auto relative">
+      {toast.show && (
+        <div className="fixed bottom-5 right-5 bg-gray-900 border border-gray-800 text-white px-5 py-3.5 rounded-2xl flex items-center gap-3 shadow-2xl z-50 animate-slide-in">
+          <CheckCircle size={18} className="text-emerald-400 shrink-0" />
+          <span className="text-xs font-black uppercase tracking-wider">{toast.message}</span>
+        </div>
+      )}
+
       <form onSubmit={handleSavePromo} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider">Editar Barra de Anuncios (PromoBanner)</h2>
@@ -179,6 +194,16 @@ export const AdminBanners = () => {
           <Save size={14} /> {saving ? 'Guardando...' : 'Guardar Hero'}
         </button>
       </form>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes slideIn {
+          0% { transform: translateY(20px) scale(0.95); opacity: 0; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}} />
     </div>
   );
 };
