@@ -84,7 +84,12 @@ export const CategoriesGrid = () => {
   };
 
   const getStylesForCategory = (catName) => {
-    const clean = catName.toLowerCase().trim();
+    const clean = catName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+      
     const key = Object.keys(categoryStyleMap).find(k => clean.includes(k));
     return key ? categoryStyleMap[key] : categoryStyleMap.default;
   };
