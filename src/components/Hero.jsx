@@ -4,7 +4,7 @@ import { getBannerSettings } from '../fireBase/dataBase';
 
 const Hero = () => {
   const [hero, setHero] = useState(null);
-  const [loading, setLoading] = useState(true); // <-- Estado para controlar la carga inicial
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchHero = async () => {
@@ -17,26 +17,33 @@ const Hero = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // <-- Apagamos el cargador cuando Firebase responda
+        setLoading(false);
       }
     };
     fetchHero();
   }, []);
 
-  // Mientras carga la base de datos, mostramos un esqueleto del mismo tamaño para evitar el parpadeo
+  // SKELETON VISUAL PREMIUM PARA EL HERO
   if (loading) {
     return (
-      <div className="w-full h-[350px] md:h-[480px] bg-gray-950 flex items-center justify-center relative overflow-hidden">
-        {/* Efecto de luz de carga sutil */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 animate-pulse" />
-        <span className="relative z-10 text-gray-500 font-bold text-xs uppercase tracking-widest animate-pulse">
-          Cargando banner principal...
-        </span>
+      <div className="w-full h-[350px] md:h-[480px] bg-neutral-950 flex items-center relative overflow-hidden">
+        {/* Efecto de pulso de fondo */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 animate-pulse opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
+        
+        {/* Simulación del contenido */}
+        <div className="container mx-auto px-6 relative z-20 space-y-4 animate-pulse">
+          {/* Línea 1 del título */}
+          <div className="h-8 md:h-12 bg-neutral-800 rounded-lg w-3/4 max-w-sm" />
+          {/* Línea 2 del título (Subtítulo destacado) */}
+          <div className="h-8 md:h-12 bg-blue-900/40 rounded-lg w-1/2 max-w-xs" />
+          {/* Simulación del botón */}
+          <div className="h-12 bg-neutral-800 rounded-md w-52 pt-2" />
+        </div>
       </div>
     );
   }
 
-  // Si terminó de cargar pero por alguna razón no hay datos o el banner está inactivo, no renderizamos nada
   if (!hero) return null;
 
   return (
@@ -62,7 +69,7 @@ const Hero = () => {
         </h1>
         
         <Link to={hero.link || "/Catalogo"}>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3.5 rounded-md font-semibold text-sm transition-all shadow-lg active:scale-95 cursor-pointer">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3.5 rounded-md font-semibold text-sm transition-all shadow-lg active:scale-[0.97] cursor-pointer">
             {(hero.buttonText || "VER CATÁLOGO COMPLETO").toUpperCase()}
           </button>
         </Link>
