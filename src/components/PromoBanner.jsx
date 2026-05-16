@@ -4,22 +4,33 @@ import { getBannerSettings } from '../fireBase/dataBase';
 
 const PromoBanner = () => {
   const [promo, setPromo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPromo = async () => {
       try {
+        setLoading(true);
         const data = await getBannerSettings('promo_static');
         if (data) {
           setPromo(data);
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchPromo();
   }, []);
 
-  // Si en el panel se desmarca el checkbox, no se dibuja nada en pantalla
+  if (loading) {
+    return (
+      <div className="bg-blue-50 border-b border-blue-100 py-2 h-[37px] flex items-center justify-center relative z-40 overflow-hidden">
+        <div className="h-2 bg-blue-200 rounded-full w-1/3 max-w-xs animate-pulse" />
+      </div>
+    );
+  }
+
   if (!promo || !promo.active) return null;
 
   const content = (
