@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { getBannerSettings } from '../fireBase/dataBase';
 
-export const FeaturesAndBrands = ({ productos }) => {
-  const navigate = useNavigate();
+export const FeaturesAndBrands = () => {
   const [settings, setSettings] = useState(null);
   const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
 
@@ -47,54 +46,12 @@ export const FeaturesAndBrands = ({ productos }) => {
     return () => clearInterval(timer);
   }, [settings]);
 
-  // Lógica para extraer marcas reales en tiempo de ejecución basadas en tus productos
-  const marcasReales = useMemo(() => {
-    if (!productos || productos.length === 0) return [];
-
-    const palabrasNoPermitidas = [
-      'kit', 'filtro', 'lampara', 'aspiradora', 'bomba', 'aceite', 'pastilla', 
-      'cable', 'freno', 'bateria', 'juego', 'soporte', 'optica', 'led'
-    ];
-
-    const marcasSet = new Set();
-
-    productos.forEach((prod) => {
-      if (prod.stock <= 0 || !prod.titulo) return;
-
-      // Limpiamos el título y lo separamos en palabras
-      const palabras = prod.titulo
-        .trim()
-        .replace(/[-–—]/g, ' ') // Cambiamos guiones por espacios
-        .split(/\s+/);
-
-      if (palabras.length === 0) return;
-
-      // Evaluamos la primera palabra del título del producto
-      let marcaCandidata = palabras[0].toLowerCase();
-
-      // Si la primera palabra es genérica (ej: "Filtro"), intentamos con la segunda (ej: "Bosch")
-      if (palabrasNoPermitidas.includes(marcaCandidata) && palabras.length > 1) {
-        marcaCandidata = palabras[1].toLowerCase();
-      }
-
-      // Si pasa el filtro y tiene una longitud razonable, la guardamos manteniendo el formato original
-      if (!palabrasNoPermitidas.includes(marcaCandidata) && marcaCandidata.length > 1) {
-        // Encontramos cómo se escribe originalmente en tu título (respetando mayúsculas/minúsculas)
-        const palabraOriginal = palabras.find(p => p.toLowerCase() === marcaCandidata) || palabras[0];
-        marcasSet.add(palabraOriginal);
-      }
-    });
-
-    // Lo convertimos a un array limpio y ordenado alfabéticamente
-    return Array.from(marcasSet).sort().map(marca => ({
-      name: marca,
-      slug: marca.toLowerCase()
-    }));
-  }, [productos]);
-
-  const handleBrandClick = (slug) => {
-    navigate(`/Catalogo?marca=${slug}`);
-  };
+  const brands = [
+    { name: 'Osram' },
+    { name: 'Bosch' },
+    { name: 'Philips' },
+    { name: 'X-28' },
+  ];
 
   const bgStyles = {
     azul: {
@@ -171,30 +128,26 @@ export const FeaturesAndBrands = ({ productos }) => {
           </div>
         )}
 
-        {marcasReales.length > 0 && (
-          <div className="pt-4">
-            <div className="text-center max-w-xl mx-auto mb-8">
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
-              <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Nuestras Marcas Disponibles</h4>
-            </div>
-
-            <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-none opacity-95 hover:opacity-100 transition-opacity duration-300">
-              {marcasReales.map((brand, i) => (
-                <motion.div 
-                  key={i}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleBrandClick(brand.slug)}
-                  className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] h-20 flex items-center justify-center transition-all duration-300 cursor-pointer snap-center shrink-0 shadow-sm hover:shadow-md hover:border-blue-300 group"
-                >
-                  <span className="font-black text-gray-500 tracking-widest text-xs sm:text-sm uppercase group-hover:text-blue-600 transition-colors duration-200 text-center break-words">
-                    {brand.name}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+        <div className="pt-4">
+          <div className="text-center max-w-xl mx-auto mb-8">
+            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
+            <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Trabajamos con las mejores marcas</h4>
           </div>
-        )}
+
+          <div className="flex lg:grid lg:grid-cols-4 gap-4 items-center overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-none opacity-65 hover:opacity-90 transition-opacity duration-300">
+            {brands.map((brand, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ scale: 1.02 }}
+                className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] lg:w-full h-20 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 snap-center shrink-0 shadow-sm"
+              >
+                <span className="font-black text-gray-400 tracking-widest text-sm uppercase">
+                  {brand.name}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </section>
