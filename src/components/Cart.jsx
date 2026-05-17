@@ -3,6 +3,7 @@ import { CartContext } from "../context/CartContext";
 import CartItem from "./CartItem";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { ShoppingBag, Trash2, ArrowLeft } from "lucide-react";
 
 export const Cart = () => {
   const { cart, emptyCart } = useContext(CartContext);
@@ -25,16 +26,18 @@ export const Cart = () => {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl border border-gray-100 text-center">
-          <div className="text-6xl mb-6">🛍️</div>
-          <h2 className="text-3xl font-black text-gray-900 mb-4">Tu carrito está vacío</h2>
-          <p className="text-gray-500 mb-8">Parece que aún no has agregado nada a tu compra.</p>
+      <div className="min-h-[60vh] flex items-center justify-center px-4 bg-slate-50/50">
+        <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-md border border-slate-100 text-center">
+          <div className="w-16 h-16 bg-slate-50 text-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag size={32} />
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Tu carrito está vacío</h2>
+          <p className="text-slate-400 text-sm mb-8">Parece que aún no has agregado ningún producto a tu compra.</p>
           <button
             onClick={() => navigate("/")}
-            className="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
+            className="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98]"
           >
-            Explorar productos
+            Explorar catálogo
           </button>
         </div>
       </div>
@@ -42,22 +45,24 @@ export const Cart = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-          <div className="p-6 sm:p-10 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900">
-              Tu Carrito <span className="text-indigo-600">({cart.length})</span>
+    <main className="min-h-screen bg-slate-50/50 py-8 px-4 sm:px-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white rounded-3xl shadow-md shadow-slate-100/80 border border-slate-100 overflow-hidden">
+          
+          <div className="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Tu Carrito <span className="text-slate-400 font-medium text-lg">({cart.length})</span>
             </h2>
             <button
               onClick={HandleEmptyCart}
-              className="text-red-500 hover:text-red-700 font-bold text-sm uppercase tracking-wider transition-colors"
+              className="text-rose-500 hover:text-rose-600 font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-1"
             >
-              Vaciar
+              <Trash2 size={14} />
+              <span>Vaciar</span>
             </button>
           </div>
 
-          <div className="p-4 sm:p-8 space-y-6">
+          <div className="p-4 sm:p-6 space-y-4">
             {cart.map((prod) => (
               <CartItem
                 key={prod.id}
@@ -67,41 +72,40 @@ export const Cart = () => {
                   precio: prod.precio,
                   cantidad: prod.cantidad,
                   imagenUrl: prod.imagenUrl,
+                  stock: prod.stock
                 }}
               />
             ))}
           </div>
 
-          <div className="p-6 sm:p-10 bg-gray-900 text-white">
+          <div className="p-6 sm:p-8 bg-slate-950 text-white">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
               <div className="flex flex-col items-center sm:items-start">
-                <span className="text-gray-400 text-sm uppercase font-bold tracking-widest">Total a pagar</span>
-                <span className="text-4xl sm:text-5xl font-black text-white">
+                <span className="text-slate-400 text-[10px] uppercase font-black tracking-widest">Total a pagar</span>
+                <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                   ${total.toFixed(2)}
                 </span>
               </div>
-              
+
               <button
                 onClick={() => navigate("/form")}
-                className="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-400 text-white font-black py-5 px-12 rounded-2xl shadow-2xl transition-all transform active:scale-95 text-xl flex items-center justify-center gap-3"
+                className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-10 rounded-xl transition-all active:scale-[0.98] text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10"
               >
                 <span>Finalizar Compra</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
             </div>
           </div>
         </div>
-        
+
         <button 
           onClick={() => navigate("/")}
-          className="mt-8 flex items-center justify-center gap-2 text-gray-500 hover:text-indigo-600 font-bold transition-colors w-full"
+          className="mt-6 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-800 text-sm font-bold transition-colors w-full"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
-          Continuar comprando
+          <ArrowLeft size={16} />
+          <span>Continuar comprando</span>
         </button>
       </div>
     </main>
