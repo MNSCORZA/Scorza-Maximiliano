@@ -6,10 +6,15 @@ export function CartProvider({ children }) {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
+  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
+  const openCart = () => setCartOpen(true);
+  const closeCart = () => setCartOpen(false);
+  const toggleCart = () => setCartOpen(!cartOpen);
 
   const addToCart = (productToAdd) => {
     const existingProductIndex = cart.findIndex(
@@ -35,6 +40,7 @@ export function CartProvider({ children }) {
       };
       setCart([...cart, newProduct]);
     }
+    openCart();
   };
 
   const updateItemQuantity = (productId, newQuantity) => {
@@ -71,6 +77,10 @@ export function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cart,
+        cartOpen,
+        openCart,
+        closeCart,
+        toggleCart,
         addToCart,
         getCantidad,
         removeItem,
