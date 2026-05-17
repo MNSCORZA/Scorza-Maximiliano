@@ -40,7 +40,6 @@ export function CartProvider({ children }) {
       };
       setCart([...cart, newProduct]);
     }
-    openCart();
   };
 
   const updateItemQuantity = (productId, newQuantity) => {
