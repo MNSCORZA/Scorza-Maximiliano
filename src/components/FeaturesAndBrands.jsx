@@ -83,11 +83,13 @@ export const FeaturesAndBrands = () => {
   const currentStyle = settings ? (bgStyles[settings.colorPalette] || bgStyles.azul) : bgStyles.azul;
 
   return (
-    <section className="py-12 bg-white font-sans">
-      <div className="container mx-auto px-4 max-w-7xl space-y-16">
+    <section className="py-14 bg-slate-950 font-sans relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-25" />
+
+      <div className="container mx-auto px-4 max-w-7xl space-y-16 relative z-10">
 
         {settings && settings.active && (
-          <div className={`grid grid-cols-1 lg:grid-cols-3 rounded-2xl overflow-hidden bg-gradient-to-br ${currentStyle.top} text-white shadow-xl`}>
+          <div className={`grid grid-cols-1 lg:grid-cols-3 rounded-2xl overflow-hidden bg-gradient-to-br ${currentStyle.top} text-white shadow-2xl border border-white/5`}>
             <div className="p-8 md:p-12 lg:col-span-2 flex flex-col justify-between space-y-6">
               <div>
                 <span className="bg-orange-500 text-white font-black text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-md shadow-sm">
@@ -135,12 +137,12 @@ export const FeaturesAndBrands = () => {
         )}
 
         {marcas.length > 0 && (
-          <div className="pt-6">
+          <div className="pt-4">
             <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] block mb-2">
+              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.25em] block mb-2">
                 Garantía de Calidad
               </span>
-              <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight sm:text-2xl">
+              <h4 className="text-xl font-black text-white uppercase tracking-tight sm:text-2xl">
                 Trabajamos con las mejores marcas
               </h4>
             </div>
@@ -149,13 +151,14 @@ export const FeaturesAndBrands = () => {
               {marcas.map((brand) => (
                 <motion.div 
                   key={brand.id}
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="bg-gradient-to-b from-white to-gray-50/90 border border-gray-200/70 rounded-2xl p-5 min-w-[150px] sm:min-w-[190px] h-24 flex items-center justify-center hover:border-indigo-500/40 hover:shadow-md transition-all duration-300 snap-center shrink-0 shadow-sm relative overflow-hidden group select-none cursor-default"
+                  whileHover={{ y: -5, scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md border border-white/10 rounded-2xl p-5 min-w-[150px] sm:min-w-[190px] h-24 flex items-center justify-center hover:border-indigo-500/50 hover:shadow-[0_0_25px_rgba(99,102,241,0.25)] transition-all duration-300 snap-center shrink-0 shadow-lg relative overflow-hidden group select-none cursor-default"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/0 via-indigo-500/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute -inset-px bg-gradient-to-b from-white/10 to-transparent rounded-2xl pointer-events-none group-hover:from-indigo-500/30" />
                   
-                  <span className="font-black text-slate-700 tracking-[0.2em] text-xs sm:text-sm uppercase select-none relative z-10 transition-colors group-hover:text-indigo-600">
+                  <span className="font-black bg-gradient-to-r from-slate-200 to-white bg-clip-text text-transparent tracking-[0.2em] text-xs sm:text-sm uppercase select-none relative z-10 transition-all group-hover:from-white group-hover:to-indigo-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
                     {brand.nombre}
                   </span>
                 </motion.div>
