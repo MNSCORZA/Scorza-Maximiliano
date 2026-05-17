@@ -1,14 +1,22 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import { toast } from "sonner";
+import { Minus, Plus, Trash2 } from "lucide-react";
 
 const CartItem = ({ item }) => {
   const { updateItemQuantity, removeItem } = useContext(CartContext);
 
-  const handleQuantityChange = (e) => {
-    const newQuantity = parseInt(e.target.value);
-    if (!isNaN(newQuantity) && newQuantity > 0) {
-      updateItemQuantity(item.id, newQuantity);
+  const handleSuma = () => {
+    if (!item.stock || item.cantidad < item.stock) {
+      updateItemQuantity(item.id, item.cantidad + 1);
+    } else {
+      toast.error("Límite de stock alcanzado");
+    }
+  };
+
+  const handleResta = () => {
+    if (item.cantidad > 1) {
+      updateItemQuantity(item.id, item.cantidad - 1);
     }
   };
 
@@ -18,60 +26,56 @@ const CartItem = ({ item }) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
-      <div className="flex items-center space-x-5 w-full sm:w-auto">
-        <div className="relative overflow-hidden rounded-xl border border-gray-100 bg-gray-50 flex-shrink-0">
+    <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 hover:shadow-sm transition-all duration-300 gap-4">
+      <div className="flex items-center space-x-4 w-full sm:w-auto">
+        <div className="relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50 flex-shrink-0 w-20 h-20 flex items-center justify-center p-2 mix-blend-multiply">
           <img
             src={item.imagenUrl}
             alt={item.titulo}
-            className="w-24 h-24 object-contain transition-transform duration-500 group-hover:scale-105"
+            className="max-h-full max-w-full object-contain"
             onError={(e) => {
               e.target.src = "https://via.placeholder.com/150?text=Sin+Imagen";
             }}
           />
         </div>
 
-        <div className="flex-grow">
-          <h3 className="font-bold text-lg text-gray-900 leading-tight">
+        <div className="flex-grow min-w-0">
+          <h3 className="font-bold text-base text-slate-900 truncate uppercase tracking-tight">
             {item.titulo}
           </h3>
-          <p className="text-indigo-600 font-black text-xl mt-1">
+          <p className="text-slate-900 font-black text-lg mt-0.5">
             ${item.precio}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between w-full sm:w-auto mt-4 sm:mt-0 gap-4">
-        <div className="flex items-center bg-gray-50 rounded-lg border border-gray-200 p-1">
-          <input
-            type="number"
-            id={`quantity-${item.id}`}
-            min="1"
-            value={item.cantidad}
-            onChange={handleQuantityChange}
-            className="w-16 bg-transparent border-none text-center text-lg font-bold text-gray-800 focus:ring-0 outline-none"
-          />
+      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-50">
+        <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-200/60 shadow-sm">
+          <button
+            onClick={handleResta}
+            disabled={item.cantidad <= 1}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 disabled:opacity-30 transition-colors"
+          >
+            <Minus size={14} strokeWidth={2.5} />
+          </button>
+
+          <span className="text-sm font-black text-slate-900 tabular-nums px-3">
+            {item.cantidad}
+          </span>
+
+          <button
+            onClick={handleSuma}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            <Plus size={14} strokeWidth={2.5} />
+          </button>
         </div>
 
         <button
           onClick={handleRemoveClick}
-          className="flex items-center justify-center gap-2 px-5 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all duration-200 font-bold text-sm active:scale-95"
+          className="w-10 h-10 flex items-center justify-center bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-sm border border-rose-100/50"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-          <span className="hidden sm:inline">Eliminar</span>
+          <Trash2 size={16} />
         </button>
       </div>
     </div>
