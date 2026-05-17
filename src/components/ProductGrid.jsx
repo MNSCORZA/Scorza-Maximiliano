@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getPaginatedItems } from '../fireBase/dataBase';
 import { Link } from 'react-router';
 import { ProductSkeleton } from './ProductSkeleton';
-import ProductCard from './ProductCard';
+import { Item } from './Item';
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([]);
@@ -60,7 +60,7 @@ const ProductGrid = () => {
               <ProductSkeleton key={index} />
             ))
           : products.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
+              <Item key={product.id} item={product} index={index} />
             ))
         }
       </div>
