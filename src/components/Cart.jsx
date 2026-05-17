@@ -27,14 +27,23 @@ export const Cart = () => {
 
   const HandleEmptyCart = () => {
     emptyCart();
-    toast.info("El carrito se vació correctamente");
+    toast('El carrito se vació correctamente', {
+      duration: 3000,
+      style: {
+        borderRadius: '16px',
+        padding: '12px 16px',
+        background: '#0f172a',
+        color: '#ffffff',
+        border: 'none'
+      }
+    });
   };
 
   if (cart.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50/50 py-12 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
-          
+
           <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-md border border-slate-100 text-center mx-auto mb-12">
             <div className="w-16 h-16 bg-slate-50 text-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <ShoppingBag size={32} />
