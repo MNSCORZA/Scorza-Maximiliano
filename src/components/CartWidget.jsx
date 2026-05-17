@@ -1,16 +1,14 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
-import { useNavigate } from "react-router";
 import { ShoppingCart } from "lucide-react";
 
 export const CartWidget = () => {
-  const { getCantidad } = useContext(CartContext);
+  const { getCantidad, toggleCart } = useContext(CartContext);
   const cantidad = getCantidad();
-  const navigate = useNavigate();
 
   return (
     <div 
-      onClick={() => navigate("/cart")}
+      onClick={toggleCart}
       className="relative flex items-center justify-center p-2.5 cursor-pointer group transition-all"
     >
       <div className="relative text-slate-700 group-hover:text-slate-900 transition-colors">
