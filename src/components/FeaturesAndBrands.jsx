@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
+import { db } from '../fireBase/config';
+import { collection, getDocs } from 'firebase/firestore';
 import { getBannerSettings } from '../fireBase/dataBase';
 
 export const FeaturesAndBrands = () => {
   const [settings, setSettings] = useState(null);
+  const [marcas, setMarcas] = useState([]);
   const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
 
   useEffect(() => {
@@ -17,7 +20,17 @@ export const FeaturesAndBrands = () => {
         console.error(error);
       }
     };
+    const fetchMarcas = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "marcas"));
+        const lista = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setMarcas(lista);
+      } catch (error) {
+        console.error(error);
+      }
+    };
     fetchSettings();
+    fetchMarcas();
   }, []);
 
   useEffect(() => {
@@ -45,13 +58,6 @@ export const FeaturesAndBrands = () => {
     const timer = setInterval(calculateTime, 1000);
     return () => clearInterval(timer);
   }, [settings]);
-
-  const brands = [
-    { name: 'Osram' },
-    { name: 'Bosch' },
-    { name: 'Philips' },
-    { name: 'X-28' },
-  ];
 
   const bgStyles = {
     azul: {
@@ -128,26 +134,28 @@ export const FeaturesAndBrands = () => {
           </div>
         )}
 
-        <div className="pt-4">
-          <div className="text-center max-w-xl mx-auto mb-8">
-            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
-            <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Trabajamos con las mejores marcas</h4>
-          </div>
+        {marcas.length > 0 && (
+          <div className="pt-4">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
+              <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Trabajamos con las mejores marcas</h4>
+            </div>
 
-          <div className="flex lg:grid lg:grid-cols-4 gap-4 items-center overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-none opacity-65 hover:opacity-90 transition-opacity duration-300">
-            {brands.map((brand, i) => (
-              <motion.div 
-                key={i}
-                whileHover={{ scale: 1.02 }}
-                className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] lg:w-full h-20 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 snap-center shrink-0 shadow-sm"
-              >
-                <span className="font-black text-gray-400 tracking-widest text-sm uppercase">
-                  {brand.name}
-                </span>
-              </motion.div>
-            ))}
+            <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-none opacity-65 hover:opacity-90 transition-opacity duration-300">
+              {marcas.map((brand) => (
+                <motion.div 
+                  key={brand.id}
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] h-20 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 snap-center shrink-0 shadow-sm"
+                >
+                  <span className="font-black text-gray-400 tracking-widest text-sm uppercase">
+                    {brand.nombre}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </section>
