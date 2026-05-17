@@ -151,11 +151,11 @@ export const FeaturesAndBrands = () => {
                   key={brand.id}
                   whileHover={{ y: -4, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="bg-gradient-to-b from-white to-gray-50/85 border border-gray-200/60 rounded-2xl p-5 min-w-[150px] sm:min-w-[190px] h-24 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:border-indigo-500/30 hover:shadow-md transition-all duration-400 snap-center shrink-0 shadow-sm relative overflow-hidden group select-none cursor-default"
+                  className="bg-gradient-to-b from-white to-gray-50/90 border border-gray-200/70 rounded-2xl p-5 min-w-[150px] sm:min-w-[190px] h-24 flex items-center justify-center hover:border-indigo-500/40 hover:shadow-md transition-all duration-300 snap-center shrink-0 shadow-sm relative overflow-hidden group select-none cursor-default"
                 >
                   <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
-                  <span className="font-black text-slate-700 tracking-[0.15em] text-xs sm:text-sm uppercase select-none relative z-10 transition-colors group-hover:text-slate-900">
+                  <span className="font-black text-slate-700 tracking-[0.2em] text-xs sm:text-sm uppercase select-none relative z-10 transition-colors group-hover:text-indigo-600">
                     {brand.nombre}
                   </span>
                 </motion.div>
