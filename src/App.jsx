@@ -17,6 +17,7 @@ import { Login } from "./pages/Login";
 import { SignUp } from "./pages/SignUp";
 import { ResetPassword } from "./pages/ResetPassword";
 import UserPanel from "./pages/UserPanel";
+import { SideCart } from "./components/SideCart";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, userData, loading } = useAuth();
@@ -38,6 +39,7 @@ function App() {
       <div className="min-h-screen flex flex-col">
         <BrowserRouter>
           <NavBar />
+          <SideCart />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<HomeContent />} />
