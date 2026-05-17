@@ -17,7 +17,7 @@ export const ItemCount = ({ item }) => {
     audio.volume = 0.3;
     audio.play().catch(() => {});
 
-    toast.success('¡Agregado al carrito!', {
+    toast('¡Agregado al carrito!', {
       description: `${count}x ${item.titulo} listo para llevar.`,
       duration: 3000,
       style: {
