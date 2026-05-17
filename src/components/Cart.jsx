@@ -3,11 +3,12 @@ import { CartContext } from "../context/CartContext";
 import CartItem from "./CartItem";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import { ShoppingBag, Trash2, ArrowLeft } from "lucide-react";
+import { ShoppingBag, Trash2, ArrowLeft, ArrowRight } from "lucide-react";
 
 export const Cart = () => {
   const { cart, emptyCart } = useContext(CartContext);
   const [total, setTotal] = useState(0);
+  const [recomendados, setRecomendados] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,11 @@ export const Cart = () => {
     setTotal(calculatedTotal);
   }, [cart]);
 
+  useEffect(() => {
+    const historial = JSON.parse(localStorage.getItem("historial_vistos")) || [];
+    setRecomendados(historial);
+  }, []);
+
   const HandleEmptyCart = () => {
     emptyCart();
     toast.info("El carrito se vació correctamente");
@@ -26,19 +32,75 @@ export const Cart = () => {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4 bg-slate-50/50">
-        <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-md border border-slate-100 text-center">
-          <div className="w-16 h-16 bg-slate-50 text-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag size={32} />
+      <div className="min-h-screen bg-slate-50/50 py-12 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          
+          <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-md border border-slate-100 text-center mx-auto mb-12">
+            <div className="w-16 h-16 bg-slate-50 text-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <ShoppingBag size={32} />
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 mb-2">Tu carrito está vacío</h2>
+            <p className="text-slate-400 text-sm mb-8">Parece que aún no has agregado ningún producto a tu compra.</p>
+            <button
+              onClick={() => navigate("/")}
+              className="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98]"
+            >
+              Explorar catálogo
+            </button>
           </div>
-          <h2 className="text-2xl font-black text-slate-900 mb-2">Tu carrito está vacío</h2>
-          <p className="text-slate-400 text-sm mb-8">Parece que aún no has agregado ningún producto a tu compra.</p>
-          <button
-            onClick={() => navigate("/")}
-            className="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98]"
-          >
-            Explorar catálogo
-          </button>
+
+          {recomendados.length > 0 && (
+            <div className="animate-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center justify-between mb-6 px-2">
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                  Productos que te interesaron
+                </h3>
+                <button 
+                  onClick={() => navigate("/")} 
+                  className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors underline flex items-center gap-1"
+                >
+                  <span>Ver más</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {recomendados.map((prod) => (
+                  <div
+                    key={prod.id}
+                    onClick={() => {
+                      navigate(`/item/${prod.id}`);
+                      window.scrollTo(0, 0);
+                    }}
+                    className="group cursor-pointer bg-white border border-slate-100 rounded-2xl p-4 hover:shadow-md hover:border-slate-200 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="aspect-square w-full bg-slate-50/30 rounded-xl overflow-hidden mb-3 flex items-center justify-center border border-slate-100/50 p-2">
+                        <img
+                          src={prod.imagenUrl}
+                          alt={prod.titulo}
+                          className="max-h-24 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-700 line-clamp-2 group-hover:text-slate-900 transition-colors leading-snug">
+                        {prod.titulo}
+                      </h4>
+                    </div>
+
+                    <div className="mt-3 pt-2 border-t border-slate-50 flex items-baseline justify-between gap-1">
+                      <span className="text-base font-black text-slate-900">
+                        ${prod.precio}
+                      </span>
+                      <span className="text-[9px] font-black uppercase text-green-600 tracking-tight shrink-0">
+                        Ver artículo
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     );
@@ -48,7 +110,7 @@ export const Cart = () => {
     <main className="min-h-screen bg-slate-50/50 py-8 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-3xl shadow-md shadow-slate-100/80 border border-slate-100 overflow-hidden">
-          
+
           <div className="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white">
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Tu Carrito <span className="text-slate-400 font-medium text-lg">({cart.length})</span>
@@ -92,7 +154,7 @@ export const Cart = () => {
                 className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-10 rounded-xl transition-all active:scale-[0.98] text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10"
               >
                 <span>Finalizar Compra</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/xl" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
