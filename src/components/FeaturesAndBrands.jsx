@@ -135,20 +135,27 @@ export const FeaturesAndBrands = () => {
         )}
 
         {marcas.length > 0 && (
-          <div className="pt-4">
-            <div className="text-center max-w-xl mx-auto mb-8">
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">Garantía de Calidad</span>
-              <h4 className="text-lg font-extrabold text-gray-900 uppercase tracking-tight">Trabajamos con las mejores marcas</h4>
+          <div className="pt-6">
+            <div className="text-center max-w-xl mx-auto mb-10">
+              <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] block mb-2">
+                Garantía de Calidad
+              </span>
+              <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight sm:text-2xl">
+                Trabajamos con las mejores marcas
+              </h4>
             </div>
 
-            <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-none opacity-65 hover:opacity-90 transition-opacity duration-300">
+            <div className="flex overflow-x-auto pb-6 gap-5 snap-x snap-mandatory scrollbar-none px-2">
               {marcas.map((brand) => (
                 <motion.div 
                   key={brand.id}
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-gray-50 border border-gray-150 rounded-xl p-4 min-w-[140px] sm:min-w-[180px] h-20 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 snap-center shrink-0 shadow-sm"
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-gradient-to-b from-white to-gray-50/85 border border-gray-200/60 rounded-2xl p-5 min-w-[150px] sm:min-w-[190px] h-24 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:border-indigo-500/30 hover:shadow-md transition-all duration-400 snap-center shrink-0 shadow-sm relative overflow-hidden group select-none cursor-default"
                 >
-                  <span className="font-black text-gray-400 tracking-widest text-sm uppercase">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <span className="font-black text-slate-700 tracking-[0.15em] text-xs sm:text-sm uppercase select-none relative z-10 transition-colors group-hover:text-slate-900">
                     {brand.nombre}
                   </span>
                 </motion.div>
