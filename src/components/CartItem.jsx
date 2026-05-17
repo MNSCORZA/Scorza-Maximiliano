@@ -10,7 +10,16 @@ const CartItem = ({ item }) => {
     if (!item.stock || item.cantidad < item.stock) {
       updateItemQuantity(item.id, item.cantidad + 1);
     } else {
-      toast.error("Límite de stock alcanzado");
+      toast('Límite de stock alcanzado', {
+        duration: 3000,
+        style: {
+          borderRadius: '16px',
+          padding: '12px 16px',
+          background: '#0f172a',
+          color: '#ffffff',
+          border: 'none'
+        }
+      });
     }
   };
 
@@ -21,7 +30,16 @@ const CartItem = ({ item }) => {
   };
 
   const handleRemoveClick = () => {
-    toast.info("Producto eliminado del carrito");
+    toast('Producto eliminado del carrito', {
+      duration: 3000,
+      style: {
+        borderRadius: '16px',
+        padding: '12px 16px',
+        background: '#0f172a',
+        color: '#ffffff',
+        border: 'none'
+      }
+    });
     removeItem(item.id);
   };
 
