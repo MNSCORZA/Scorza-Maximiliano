@@ -17,7 +17,23 @@ export const ItemDetailContainer = () => {
     getDoc(docRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
-          setItem({ ...snapshot.data(), id: snapshot.id });
+          const productoData = { ...snapshot.data(), id: snapshot.id };
+          setItem(productoData);
+
+          const historial = JSON.parse(localStorage.getItem("historial_vistos")) || [];
+          const historialFiltrado = historial.filter(prod => prod.id !== productoData.id);
+          
+          const nuevoHistorial = [
+            {
+              id: productoData.id,
+              titulo: productoData.titulo,
+              precio: productoData.precio,
+              imagenUrl: productoData.imagenUrl,
+            },
+            ...historialFiltrado
+          ].slice(0, 4);
+
+          localStorage.setItem("historial_vistos", JSON.stringify(nuevoHistorial));
         }
       })
       .finally(() => {
