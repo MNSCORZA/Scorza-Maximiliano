@@ -20,9 +20,16 @@ const ProductCard = ({ product, index }) => {
     audio.volume = 0.5;
     audio.play().catch(err => console.log("Audio play blocked"));
 
-    toast.success('¡Agregado con éxito!', {
+    toast('¡Agregado con éxito!', {
       description: `1x ${product.titulo} ya está en tu carrito.`,
-      style: { borderRadius: '12px', padding: '16px' },
+      duration: 3000,
+      style: {
+        borderRadius: '16px',
+        padding: '12px 16px',
+        background: '#0f172a',
+        color: '#ffffff',
+        border: 'none'
+      }
     });
   };
 
@@ -49,7 +56,7 @@ const ProductCard = ({ product, index }) => {
               </span>
             )}
           </div>
-          
+
           <img 
             src={product.imagenUrl} 
             alt={product.titulo} 
