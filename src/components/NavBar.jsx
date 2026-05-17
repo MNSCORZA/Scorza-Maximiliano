@@ -23,81 +23,81 @@ const MobileMenu = ({ isOpen, setIsOpen, searchValue, setSearchValue, handleSear
   return createPortal(
     <div className={`fixed inset-0 z-[9999] transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
       <div 
-        className={`absolute inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
+        className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
         onClick={() => setIsOpen(false)}
       />
       <div className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between p-8 bg-white border-b border-gray-50">
-          <span className="font-black text-[10px] tracking-[0.3em] text-gray-400 uppercase">Menú Principal</span>
-          <button onClick={() => setIsOpen(false)} className="p-2 text-gray-900 bg-gray-100 rounded-xl hover:bg-red-50 hover:text-red-500 transition-colors">
+        <div className="flex items-center justify-between p-6 bg-white border-b border-slate-100">
+          <span className="font-black text-[10px] tracking-[0.3em] text-slate-400 uppercase">Menú Principal</span>
+          <button onClick={() => setIsOpen(false)} className="p-2 text-slate-900 bg-slate-100 rounded-xl hover:bg-rose-50 hover:text-rose-500 transition-colors">
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 bg-white">
-          <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
+          <div className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100/80">
             {user ? (
               <div className="flex flex-col gap-4">
                 <Link to="/mi-cuenta" onClick={() => setIsOpen(false)} className="flex items-center justify-between group no-underline">
                   <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-2 rounded-xl text-white group-hover:scale-110 transition-transform">
-                      <User size={20} />
+                    <div className="bg-slate-900 p-2 rounded-xl text-white group-hover:scale-105 transition-transform">
+                      <User size={18} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase text-blue-600 leading-none">Hola,</p>
-                      <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{userData?.nombre || 'Usuario'}</p>
+                      <p className="text-[10px] font-black uppercase text-slate-400 leading-none">Hola,</p>
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-slate-800 transition-colors">{userData?.nombre || 'Usuario'}</p>
                     </div>
                   </div>
-                  <ChevronRight size={18} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
+                  <ChevronRight size={16} className="text-slate-300 group-hover:text-slate-600 transition-colors" />
                 </Link>
-                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                <div className="flex items-center justify-between border-t border-slate-100 pt-3">
                   {userData?.rol === 'admin' ? (
-                    <Link to="/admin" onClick={() => setIsOpen(false)} className="text-[11px] font-black uppercase tracking-tighter text-blue-600 hover:underline flex items-center gap-1">
+                    <Link to="/admin" onClick={() => setIsOpen(false)} className="text-[11px] font-black uppercase tracking-tight text-slate-900 hover:underline flex items-center gap-1">
                       <Settings size={14} /> Panel Admin
                     </Link>
                   ) : (
-                    <Link to="/mi-cuenta" onClick={() => setIsOpen(false)} className="text-[11px] font-black uppercase tracking-tighter text-blue-600 hover:underline">
+                    <Link to="/mi-cuenta" onClick={() => setIsOpen(false)} className="text-[11px] font-black uppercase tracking-tight text-slate-900 hover:underline">
                       Mi Perfil
                     </Link>
                   )}
-                  <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-600 transition-colors ml-auto">
-                    <LogOut size={16} /> Cerrar Sesión
+                  <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors ml-auto">
+                    <LogOut size={15} /> Cerrar Sesión
                   </button>
                 </div>
               </div>
             ) : (
-              <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-2 w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest">
+              <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-2 w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-wider">
                 <LogIn size={16} /> Ingresar
               </Link>
             )}
           </div>
 
-          <form onSubmit={handleSearch} className="mb-10 relative group">
+          <form onSubmit={handleSearch} className="mb-8 relative group">
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <Search className="text-gray-400" size={18} />
+              <Search className="text-slate-400" size={16} />
             </div>
             <input 
               type="text" 
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               placeholder="¿Qué estás buscando?" 
-              className="w-full bg-gray-100/50 border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-[12px] font-bold text-gray-700 outline-none focus:bg-white focus:border-blue-600/20 shadow-inner"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:border-slate-200 shadow-sm"
             />
           </form>
 
           <nav className="flex flex-col gap-1">
-            <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center justify-between py-4 px-2 border-b border-gray-50">
-              <span className="text-xs font-black uppercase tracking-widest text-gray-900">Inicio</span>
-              <ChevronRight size={16} className="text-gray-300" />
+            <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center justify-between py-4 px-2 border-b border-slate-50">
+              <span className="text-xs font-black uppercase tracking-wider text-slate-900">Inicio</span>
+              <ChevronRight size={16} className="text-slate-300" />
             </Link>
-            <div className="border-b border-gray-50">
+            <div className="border-b border-slate-50">
               <button onClick={() => setShowCategories(!showCategories)} className="w-full flex items-center justify-between py-4 px-2 group">
-                <span className="text-xs font-black uppercase tracking-widest text-gray-900">Productos</span>
-                <ChevronDown size={16} className={`text-gray-300 transition-transform ${showCategories ? 'rotate-180 text-blue-600' : ''}`} />
+                <span className="text-xs font-black uppercase tracking-wider text-slate-900">Productos</span>
+                <ChevronDown size={16} className={`text-slate-300 transition-transform ${showCategories ? 'rotate-180 text-slate-900' : ''}`} />
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${showCategories ? 'max-h-[500px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
                 {categorias.map((cat) => (
-                  <button key={cat} onClick={() => handleCategoryClick(cat)} className="w-full text-left block py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-blue-600 transition-colors border-l-2 border-transparent hover:border-blue-600 ml-2">
+                  <button key={cat} onClick={() => handleCategoryClick(cat)} className="w-full text-left block py-2.5 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors border-l-2 border-transparent hover:border-slate-900 ml-2">
                     {cat}
                   </button>
                 ))}
@@ -116,7 +116,7 @@ export const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [categorias, setCategorias] = useState([]);
-  const { getCantidad } = useContext(CartContext);
+  const { getCantidad, toggleCart } = useContext(CartContext);
   const { user, userData, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -148,57 +148,64 @@ export const NavBar = () => {
 
   return (
     <>
-      <nav className={`sticky top-0 z-[50] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md py-2 shadow-md' : 'bg-white py-4'}`}>
+      <nav className={`sticky top-0 z-[50] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md py-2 shadow-sm border-b border-slate-100' : 'bg-white py-4'}`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-6 shrink-0">
-              <button onClick={() => setIsOpen(true)} className="p-2 text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
+            <div className="flex items-center gap-4 shrink-0">
+              <button onClick={() => setIsOpen(true)} className="p-2 text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">
                 <Menu size={24} />
               </button>
               <Link to="/" className="flex items-center group">
-                <img src={logoImg} alt="Logo" className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform" />
+                <img src={logoImg} alt="Logo" className="h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-102" />
               </Link>
             </div>
 
             <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-xl relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <Search size={18} className="text-gray-400 group-focus-within:text-blue-600 transition-all" />
+                <Search size={16} className="text-slate-400 group-focus-within:text-slate-600 transition-all" />
               </div>
               <input 
                 type="text" 
                 value={searchValue} 
                 onChange={(e) => setSearchValue(e.target.value)} 
                 placeholder="Busca productos..." 
-                className="w-full bg-gray-100/80 border-2 border-transparent px-12 py-2.5 rounded-2xl text-[13px] font-medium text-gray-700 outline-none focus:bg-white focus:border-blue-600/30 transition-all shadow-inner"
+                className="w-full bg-slate-50 border border-slate-100 px-11 py-2.5 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:border-slate-200 transition-all shadow-sm"
               />
             </form>
 
             <div className="flex items-center gap-2 shrink-0">
               <div className="hidden sm:flex items-center">
                 {user ? (
-                  <div className="flex items-center gap-3 bg-gray-50 p-1 pr-4 rounded-full border border-gray-100">
-                    <Link to={userData?.rol === 'admin' ? "/admin" : "/mi-cuenta"} className="bg-blue-600 p-2 rounded-full text-white hover:scale-105 transition-transform shadow-md">
-                      {userData?.rol === 'admin' ? <Settings size={18} /> : <User size={18} />}
+                  <div className="flex items-center gap-3 bg-slate-50 p-1 pr-4 rounded-full border border-slate-100">
+                    <Link to={userData?.rol === 'admin' ? "/admin" : "/mi-cuenta"} className="bg-slate-900 p-2 rounded-full text-white hover:scale-105 transition-transform shadow-sm">
+                      {userData?.rol === 'admin' ? <Settings size={16} /> : <User size={16} />}
                     </Link>
                     <div className="leading-tight">
-                      <p className="text-[9px] font-black uppercase text-blue-600">Hola,</p>
-                      <p className="text-sm font-bold text-gray-900">{userData?.nombre || 'Usuario'}</p>
+                      <p className="text-[9px] font-black uppercase text-slate-400">Hola,</p>
+                      <p className="text-xs font-bold text-slate-900">{userData?.nombre || 'Usuario'}</p>
                     </div>
-                    <button onClick={logout} className="ml-1 text-gray-400 hover:text-red-500 transition-colors">
-                      <LogOut size={18} />
+                    <button onClick={logout} className="ml-1 text-slate-400 hover:text-rose-500 transition-colors">
+                      <LogOut size={16} />
                     </button>
                   </div>
                 ) : (
-                  <Link to="/login" className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
-                    <LogIn size={18} />
+                  <Link to="/login" className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-800 transition-all shadow-sm">
+                    <LogIn size={16} />
                     <span>Ingresar</span>
                   </Link>
                 )}
               </div>
-              <Link to="/cart" className="relative p-2.5 text-gray-900 hover:bg-blue-50 rounded-xl transition-all group">
-                <ShoppingCart size={22} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" />
-                {getCantidad() > 0 && <span className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">{getCantidad()}</span>}
-              </Link>
+              <div 
+                onClick={toggleCart} 
+                className="relative p-2.5 text-slate-700 hover:bg-slate-50 rounded-xl transition-all group cursor-pointer"
+              >
+                <ShoppingCart size={24} strokeWidth={2} className="group-hover:scale-105 transition-transform" />
+                {getCantidad() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-slate-900 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm animate-in scale-in duration-300">
+                    {getCantidad()}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
