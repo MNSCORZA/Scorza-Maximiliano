@@ -14,11 +14,12 @@ export const Item = ({ item, index }) => {
   const { user } = useAuth();
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
   const playCartSound = useSoundEffect('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3', 0.5);
-  
+
   const hasStock = item?.stock > 0;
   const isBestSeller = item?.ventas > 50;
   const isOffer = item?.precioAnterior && Number(item?.precioAnterior) > Number(item?.precio);
   const isFav = isFavorite(item?.id);
+  const mainImage = item?.imagenUrl || item?.img;
 
   const handleAddToCart = (e) => {
     e.stopPropagation(); 
@@ -53,7 +54,7 @@ export const Item = ({ item, index }) => {
       className={`group bg-white border border-gray-100 rounded-2xl p-4 flex flex-col justify-between cursor-pointer hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative ${!hasStock ? 'opacity-70' : ''}`}
     >
       <div>
-        <div className="h-40 relative overflow-hidden mb-4 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100/60">
+        <div className="h-40 relative overflow-hidden mb-4 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100/60 w-full">
           <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
             {isOffer && hasStock && (
               <span className="bg-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded shadow-sm tracking-wider uppercase">
@@ -80,12 +81,14 @@ export const Item = ({ item, index }) => {
             </button>
           )}
 
-          <img 
-            className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500"
-            src={item?.imagenUrl || item?.img}
-            alt={item?.titulo}
-            loading="lazy"
-          />
+          {mainImage && (
+            <img 
+              className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500 block absolute inset-0"
+              src={mainImage}
+              alt={item?.titulo}
+              loading="lazy"
+            />
+          )}
 
           {!hasStock && (
             <div className="absolute inset-0 bg-[#0f172a]/40 flex items-center justify-center z-10 backdrop-blur-[1px]">
