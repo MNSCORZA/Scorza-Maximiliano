@@ -12,6 +12,8 @@ import HomeContent from "./components/HomeContent";
 import { ScrollToTop } from "./components/ScrollToTop";
 import WhatsAppBtn from "./components/WhatsAppBtn";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";             // <-- IMPORTANTE: Agregado
+import { FavoritesProvider } from "./context/FavoritesContext";   // <-- IMPORTANTE: Agregado
 import AdminContainer from "./pages/AdminContainer";
 import { Login } from "./pages/Login";
 import { SignUp } from "./pages/SignUp";
@@ -36,33 +38,37 @@ const WhatsAppWrapper = () => {
 function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen flex flex-col">
-        <BrowserRouter>
-          <NavBar />
-          <SideCart />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<HomeContent />} />
-              <Route path="/Catalogo" element={<ItemListContainer />} />
-              <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
-              <Route path="/item/:id" element={<ItemDetailContainer />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/form" element={<Formulario />} />
-              <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
-              <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
-              <Route path="/*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-          <WhatsAppWrapper />
-          <ScrollToTop />
-        </BrowserRouter>
-        <Toaster position="top-right" richColors />
-      </div>
+      <CartProvider>
+        <FavoritesProvider>
+          <div className="min-h-screen flex flex-col">
+            <BrowserRouter>
+              <NavBar />
+              <SideCart />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<HomeContent />} />
+                  <Route path="/Catalogo" element={<ItemListContainer />} />
+                  <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
+                  <Route path="/item/:id" element={<ItemDetailContainer />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/form" element={<Formulario />} />
+                  <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
+                  <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
+                  <Route path="/*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+              <WhatsAppWrapper />
+              <ScrollToTop />
+            </BrowserRouter>
+            <Toaster position="top-right" richColors />
+          </div>
+        </FavoritesProvider>
+      </CartProvider>
     </AuthProvider>
   );
 }
