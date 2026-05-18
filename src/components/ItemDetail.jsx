@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router';
 import { Home, ChevronRight, ShieldCheck, Truck, RefreshCw, Star, Heart } from 'lucide-react';
 import { ItemCount } from './ItemCount';
+import { ProductBenefits } from './ProductBenefits';
 import { useAuth } from '../context/AuthContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 
@@ -14,6 +15,7 @@ export const ItemDetail = ({ item }) => {
     <div className="py-6 sm:py-12 animate-in fade-in duration-500 bg-slate-50/50">
       <div className="container mx-auto px-4 max-w-6xl">
 
+        {/* Migas de pan / Breadcrumbs */}
         <nav className="flex items-center gap-2 text-[10px] font-bold text-slate-400 mb-6 bg-white w-fit px-4 py-2 rounded-full shadow-sm border border-slate-100/80">
           <Link to="/" className="flex items-center gap-1.5 hover:text-slate-800 transition-colors">
             <Home size={12} strokeWidth={2.5} /> <span>INICIO</span>
@@ -26,9 +28,11 @@ export const ItemDetail = ({ item }) => {
           </span>
         </nav>
 
+        {/* Contenedor Principal de Producto */}
         <div className="bg-white rounded-3xl shadow-md shadow-slate-100/80 border border-slate-100 overflow-hidden mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-12">
 
+            {/* Galería / Imagen de Producto */}
             <div className="lg:col-span-7 bg-slate-50 p-6 sm:p-12 flex items-center justify-center relative min-h-[350px] lg:min-h-[500px]">
               <div className="relative w-full h-full max-h-[400px] flex items-center justify-center mix-blend-multiply">
                 <img 
@@ -37,7 +41,7 @@ export const ItemDetail = ({ item }) => {
                   className="max-h-full max-w-[85%] object-contain drop-shadow-xl transition-transform duration-500 hover:scale-105"
                 />
               </div>
-              
+
               {user && (
                 <button
                   onClick={() => toggleFavorite(item)}
@@ -58,6 +62,7 @@ export const ItemDetail = ({ item }) => {
               )}
             </div>
 
+            {/* Información y Compra */}
             <div className="lg:col-span-5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between bg-white border-t lg:border-t-0 lg:border-l border-slate-100">
               <div>
                 <div className="flex items-center gap-2 mb-4">
@@ -79,11 +84,11 @@ export const ItemDetail = ({ item }) => {
 
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
-                    ${item.precio}
+                    ${item.precio?.toLocaleString('es-AR')}
                   </span>
                   {item.precioAnterior && (
                     <span className="text-base text-slate-300 line-through font-semibold">
-                      ${item.precioAnterior}
+                      ${item.precioAnterior?.toLocaleString('es-AR')}
                     </span>
                   )}
                 </div>
@@ -93,27 +98,15 @@ export const ItemDetail = ({ item }) => {
                 </p>
               </div>
 
+              {/* Acciones de Carrito */}
               <div className="space-y-6">
                 {item.stock > 0 && (
                   <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
                     <ItemCount item={item} />
                   </div>
                 )}
-
-                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100">
-                  <div className="flex flex-col items-center text-center gap-1">
-                    <div className="w-9 h-9 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center"><Truck size={16} /></div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">Envío Rápido</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center gap-1">
-                    <div className="w-9 h-9 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center"><ShieldCheck size={16} /></div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">Compra Segura</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center gap-1">
-                    <div className="w-9 h-9 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center"><RefreshCw size={16} /></div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">Cambio Oficial</span>
-                  </div>
-                </div>
+                
+                <ProductBenefits />
               </div>
 
             </div>
