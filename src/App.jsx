@@ -12,8 +12,8 @@ import HomeContent from "./components/HomeContent";
 import { ScrollToTop } from "./components/ScrollToTop";
 import WhatsAppBtn from "./components/WhatsAppBtn";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";             // <-- Con llaves {} igual que AuthProvider
-import { FavoritesProvider } from "./context/FavoritesContext";   // <-- Con llaves {} igual que AuthProvider
+import { CartProvider } from "./context/CartContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
 import AdminContainer from "./pages/AdminContainer";
 import { Login } from "./pages/Login";
 import { SignUp } from "./pages/SignUp";
