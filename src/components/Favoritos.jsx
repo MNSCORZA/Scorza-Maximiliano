@@ -1,9 +1,10 @@
-import { useFavorites } from "../context/FavoritesContext";
+import { useContext } from "react";
+import { FavoritesContext } from "../context/FavoritesContext";
 import { Item } from "./Item";
 import { Link } from "react-router";
 
 export function Favoritos() {
-  const { favorites } = useFavorites();
+  const { favorites } = useContext(FavoritesContext);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-12">
