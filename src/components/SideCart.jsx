@@ -28,7 +28,7 @@ export const SideCart = () => {
       />
 
       <div className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-        
+
         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
           <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
             <ShoppingBag size={20} />
@@ -57,14 +57,7 @@ export const SideCart = () => {
             cart.map((prod) => (
               <CartItem
                 key={prod.id}
-                item={{
-                  id: prod.id,
-                  titulo: prod.titulo,
-                  precio: prod.precio,
-                  cantidad: prod.cantidad,
-                  imagenUrl: prod.imagenUrl,
-                  stock: prod.stock
-                }}
+                item={{ ...prod }}
               />
             ))
           )}
@@ -74,9 +67,11 @@ export const SideCart = () => {
           <div className="p-6 border-t border-slate-100 bg-white space-y-4 shrink-0 pb-8">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Subtotal</span>
-              <span className="text-2xl font-black text-slate-900 tracking-tight">${total.toFixed(2)}</span>
+              <span className="text-2xl font-black text-slate-900 tracking-tight">
+                ${total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => { closeCart(); navigate("/cart"); }}
