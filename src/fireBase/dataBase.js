@@ -11,7 +11,10 @@ import {
   increment,
   limit,
   startAfter,
-  orderBy
+  orderBy,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
 } from "firebase/firestore";
 import { db } from "./config.js";
 
@@ -112,4 +115,26 @@ export const getBannerSettings = async (bannerId) => {
 export const updateBannerSettings = async (bannerId, data) => {
   const docRef = doc(db, "banners", bannerId);
   await setDoc(docRef, data, { merge: true });
+};
+
+export const addFavoriteToFirebase = async (uid, product) => {
+  try {
+    const userRef = doc(db, "usuarios", uid);
+    await updateDoc(userRef, {
+      favoritos: arrayUnion(product)
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const removeFavoriteFromFirebase = async (uid, productId, product) => {
+  try {
+    const userRef = doc(db, "usuarios", uid);
+    await updateDoc(userRef, {
+      favoritos: arrayRemove(product)
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
