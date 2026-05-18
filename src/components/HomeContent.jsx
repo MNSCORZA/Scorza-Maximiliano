@@ -23,10 +23,6 @@ const HomeContent = () => {
       <HistoryGrid />
 
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 my-10">
-        <div className="mb-6 border-b border-gray-100 pb-4">
-          <h2 className="text-md sm:text-lg font-black text-gray-900 uppercase tracking-tight">Productos Destacados</h2>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Nuestra selección recomendada para vos</p>
-        </div>
         <ProductGrid />
       </section>
 
