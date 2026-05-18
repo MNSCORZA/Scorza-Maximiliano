@@ -12,7 +12,7 @@ import HomeContent from "./components/HomeContent";
 import { ScrollToTop } from "./components/ScrollToTop";
 import WhatsAppBtn from "./components/WhatsAppBtn";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";
+import { CartProvider } from "./context/CartProvider";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import AdminContainer from "./pages/AdminContainer";
 import { Login } from "./pages/Login";
