@@ -3,7 +3,8 @@ import { FavoritesContext } from "../context/FavoritesContext";
 import { useAuth } from "../context/AuthContext";
 import { Item } from "./Item";
 import { ProductSkeleton } from "./ProductSkeleton";
-import { Link } from "react-router";
+import { AuthRequiredBlock } from "./AuthRequiredBlock";
+import { FavoritesEmpty } from "./FavoritesEmpty";
 
 export function Favoritos() {
   const { favorites } = useContext(FavoritesContext);
@@ -30,26 +31,7 @@ export function Favoritos() {
   }
 
   if (!user) {
-    return (
-      <div className="bg-gray-50 min-h-screen pb-12">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
-          <div className="max-w-md mx-auto text-center py-20 px-4 bg-white rounded-2xl shadow-sm border border-gray-100 mt-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 text-indigo-600 mb-5">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Iniciá sesión para continuar</h2>
-            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-              Guardamos tus favoritos en tu cuenta para que puedas acceder a ellos desde cualquier computadora o celular.
-            </p>
-            <Link to="/login" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm w-full sm:w-auto">
-              Iniciar Sesión
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    return <AuthRequiredBlock />;
   }
 
   return (
@@ -65,20 +47,7 @@ export function Favoritos() {
         </div>
 
         {favorites.length === 0 ? (
-          <div className="max-w-md mx-auto text-center py-20 px-4 bg-white rounded-2xl shadow-sm border border-gray-100 mt-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-5">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Tu lista está vacía</h2>
-            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-              ¡No te quedes con las ganas! Explorá nuestro catálogo y guardá los productos que más te gusten haciendo clic en el corazón.
-            </p>
-            <Link to="/Catalogo" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm w-full sm:w-auto">
-              Volver a la tienda
-            </Link>
-          </div>
+          <FavoritesEmpty />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
             {favorites.map((product) => (
