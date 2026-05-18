@@ -21,6 +21,7 @@ import { ResetPassword } from "./pages/ResetPassword";
 import UserPanel from "./pages/UserPanel";
 import { SideCart } from "./components/SideCart";
 import { Favoritos } from "./components/Favoritos";
+import { OfertasContainer } from "./components/OfertasContainer";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, userData, loading } = useAuth();
@@ -54,6 +55,7 @@ function App() {
                   <Route path="/item/:id" element={<ItemDetailContainer />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/favoritos" element={<Favoritos />} />
+                  <Route path="/ofertas" element={<OfertasContainer />} />
                   <Route path="/form" element={<Formulario />} />
                   <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
                   <Route path="/login" element={<Login />} />
