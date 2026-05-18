@@ -18,7 +18,7 @@ export const AdminBrands = () => {
       const lista = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setMarcas(lista);
     } catch (error) {
-      console.error("Error al leer marcas:", error);
+      console.error(error);
     }
   };
 
@@ -35,8 +35,7 @@ export const AdminBrands = () => {
       setNuevoNombre('');
       await fetchMarcas();
     } catch (error) {
-      console.error("Error al agregar marca:", error);
-      alert("Error de Firebase: Revisá las Reglas de Seguridad en tu consola.");
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -45,7 +44,7 @@ export const AdminBrands = () => {
   const handleBorrar = async (id) => {
     try {
       await deleteDoc(doc(db, 'marcas', id));
-      fetchMarcas();
+      await fetchMarcas();
     } catch (error) {
       console.error(error);
     }
@@ -61,7 +60,7 @@ export const AdminBrands = () => {
     try {
       await updateDoc(doc(db, 'marcas', id), { nombre: editandoNombre.trim() });
       setEditandoId(null);
-      fetchMarcas();
+      await fetchMarcas();
     } catch (error) {
       console.error(error);
     }
@@ -104,7 +103,7 @@ export const AdminBrands = () => {
           {marcas.map((marca) => (
             <div 
               key={marca.id} 
-              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-150 rounded-2xl gap-3 shadow-2xs"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl gap-3 shadow-sm"
             >
               <div className="flex-1">
                 {editandoId === marca.id ? (
@@ -120,7 +119,7 @@ export const AdminBrands = () => {
                   </span>
                 )}
               </div>
-              
+
               <div className="flex justify-end gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
                 {editandoId === marca.id ? (
                   <>
