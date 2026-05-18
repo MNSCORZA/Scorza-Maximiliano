@@ -1,14 +1,43 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../fireBase/config';
 import { Item } from './Item';
 import { Eye } from 'lucide-react';
 
 export const HistoryGrid = () => {
   const [recentItems, setRecentItems] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const history = JSON.parse(localStorage.getItem('recent_views')) || [];
-    setRecentItems(history);
-  }, []);
+    if (!user) {
+      const history = JSON.parse(localStorage.getItem('recent_views')) || [];
+      setRecentItems(history);
+      return;
+    }
+
+    const userRef = doc(db, "usuarios", user.uid);
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        const firebaseHistory = userData.historial || [];
+        
+        const uniqueItems = [];
+        const seenIds = new Set();
+        
+        [...firebaseHistory].reverse().forEach(item => {
+          if (!seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            uniqueItems.push(item);
+          }
+        });
+
+        setRecentItems(uniqueItems.slice(0, 4));
+      }
+    }, (error) => console.error(error));
+
+    return () => unsubscribe();
+  }, [user]);
 
   if (recentItems.length === 0) return null;
 
