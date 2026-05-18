@@ -138,3 +138,24 @@ export const removeFavoriteFromFirebase = async (uid, productId, product) => {
     console.error(error);
   }
 };
+
+export const addProductToHistoryFirebase = async (uid, product) => {
+  try {
+    const userRef = doc(db, "usuarios", uid);
+    const productData = {
+      id: product.id,
+      titulo: product.titulo || "",
+      precio: product.precio || 0,
+      precioAnterior: product.precioAnterior || null,
+      imagenUrl: product.imagenUrl || product.img || null,
+      categoria: product.categoria || null,
+      stock: product.stock || 0,
+      ventas: product.ventas || 0
+    };
+    await updateDoc(userRef, {
+      historial: arrayUnion(productData)
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
