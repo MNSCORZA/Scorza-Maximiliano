@@ -43,6 +43,7 @@ function App() {
         <FavoritesProvider>
           <div className="min-h-screen flex flex-col">
             <BrowserRouter>
+              <ScrollToTop />
               <NavBar />
               <SideCart />
               <main className="flex-grow">
@@ -65,7 +66,6 @@ function App() {
               </main>
               <Footer />
               <WhatsAppWrapper />
-              <ScrollToTop />
             </BrowserRouter>
             <Toaster position="top-right" richColors />
           </div>
