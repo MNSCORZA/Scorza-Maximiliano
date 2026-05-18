@@ -20,6 +20,7 @@ import { SignUp } from "./pages/SignUp";
 import { ResetPassword } from "./pages/ResetPassword";
 import UserPanel from "./pages/UserPanel";
 import { SideCart } from "./components/SideCart";
+import { Favoritos } from "./pages/Favoritos"; // <-- Cambiá el nombre e importalo desde donde lo tengas creado
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, userData, loading } = useAuth();
@@ -51,6 +52,7 @@ function App() {
                   <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
                   <Route path="/item/:id" element={<ItemDetailContainer />} />
                   <Route path="/cart" element={<Cart />} />
+                  <Route path="/favoritos" element={<Favoritos />} /> // <-- Declaramos la ruta para que no dé 404
                   <Route path="/form" element={<Formulario />} />
                   <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
                   <Route path="/login" element={<Login />} />
