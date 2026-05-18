@@ -1,21 +1,20 @@
 import { useState, useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { useSoundEffect } from "../hooks/useSoundEffect";
 import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 
 export const ItemCount = ({ item }) => {
   const [count, setCount] = useState(1);
   const { addToCart } = useContext(CartContext);
+  const playCartSound = useSoundEffect('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3', 0.3);
 
   const handleSuma = () => count < item.stock && setCount(count + 1);
   const handleResta = () => count > 1 && setCount(count - 1);
 
   const handleAddToCart = () => {
     addToCart({ ...item, cantidad: count });
-
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
-    audio.volume = 0.3;
-    audio.play().catch(() => {});
+    playCartSound();
 
     toast('¡Agregado al carrito!', {
       description: `${count}x ${item.titulo} listo para llevar.`,
