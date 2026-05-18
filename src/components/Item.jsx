@@ -1,17 +1,22 @@
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { FavoritesContext } from "../context/FavoritesContext";
 import { toast } from "sonner";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const Item = ({ item, index }) => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const { user } = useAuth();
+  const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
   const hasStock = item?.stock > 0;
 
   const isBestSeller = item?.ventas > 50;
   const isOffer = item?.precioAnterior && Number(item?.precioAnterior) > Number(item?.precio);
+  const isFav = isFavorite(item?.id);
 
   const handleAddToCart = (e) => {
     e.stopPropagation(); 
@@ -32,6 +37,11 @@ export const Item = ({ item, index }) => {
         border: 'none'
       }
     });
+  };
+
+  const handleFavoriteClick = (e) => {
+    e.stopPropagation();
+    toggleFavorite(item);
   };
 
   return (
@@ -57,6 +67,19 @@ export const Item = ({ item, index }) => {
               </span>
             )}
           </div>
+
+          {user && (
+            <button
+              onClick={handleFavoriteClick}
+              className="absolute top-2 right-2 z-20 p-2 rounded-xl bg-white/70 backdrop-blur-md border border-gray-100/40 shadow-sm hover:bg-white text-slate-400 hover:text-rose-500 transition-all duration-300 active:scale-90"
+            >
+              <Heart 
+                size={14} 
+                fill={isFav ? "#f43f5e" : "none"} 
+                className={isFav ? "text-rose-500 scale-105" : "transition-transform group-hover:scale-105"} 
+              />
+            </button>
+          )}
 
           <img 
             className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500"
