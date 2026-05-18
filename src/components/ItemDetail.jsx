@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Home, ChevronRight, ShieldCheck, Truck, RefreshCw, Star, Heart } from 'lucide-react';
+import { Home, ChevronRight, Star, Heart } from 'lucide-react';
 import { ItemCount } from './ItemCount';
 import { ProductBenefits } from './ProductBenefits';
 import { useAuth } from '../context/AuthContext';
@@ -11,11 +11,19 @@ export const ItemDetail = ({ item }) => {
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
   const isFav = isFavorite(item?.id);
 
+  useEffect(() => {
+    if (!item || !item.id || item.stock <= 0) return;
+
+    const localHistory = JSON.parse(localStorage.getItem('recent_views')) || [];
+    const filteredHistory = localHistory.filter(p => p.id !== item.id);
+    const updatedHistory = [item, ...filteredHistory].slice(0, 4); 
+    localStorage.setItem('recent_views', JSON.stringify(updatedHistory));
+  }, [item]);
+
   return (
     <div className="py-6 sm:py-12 animate-in fade-in duration-500 bg-slate-50/50">
       <div className="container mx-auto px-4 max-w-6xl">
 
-        {/* Migas de pan / Breadcrumbs */}
         <nav className="flex items-center gap-2 text-[10px] font-bold text-slate-400 mb-6 bg-white w-fit px-4 py-2 rounded-full shadow-sm border border-slate-100/80">
           <Link to="/" className="flex items-center gap-1.5 hover:text-slate-800 transition-colors">
             <Home size={12} strokeWidth={2.5} /> <span>INICIO</span>
@@ -28,11 +36,9 @@ export const ItemDetail = ({ item }) => {
           </span>
         </nav>
 
-        {/* Contenedor Principal de Producto */}
         <div className="bg-white rounded-3xl shadow-md shadow-slate-100/80 border border-slate-100 overflow-hidden mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-12">
 
-            {/* Galería / Imagen de Producto */}
             <div className="lg:col-span-7 bg-slate-50 p-6 sm:p-12 flex items-center justify-center relative min-h-[350px] lg:min-h-[500px]">
               <div className="relative w-full h-full max-h-[400px] flex items-center justify-center mix-blend-multiply">
                 <img 
@@ -62,7 +68,6 @@ export const ItemDetail = ({ item }) => {
               )}
             </div>
 
-            {/* Información y Compra */}
             <div className="lg:col-span-5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between bg-white border-t lg:border-t-0 lg:border-l border-slate-100">
               <div>
                 <div className="flex items-center gap-2 mb-4">
@@ -98,14 +103,13 @@ export const ItemDetail = ({ item }) => {
                 </p>
               </div>
 
-              {/* Acciones de Carrito */}
               <div className="space-y-6">
                 {item.stock > 0 && (
                   <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
                     <ItemCount item={item} />
                   </div>
                 )}
-                
+
                 <ProductBenefits />
               </div>
 
