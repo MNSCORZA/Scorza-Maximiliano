@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { FavoritesContext } from "../context/FavoritesContext";
+import { useSoundEffect } from "../hooks/useSoundEffect";
 import { toast } from "sonner";
 import { ShoppingCart, Heart } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,8 +13,9 @@ export const Item = ({ item, index }) => {
   const { addToCart } = useContext(CartContext);
   const { user } = useAuth();
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
+  const playCartSound = useSoundEffect('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3', 0.5);
+  
   const hasStock = item?.stock > 0;
-
   const isBestSeller = item?.ventas > 50;
   const isOffer = item?.precioAnterior && Number(item?.precioAnterior) > Number(item?.precio);
   const isFav = isFavorite(item?.id);
@@ -21,10 +23,7 @@ export const Item = ({ item, index }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation(); 
     addToCart({ ...item, cantidad: 1 });
-
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(err => console.log("Audio play blocked"));
+    playCartSound();
 
     toast('¡Agregado al carrito!', {
       description: `1x ${item?.titulo} listo para llevar.`,
