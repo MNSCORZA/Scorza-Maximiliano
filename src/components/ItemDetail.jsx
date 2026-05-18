@@ -5,6 +5,7 @@ import { ItemCount } from './ItemCount';
 import { ProductBenefits } from './ProductBenefits';
 import { useAuth } from '../context/AuthContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import { addProductToHistoryFirebase } from '../fireBase/dataBase';
 
 export const ItemDetail = ({ item }) => {
   const { user } = useAuth();
@@ -18,7 +19,11 @@ export const ItemDetail = ({ item }) => {
     const filteredHistory = localHistory.filter(p => p.id !== item.id);
     const updatedHistory = [item, ...filteredHistory].slice(0, 4); 
     localStorage.setItem('recent_views', JSON.stringify(updatedHistory));
-  }, [item]);
+
+    if (user?.uid) {
+      addProductToHistoryFirebase(user.uid, item);
+    }
+  }, [item, user]);
 
   return (
     <div className="py-6 sm:py-12 animate-in fade-in duration-500 bg-slate-50/50">
