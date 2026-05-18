@@ -39,7 +39,7 @@ export function OrdenConfirmacion() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-10 print:bg-white print:p-0">
       <div className="max-w-3xl mx-auto bg-white rounded-[40px] shadow-2xl overflow-hidden border border-gray-100 animate-fade-in-up print:shadow-none print:border-none print:rounded-none">
-        
+
         <div className="bg-indigo-600 p-8 text-white flex justify-between items-center print:bg-white print:text-black print:border-b-2 print:border-gray-100">
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter italic">De Todo</h1>
@@ -72,10 +72,10 @@ export function OrdenConfirmacion() {
                   <div className="flex-1">
                     <p className="font-black text-gray-800 text-sm uppercase leading-tight">{item.titulo}</p>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mt-1">
-                      {item.cantidad} unidades x ${Number(item.precio).toFixed(2)}
+                      {item.cantidad} unidades x ${Number(item.precio).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </p>
                   </div>
-                  <p className="font-black text-gray-900 ml-4">${(item.cantidad * item.precio).toFixed(2)}</p>
+                  <p className="font-black text-gray-900 ml-4">${(item.cantidad * item.precio).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</p>
                 </div>
               ))}
             </div>
@@ -84,7 +84,7 @@ export function OrdenConfirmacion() {
           <div className="bg-indigo-50 rounded-3xl p-8 flex justify-between items-center print:bg-white print:border-2 print:border-gray-100">
             <div>
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Total Final Pagado</p>
-              <p className="text-4xl font-black text-indigo-700 tracking-tighter">${Number(order.total).toFixed(2)}</p>
+              <p className="text-4xl font-black text-indigo-700 tracking-tighter">${Number(order.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</p>
             </div>
             <div className="no-print">
               <div className="bg-green-500 text-white p-3 rounded-full shadow-lg shadow-green-200">
