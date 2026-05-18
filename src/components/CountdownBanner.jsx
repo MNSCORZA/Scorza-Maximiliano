@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import { getBannerSettings } from '../fireBase/dataBase';
+import { bgStyles } from '../constants/bannerStyles';
+import { useCountdown } from '../hooks/useCountdown';
 
 export const CountdownBanner = () => {
   const [settings, setSettings] = useState(null);
-  const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -19,54 +20,9 @@ export const CountdownBanner = () => {
     fetchSettings();
   }, []);
 
-  useEffect(() => {
-    if (!settings || !settings.active || !settings.endDate) return;
-
-    const calculateTime = () => {
-      const difference = +new Date(settings.endDate) - +new Date();
-      if (difference <= 0) {
-        setTimeLeft({ hours: '00', minutes: '00', seconds: '00' });
-        return;
-      }
-
-      const hours = Math.floor(difference / (1000 * 60 * 60));
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
-      setTimeLeft({
-        hours: hours < 10 ? `0${hours}` : `${hours}`,
-        minutes: minutes < 10 ? `0${minutes}` : `${minutes}`,
-        seconds: seconds < 10 ? `0${seconds}` : `${seconds}`
-      });
-    };
-
-    calculateTime();
-    const timer = setInterval(calculateTime, 1000);
-    return () => clearInterval(timer);
-  }, [settings]);
+  const timeLeft = useCountdown(settings?.endDate, settings?.active);
 
   if (!settings || !settings.active) return null;
-
-  const bgStyles = {
-    azul: {
-      top: "from-gray-900 via-indigo-950 to-blue-950",
-      bottom: "bg-blue-600/20",
-      button: "text-gray-900 bg-white hover:bg-orange-500 hover:text-white",
-      subTag: "text-blue-400"
-    },
-    rojo: {
-      top: "from-neutral-950 via-red-950 to-neutral-900",
-      bottom: "bg-red-600/20",
-      button: "text-white bg-red-600 hover:bg-red-700",
-      subTag: "text-red-400"
-    },
-    premium: {
-      top: "from-neutral-950 via-neutral-900 to-neutral-800",
-      bottom: "bg-amber-500/10 border-t lg:border-t-0 lg:border-l border-amber-500/20",
-      button: "text-neutral-900 bg-amber-500 hover:bg-amber-600 font-black",
-      subTag: "text-amber-400"
-    }
-  };
 
   const currentStyle = bgStyles[settings.colorPalette] || bgStyles.azul;
 
@@ -74,6 +30,7 @@ export const CountdownBanner = () => {
     <div className="w-full bg-white py-10">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className={`grid grid-cols-1 lg:grid-cols-3 rounded-2xl overflow-hidden bg-gradient-to-br ${currentStyle.top} text-white shadow-xl`}>
+          
           <div className="p-8 md:p-12 lg:col-span-2 flex flex-col justify-between space-y-6">
             <div>
               <span className="bg-orange-500 text-white font-black text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-md shadow-sm">
@@ -117,6 +74,7 @@ export const CountdownBanner = () => {
               </Link>
             </div>
           </div>
+
         </div>
       </div>
     </div>
