@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../hooks/useAdmin';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../fireBase/config';
-import { doc, setDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, getDocs, query, orderBy, addDoc } from 'firebase/firestore';
 import { Lock, UserCheck, Briefcase } from 'lucide-react';
 
 import ProductForm from '../components/admin/ProductForm';
@@ -41,6 +41,59 @@ const AdminContainer = () => {
   const handleUpdateOrderStatus = async (id, newStatus) => {
     await updateDoc(doc(db, "orders", id), { status: newStatus });
     fetchOrders();
+  };
+
+  const handleCustomFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const currentPrice = Number(admin.formData.precio);
+      const currentStock = Number(admin.formData.stock);
+
+      const productData = {
+        ...admin.formData,
+        precio: currentPrice,
+        stock: currentStock,
+      };
+
+      if (admin.isEditing && admin.currentId) {
+        const originalProduct = admin.products.find(p => p.id === admin.currentId);
+        const oldPrice = originalProduct ? Number(originalProduct.precio) : null;
+
+        if (oldPrice && currentPrice < oldPrice) {
+          productData.precioAnterior = oldPrice;
+        } else if (oldPrice && currentPrice >= oldPrice) {
+          productData.precioAnterior = null;
+        }
+
+        const productRef = doc(db, "productos", admin.currentId);
+        await updateDoc(productRef, productData);
+      } else {
+        productData.precioAnterior = null;
+        productData.ventas = productData.ventas || 0;
+        const productsCollection = collection(db, "productos");
+        await addDoc(productsCollection, productData);
+      }
+
+      admin.setFormData({
+        titulo: "",
+        descripcion: "",
+        precio: "",
+        stock: "",
+        categoria: "",
+        imagenUrl: "",
+        envioGratis: false
+      });
+      admin.setIsEditing(false);
+      admin.setCurrentId(null);
+      
+      if (admin.refreshProducts) {
+        admin.refreshProducts();
+      } else {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const filteredUsers = admin.users?.filter(u => {
@@ -100,7 +153,14 @@ const AdminContainer = () => {
         <>
           <AdminFilters {...admin} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-8">
-            <div className="lg:col-span-1"><ProductForm formData={admin.formData} setFormData={admin.setFormData} isEditing={admin.isEditing} /></div>
+            <div className="lg:col-span-1">
+              <ProductForm 
+                formData={admin.formData} 
+                setFormData={admin.setFormData} 
+                isEditing={admin.isEditing} 
+                handleSubmit={handleCustomFormSubmit}
+              />
+            </div>
             <div className="lg:col-span-2">
               <ProductTable 
                 products={admin.products} onEdit={handleEdit} 
