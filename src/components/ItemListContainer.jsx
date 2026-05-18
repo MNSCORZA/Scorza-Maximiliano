@@ -14,12 +14,10 @@ export const ItemListContainer = () => {
   const [sortOrder, setSortOrder] = useState("");
   const [visibleCount, setVisibleCount] = useState(8);
   
-  // Usamos el hook nativo de react-router para capturar la URL reactivamente
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category");
   const searchParam = searchParams.get("search");
 
-  // Si cambia la categoría o la búsqueda, reseteamos la paginación a 8 ítems
   useEffect(() => {
     setVisibleCount(8);
   }, [categoryParam, searchParam]);
@@ -94,7 +92,6 @@ export const ItemListContainer = () => {
     <section className="py-8 bg-[#f9f9f9] min-h-screen">
       <div className="container mx-auto px-4">
         
-        {/* Breadcrumbs / Navegación */}
         <nav className="flex items-center gap-2 text-[11px] font-bold text-gray-500 mb-6 bg-white w-fit px-4 py-2.5 rounded-full shadow-sm border border-gray-100">
           <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
             <Home size={14} /> <span>INICIO</span>
@@ -105,7 +102,6 @@ export const ItemListContainer = () => {
           </Link>
         </nav>
 
-        {/* Cabecera y Filtros Reutilizables */}
         <CatalogHeader 
           category={categoryParam}
           search={searchParam}
@@ -116,7 +112,6 @@ export const ItemListContainer = () => {
           setOnlyFreeShipping={setOnlyFreeShipping}
         />
 
-        {/* Listado o Estado Vacío */}
         {filteredAndSortedProducts.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center max-w-md mx-auto mt-12 shadow-sm">
             <p className="text-sm font-bold text-gray-700 uppercase tracking-tight">No se encontraron productos</p>
