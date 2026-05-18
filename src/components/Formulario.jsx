@@ -4,11 +4,12 @@ import { useNavigate } from "react-router";
 import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { createOrder } from "../fireBase/dataBase";
+import { useCartTotals } from "../hooks/useCartTotals";
 
 export function Formulario() {
   const { cart, emptyCart } = useContext(CartContext);
   const { user, userData } = useAuth();
-  const [total, setTotal] = useState(0);
+  const total = useCartTotals(cart);
   const [formData, setFormData] = useState({ nombre: "", apellido: "", email: "", telefono: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -28,11 +29,6 @@ export function Formulario() {
       });
     }
   }, [user, userData]);
-
-  useEffect(() => {
-    const calculatedTotal = cart.reduce((acc, prod) => acc + (prod.precio * prod.cantidad), 0);
-    setTotal(calculatedTotal);
-  }, [cart]);
 
   const handleChange = (e) => setFormData({...formData, [e.target.name]: e.target.value});
 
@@ -56,7 +52,7 @@ export function Formulario() {
     <div className="min-h-screen bg-gray-50 p-8 flex justify-center items-center">
       <form onSubmit={handleFinalizarCompra} className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full space-y-6">
         <h2 className="text-3xl font-black text-center text-gray-900 uppercase tracking-tighter">Finalizar Compra</h2>
-        
+
         <div className="space-y-4">
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Nombre</label>
