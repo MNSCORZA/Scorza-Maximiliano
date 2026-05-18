@@ -24,7 +24,7 @@ export const Item = ({ item, index }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation(); 
     addToCart({ ...item, cantidad: 1 });
-    playCartSound();
+    if (playCartSound) playCartSound();
 
     toast('¡Agregado al carrito!', {
       description: `1x ${item?.titulo} listo para llevar.`,
@@ -51,7 +51,7 @@ export const Item = ({ item, index }) => {
       viewport={{ once: true }}
       transition={{ delay: (index || 0) * 0.05, duration: 0.4, ease: "easeOut" }}
       onClick={() => hasStock && navigate(`/item/${item?.id}`)}
-      className={`group bg-white border border-gray-100 rounded-2xl p-4 flex flex-col justify-between cursor-pointer hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative ${!hasStock ? 'opacity-70' : ''}`}
+      className={`group bg-white border border-gray-100 rounded-2xl p-4 flex flex-col justify-between cursor-pointer hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative h-full ${!hasStock ? 'opacity-70' : ''}`}
     >
       <div>
         <div className="h-40 relative overflow-hidden mb-4 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100/60 w-full">
@@ -83,7 +83,7 @@ export const Item = ({ item, index }) => {
 
           {mainImage && (
             <img 
-              className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500 block absolute inset-0"
+              className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500 absolute inset-0 m-auto"
               src={mainImage}
               alt={item?.titulo}
               loading="lazy"
