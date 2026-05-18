@@ -2,7 +2,7 @@ import React from 'react';
 import { Banner } from './Banner';
 import PromoBanner from './PromoBanner';
 import Hero from './Hero';
-import TrustGrid from './TrustGrid';
+import { TrustGrid } from './TrustGrid';
 import { CategoriesGrid } from './CategoriesGrid';
 import { FeaturesAndBrands } from './FeaturesAndBrands';
 import { DiscountGrid } from './DiscountGrid';
