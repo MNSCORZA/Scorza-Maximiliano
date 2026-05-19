@@ -86,7 +86,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
                       </div>
                     </td>
 
-                    <td className="p-5 hidden sm:table-cell text-center vertical-middle">
+                    <td className="p-5 hidden sm:table-cell text-center">
                       {hasOffer ? (
                         <span className="inline-flex items-center gap-1 text-[9px] font-black text-orange-600 bg-orange-50 border border-orange-100 px-2 py-1 rounded-xl mx-auto">
                           <Percent size={10} /> {p.porcentajeDescuento || Math.round(((p.precioAnterior - p.precio) / p.precioAnterior) * 100)}% OFF
@@ -105,10 +105,10 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
 
                     <td className="p-5 text-right pr-8">
                       <div className="flex justify-end gap-2">
-                        <button onClick={() => onEdit(p)} className="p-2 bg-slate-50 text-slate-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all cursor-pointer" title="Editar">
+                        <button onClick={() => onEdit(p)} className="p-2 bg-slate-50 text-slate-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">
                           <Edit3 size={14} />
                         </button>
-                        <button onClick={() => onDelete(p.id)} className="p-2 bg-slate-50 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Eliminar">
+                        <button onClick={() => onDelete(p.id)} className="p-2 bg-slate-50 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer">
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -121,31 +121,12 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
         </table>
       </div>
 
-      {/* Módulo de Paginación Premium */}
       {totalPages > 1 && (
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between sm:px-6">
           <div className="flex-1 flex justify-between sm:hidden">
-            <button onClick={() => handlePageChange(Math.max(currentPage - 1, 1))} disabled={currentPage === 1} className={`px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 bg-white active:scale-95 transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+            <button onClick={() => handlePageChange(Math.max(currentPage - 1, 1))} disabled={currentPage === 1} className={`px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 bg-white ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
               Anterior
             </button>
-            <button onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))} disabled={currentPage === totalPages} className={`px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 bg-white active:scale-95 transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+            <button onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))} disabled={currentPage === totalPages} className={`px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 bg-white ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
               Siguiente
             </button>
-          </div>
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">
-                Mostrando <span className="font-black text-slate-800">{indexOfFirstItem + 1}</span> a <span className="font-black text-slate-800">{Math.min(indexOfLastItem, products.length)}</span> de <span className="font-black text-slate-800">{products.length}</span> artículos
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-xl shadow-sm gap-1" aria-label="Pagination">
-                <button onClick={() => handlePageChange(Math.max(currentPage - 1, 1))} disabled={currentPage === 1} className={`p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 active:scale-95 transition-all ${currentPage === 1 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
-                  <ChevronLeft size={16} />
-                </button>
-                {[...Array(totalPages)].map((_, index) => (
-                  <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${currentPage === index + 1 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
-                    {index + 1}
-                  </button>
-                ))}
-                <button onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))} disabled={currentPage === totalPages} className={`p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 active:scale-95 transition-all ${currentPage === totalPages ? 'opacity-40 cursor-not-
