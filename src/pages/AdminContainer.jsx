@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../fireBase/config';
 import { doc, setDoc, updateDoc, collection, getDocs, query, orderBy, addDoc } from 'firebase/firestore';
 import { Lock, UserCheck, Briefcase } from 'lucide-react';
+import { toast } from 'sonner';
 
 import ProductForm from '../components/admin/ProductForm';
 import UserTable from '../components/admin/UserTable';
@@ -46,32 +47,47 @@ const AdminContainer = () => {
   const handleCustomFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      const currentPrice = Number(admin.formData.precio);
+      let basePrice = Number(admin.formData.precio);
       const currentStock = Number(admin.formData.stock);
+      const hasDiscount = admin.formData.tieneDescuento;
+      const discountPercent = Number(admin.formData.porcentajeDescuento || 0);
+
+      let finalPrice = basePrice;
+      let previousPrice = null;
+
+      if (hasDiscount && discountPercent > 0) {
+        previousPrice = basePrice;
+        finalPrice = basePrice - (basePrice * (discountPercent / 100));
+      }
 
       const productData = {
         ...admin.formData,
-        precio: currentPrice,
+        precio: finalPrice,
+        precioAnterior: previousPrice,
         stock: currentStock,
+        tieneDescuento: hasDiscount,
+        porcentajeDescuento: hasDiscount ? discountPercent : 0
       };
 
       if (admin.isEditing && admin.currentId) {
-        const originalProduct = admin.products.find(p => p.id === admin.currentId);
-        const oldPrice = originalProduct ? Number(originalProduct.precio) : null;
-
-        if (oldPrice && currentPrice < oldPrice) {
-          productData.precioAnterior = oldPrice;
-        } else if (oldPrice && currentPrice >= oldPrice) {
-          productData.precioAnterior = null;
-        }
-
         const productRef = doc(db, "productos", admin.currentId);
         await updateDoc(productRef, productData);
+        
+        toast.success('¡Cambios guardados!', {
+          description: `El producto "${admin.formData.titulo}" se actualizó correctamente.`,
+          duration: 4000,
+          style: { borderRadius: '16px', padding: '12px 16px' }
+        });
       } else {
-        productData.precioAnterior = null;
         productData.ventas = productData.ventas || 0;
         const productsCollection = collection(db, "productos");
         await addDoc(productsCollection, productData);
+
+        toast.success('¡Producto publicado!', {
+          description: `"${productData.titulo}" ya está disponible en el catálogo.`,
+          duration: 4000,
+          style: { borderRadius: '16px', padding: '12px 16px' }
+        });
       }
 
       admin.setFormData({
@@ -81,18 +97,19 @@ const AdminContainer = () => {
         stock: "",
         categoria: "",
         imagenUrl: "",
-        envioGratis: false
+        envioGratis: false,
+        tieneDescuento: false,
+        porcentajeDescuento: ""
       });
       admin.setIsEditing(false);
       admin.setCurrentId(null);
-      
+
       if (admin.refreshProducts) {
         admin.refreshProducts();
-      } else {
-        window.location.reload();
       }
     } catch (error) {
       console.error(error);
+      toast.error('Hubo un error al guardar los cambios');
     }
   };
 
@@ -102,7 +119,14 @@ const AdminContainer = () => {
   }) || [];
 
   const handleEdit = (p) => {
-    admin.setFormData(p);
+    const productToEdit = {
+      ...p,
+      precio: p.precioAnterior ? p.precioAnterior : p.precio,
+      tieneDescuento: p.tieneDescuento || false,
+      porcentajeDescuento: p.porcentajeDescuento || ""
+    };
+    
+    admin.setFormData(productToEdit);
     admin.setCurrentId(p.id);
     admin.setIsEditing(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
