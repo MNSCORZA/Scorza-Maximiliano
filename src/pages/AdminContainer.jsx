@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../hooks/useAdmin';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { db, auth } from '../fireBase/config';
-import { doc, setDoc, updateDoc, collection, getDocs, query, orderBy, addDoc } from 'firebase/firestore';
-import { Lock, UserCheck, Briefcase, Plus, X } from 'lucide-react';
+import { doc, updateDoc, collection, addDoc } from 'firebase/firestore';
+import { db } from '../fireBase/config';
+import { Lock } from 'lucide-react';
 import { toast } from 'sonner';
 
-import ProductForm from '../components/admin/ProductForm';
-import UserTable from '../components/admin/UserTable';
-import AdminFilters from '../components/admin/AdminFilters';
-import ProductTable from '../components/admin/ProductTable';
 import ConfirmModal from '../components/admin/ConfirmModal';
-import UserModal from '../components/admin/UserModal';
-import OrderTable from '../components/admin/OrderTable';
+import ProductsManager from '../components/admin/ProductsManager';
+import OrdersManager from '../components/admin/OrdersManager';
+import UsersManager from '../components/admin/UsersManager';
 import { AdminBanners } from '../components/admin/AdminBanners';
 import { AdminBrands } from '../components/admin/AdminBrands';
 
@@ -21,29 +17,7 @@ const AdminContainer = () => {
   const { user, userData, loading } = useAuth();
   const admin = useAdmin(user, userData, loading);
   const [activeTab, setActiveTab] = useState('productos');
-  const [orders, setOrders] = useState([]);
-  const [userSubTab, setUserSubTab] = useState('clientes');
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
-  const [newUser, setNewUser] = useState({ nombre: '', email: '', password: '', permisos: { isAdmin: false, ver: true, editar: false, borrar: false } });
-
-  useEffect(() => {
-    if (activeTab === 'pedidos') {
-      fetchOrders();
-    }
-  }, [activeTab]);
-
-  const fetchOrders = async () => {
-    const q = query(collection(db, "orders"), orderBy("date", "desc"));
-    const querySnapshot = await getDocs(q);
-    setOrders(querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-  };
-
-  const handleUpdateOrderStatus = async (id, newStatus) => {
-    await updateDoc(doc(db, "orders", id), { status: newStatus });
-    fetchOrders();
-  };
 
   const handleCustomFormSubmit = async (e) => {
     e.preventDefault();
@@ -62,80 +36,38 @@ const AdminContainer = () => {
       }
 
       const productData = {
-        ...admin.formData,
-        precio: finalPrice,
-        precioAnterior: previousPrice,
-        stock: currentStock,
-        tieneDescuento: hasDiscount,
-        porcentajeDescuento: hasDiscount ? discountPercent : 0
+        ...admin.formData, precio: finalPrice, precioAnterior: previousPrice,
+        stock: currentStock, tieneDescuento: hasDiscount, porcentajeDescuento: hasDiscount ? discountPercent : 0
       };
 
       if (admin.isEditing && admin.currentId) {
-        const productRef = doc(db, "productos", admin.currentId);
-        await updateDoc(productRef, productData);
-
-        toast.success('¡Cambios guardados!', {
-          description: `El producto "${admin.formData.titulo}" se actualizó correctamente.`,
-          duration: 4000,
-          style: { borderRadius: '16px', padding: '12px 16px' }
-        });
+        await updateDoc(doc(db, "productos", admin.currentId), productData);
+        toast.success('¡Cambios guardados!', { description: `"${admin.formData.titulo}" se actualizó.` });
       } else {
         productData.ventas = productData.ventas || 0;
-        const productsCollection = collection(db, "productos");
-        await addDoc(productsCollection, productData);
-
-        toast.success('¡Producto publicado!', {
-          description: `"${productData.titulo}" ya está disponible en el catálogo.`,
-          duration: 4000,
-          style: { borderRadius: '16px', padding: '12px 16px' }
-        });
+        await addDoc(collection(db, "productos"), productData);
+        toast.success('¡Producto publicado!', { description: `"${productData.titulo}" ya está en catálogo.` });
       }
 
-      admin.setFormData({
-        titulo: "",
-        descripcion: "",
-        precio: "",
-        stock: "",
-        categoria: "",
-        imagenUrl: "",
-        envioGratis: false,
-        tieneDescuento: false,
-        porcentajeDescuento: ""
-      });
+      admin.setFormData({ titulo: "", descripcion: "", precio: "", stock: "", categoria: "", imagenUrl: "", envioGratis: false, tieneDescuento: false, porcentajeDescuento: "" });
       admin.setIsEditing(false);
       admin.setCurrentId(null);
-      setIsFormOpen(false);
 
-      if (admin.refreshProducts) {
-        admin.refreshProducts();
-      }
+      if (admin.refreshProducts) admin.refreshProducts();
     } catch (error) {
       console.error(error);
       toast.error('Hubo un error al guardar los cambios');
     }
   };
 
-  const filteredUsers = admin.users?.filter(u => {
-    const isStaff = u.permisos?.isAdmin || u.rol === 'empleado' || u.rol === 'admin';
-    return userSubTab === 'staff' ? isStaff : !isStaff;
-  }) || [];
-
   const handleEdit = (p) => {
-    const productToEdit = {
-      ...p,
-      precio: p.precioAnterior ? p.precioAnterior : p.precio,
-      tieneDescuento: p.tieneDescuento || false,
-      porcentajeDescuento: p.porcentajeDescuento || ""
-    };
-
-    admin.setFormData(productToEdit);
+    admin.setFormData({
+      ...p, precio: p.precioAnterior ? p.precioAnterior : p.precio,
+      tieneDescuento: p.tieneDescuento || false, porcentajeDescuento: p.porcentajeDescuento || ""
+    });
     admin.setCurrentId(p.id);
     admin.setIsEditing(true);
-    setIsFormOpen(true);
-    
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
   };
 
   if (loading || (user && !userData)) return null;
@@ -143,9 +75,7 @@ const AdminContainer = () => {
   if (!user || !userData?.permisos) {
     return (
       <div className="text-center p-20 flex flex-col items-center">
-        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-[32px] flex items-center justify-center mb-6">
-          <Lock size={40}/>
-        </div>
+        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-[32px] flex items-center justify-center mb-6"><Lock size={40}/></div>
         <h2 className="font-black uppercase text-red-500 tracking-tighter text-2xl">Acceso Denegado</h2>
       </div>
     );
@@ -154,22 +84,6 @@ const AdminContainer = () => {
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 min-h-screen bg-gray-50">
       <ConfirmModal {...confirmConfig} onClose={() => setConfirmConfig(p => ({...p, isOpen: false}))} />
-      <UserModal 
-        isOpen={showUserModal} onClose={() => setShowUserModal(false)} 
-        newUser={newUser} setNewUser={setNewUser} 
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const cred = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
-          await setDoc(doc(db, "usuarios", cred.user.uid), { 
-            nombre: newUser.nombre, 
-            email: newUser.email, 
-            permisos: newUser.permisos,
-            rol: newUser.permisos.isAdmin ? "admin" : "empleado" 
-          });
-          setShowUserModal(false);
-          admin.refreshUsers();
-        }} 
-      />
       
       <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
         {['productos', 'pedidos', 'usuarios', 'banners', 'marcas'].map(tab => (
@@ -182,82 +96,17 @@ const AdminContainer = () => {
       </div>
 
       {activeTab === 'productos' && (
-        <>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <AdminFilters {...admin} />
-            <button 
-              onClick={() => {
-                if (isFormOpen && admin.isEditing) {
-                  admin.setIsEditing(false);
-                  admin.setFormData({ titulo: "", descripcion: "", precio: "", stock: "", categoria: "", imagenUrl: "", envioGratis: false, tieneDescuento: false, porcentajeDescuento: "" });
-                }
-                setIsFormOpen(!isFormOpen);
-              }} 
-              className={`lg:hidden flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border ${isFormOpen ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-indigo-600 text-white shadow-md'}`}
-            >
-              {isFormOpen ? (
-                <>
-                  <X size={14} /> Cancelar / Cerrar
-                </>
-              ) : (
-                <>
-                  <Plus size={14} /> Nuevo Producto
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-4">
-            <div className={`lg:col-span-1 ${isFormOpen ? 'block' : 'hidden lg:block'}`}>
-              <ProductForm 
-                formData={admin.formData} 
-                setFormData={admin.setFormData} 
-                isEditing={admin.isEditing} 
-                handleSubmit={handleCustomFormSubmit}
-              />
-            </div>
-            <div className="lg:col-span-2">
-              <ProductTable 
-                products={admin.products} onEdit={handleEdit} 
-                onDelete={(id) => setConfirmConfig({ isOpen: true, title: '¿Eliminar?', message: 'Se borrará del catálogo.', type: 'danger', onConfirm: async () => {} })}
-                onSort={(key) => admin.setSortConfig(p => ({ key, direction: p.key === key && p.direction === 'asc' ? 'desc' : 'asc' }))}
-              />
-            </div>
-          </div>
-        </>
+        <ProductsManager 
+          admin={{ ...admin, handleSubmit: handleCustomFormSubmit }} 
+          onEdit={handleEdit} 
+          onDeleteCustom={(id) => setConfirmConfig({ isOpen: true, title: '¿Eliminar?', message: 'Se borrará del catálogo.', type: 'danger', onConfirm: async () => {} })}
+        />
       )}
 
-      {activeTab === 'pedidos' && (
-        <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-8 border-b border-gray-50">
-            <h2 className="font-black uppercase text-xs tracking-widest text-slate-900">Registro de Ventas</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">{orders.length} pedidos totales</p>
-          </div>
-          <OrderTable orders={orders} onUpdateStatus={handleUpdateOrderStatus} />
-        </div>
-      )}
+      {activeTab === 'pedidos' && <OrdersManager />}
 
-      {activeTab === 'usuarios' && (
-        <div className="space-y-6">
-          <div className="flex bg-white p-2 rounded-2xl border border-gray-100 shadow-sm w-fit">
-            <button onClick={() => setUserSubTab('clientes')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${userSubTab === 'clientes' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400'}`}><UserCheck size={14}/> Clientes</button>
-            <button onClick={() => setUserSubTab('staff')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${userSubTab === 'staff' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400'}`}><Briefcase size={14}/> Staff</button>
-          </div>
-          <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-             <div className="p-6 md:p-8 flex justify-between items-center border-b border-gray-50">
-                <div>
-                  <h2 className="font-black uppercase text-xs tracking-widest text-slate-900">{userSubTab === 'staff' ? 'Gestión de Personal' : 'Base de Clientes'}</h2>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">{filteredUsers.length} Usuarios</p>
-                </div>
-                {userSubTab === 'staff' && <button onClick={() => setShowUserModal(true)} className="bg-indigo-600 text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-black text-[10px] uppercase tracking-widest">Nuevo</button>}
-             </div>
-             <UserTable 
-               users={filteredUsers} currentUser={user} isStaffView={userSubTab === 'staff'} admin={admin}
-               onUpdatePerms={async (id, p, v) => { await updateDoc(doc(db, "usuarios", id), {[`permisos.${p}`]: v}); admin.refreshUsers(); }} 
-             />
-          </div>
-        </div>
-      )}
+      {activeTab === 'usuarios' && <UsersManager admin={admin} currentUser={user} />}
+
       {activeTab === 'banners' && <AdminBanners />}
       {activeTab === 'marcas' && <AdminBrands />}
     </div>
