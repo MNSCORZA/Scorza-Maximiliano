@@ -68,7 +68,7 @@ export const getItemId = async (id) => {
   return docSnap.exists() ? { ...docSnap.data(), id: docSnap.id } : null;
 };
 
-export const createOrder = async (buyerData, items, total, userId = null) => {
+export const createOrder = async (buyerData, items, total, userId = null, couponId = null) => {
   const batch = writeBatch(db);
   const ordersCollection = collection(db, "orders");
   const newOrderRef = doc(ordersCollection);
@@ -76,6 +76,7 @@ export const createOrder = async (buyerData, items, total, userId = null) => {
   const order = {
     buyer: buyerData,
     userId: userId,
+    uid: userId,
     items: items.map(item => ({
       id: item.id,
       titulo: item.titulo,
@@ -85,6 +86,7 @@ export const createOrder = async (buyerData, items, total, userId = null) => {
     total: total,
     status: "generada",
     date: serverTimestamp(),
+    cuponAplicadoId: couponId
   };
 
   batch.set(newOrderRef, order);
@@ -95,6 +97,13 @@ export const createOrder = async (buyerData, items, total, userId = null) => {
       stock: increment(-item.cantidad)
     });
   });
+
+  if (couponId) {
+    const couponRef = doc(db, "cupones", couponId);
+    batch.update(couponRef, {
+      usosActuales: increment(1)
+    });
+  }
 
   await batch.commit();
   return newOrderRef.id;
