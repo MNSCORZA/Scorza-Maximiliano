@@ -3,6 +3,7 @@ import { CartContext } from "../context/CartContext";
 import CartItem from "./CartItem";
 import { CartEmpty } from "./CartEmpty";
 import { useCartTotals } from "../hooks/useCartTotals";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { Trash2, ArrowLeft, Ticket } from "lucide-react";
@@ -11,6 +12,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 
 export const Cart = () => {
   const { cart, emptyCart } = useContext(CartContext);
+  const { user } = useAuth();
   const totalBase = useCartTotals(cart);
   const navigate = useNavigate();
 
@@ -20,20 +22,54 @@ export const Cart = () => {
 
   const handleValidarCupón = async () => {
     if (!inputCupón.trim()) return;
+    
+    if (!user) {
+      toast.error("Iniciá sesión para validar las restricciones del cupón");
+      return;
+    }
+
     try {
       const q = query(collection(db, "cupones"), where("codigo", "==", inputCupón.trim().toUpperCase()));
       const querySnapshot = await getDocs(q);
       
-      if (!querySnapshot.empty) {
-        const couponData = querySnapshot.docs[0].data();
-        setDescuento(couponData.porcentaje);
-        setCupónAplicado(couponData.codigo);
-        toast.success(`Cupón ${couponData.codigo} aplicado: ${couponData.porcentaje}% de descuento`);
-      } else {
+      if (querySnapshot.empty) {
         toast.error("El cupón ingresado no existe");
+        return;
       }
+
+      const couponId = querySnapshot.docs[0].id;
+      const couponData = querySnapshot.docs[0].data();
+
+      if (couponData.fechaExpiracion) {
+        const hoy = new Date().toISOString().split('T')[0];
+        if (hoy > couponData.fechaExpiracion) {
+          toast.error("Este cupón ya expiró");
+          return;
+        }
+      }
+
+      if (couponData.limiteUsos !== null && (couponData.usosActuales >= couponData.limiteUsos)) {
+        toast.error("Este cupón alcanzó su límite de usos disponibles");
+        return;
+      }
+
+      const qOrders = query(collection(db, "orders"), where("uid", "==", user.uid));
+      const ordersSnapshot = await getDocs(qOrders);
+      
+      const yaLoUso = ordersSnapshot.docs.some(doc => doc.data().cuponAplicadoId === couponId);
+      if (yaLoUso) {
+        toast.error("Ya utilizaste este cupón en una compra anterior");
+        return;
+      }
+
+      setDescuento(couponData.porcentaje);
+      setCupónAplicado(couponData.codigo);
+      localStorage.setItem("active_coupon_id", couponId);
+      toast.success(`Cupón ${couponData.codigo} aplicado: ${couponData.porcentaje}% de descuento`);
+      
     } catch (error) {
       console.error(error);
+      toast.error("Error al procesar la validación");
     }
   };
 
@@ -41,6 +77,7 @@ export const Cart = () => {
 
   const HandleEmptyCart = () => {
     emptyCart();
+    localStorage.removeItem("active_coupon_id");
     toast('El carrito se vació correctamente', {
       duration: 3000,
       style: {
