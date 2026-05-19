@@ -12,7 +12,6 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
