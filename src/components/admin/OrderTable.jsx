@@ -15,6 +15,14 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
     }
   };
 
+  if (orders.length === 0) {
+    return (
+      <div className="p-16 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+        No se encontraron pedidos en este segmento
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
@@ -46,14 +54,14 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
                 </td>
                 
                 <td className="px-8 py-6">
-                  <p className="font-black text-xs text-gray-900 tracking-tight">{order.buyer.nombre} {order.buyer.apellido}</p>
-                  <p className="text-[10px] text-indigo-600 font-black mt-1 select-all">{order.buyer.telefono}</p>
-                  <p className="text-[10px] text-gray-400 font-bold lowercase mt-0.5 select-all break-all max-w-[200px]">{order.buyer.email}</p>
+                  <p className="font-black text-xs text-gray-900 tracking-tight">{order.buyer?.nombre || 'Sin Nombre'} {order.buyer?.apellido || ''}</p>
+                  <p className="text-[10px] text-indigo-600 font-black mt-1 select-all">{order.buyer?.telefono || 'Sin Teléfono'}</p>
+                  <p className="text-[10px] text-gray-400 font-bold lowercase mt-0.5 select-all break-all max-w-[200px]">{order.buyer?.email || ''}</p>
                 </td>
                 
                 <td className="px-8 py-6">
                   <div className="max-h-[140px] overflow-y-auto pr-2 space-y-2 scrollbar-thin">
-                    {order.items.map((item, index) => (
+                    {(order.items || []).map((item, index) => (
                       <div key={index} className="flex flex-col border-l-2 border-indigo-500/30 pl-3 py-0.5">
                         <p className="text-xs font-black text-gray-800 uppercase tracking-tight line-clamp-1">{item.titulo}</p>
                         <p className="text-[10px] font-bold text-gray-400">{item.cantidad} x {formatPrice(item.precio)}</p>
@@ -64,7 +72,7 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
                 
                 <td className="px-8 py-6">
                   <span className="text-base font-black text-indigo-600 tracking-tight">
-                    {formatPrice(order.total)}
+                    {formatPrice(order.total || 0)}
                   </span>
                 </td>
                 
