@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import CartItem from "./CartItem";
 import { CartEmpty } from "./CartEmpty";
-import { CartTotalBlock } from "./CartTotalBlock";
 import { useCartTotals } from "../hooks/useCartTotals";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
@@ -111,7 +110,7 @@ export const Cart = () => {
               </button>
             </div>
             {cupónAplicado && (
-              <span className="text-[10px] font-black uppercase bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1.5 rounded-xl tracking-widest animate-fade-in">
+              <span className="text-[10px] font-black uppercase bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1.5 rounded-xl tracking-widest">
                 Activo: {cupónAplicado} (-{descuento}%)
               </span>
             )}
