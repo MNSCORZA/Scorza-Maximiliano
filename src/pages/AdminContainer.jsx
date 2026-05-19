@@ -13,6 +13,7 @@ import UsersManager from '../components/admin/UsersManager';
 import { AdminBanners } from '../components/admin/AdminBanners';
 import { AdminBrands } from '../components/admin/AdminBrands';
 import AdminAnalytics from '../components/admin/AdminAnalytics';
+import { AdminCoupons } from '../components/admin/AdminCoupons';
 
 const AdminContainer = () => {
   const { user, userData, loading } = useAuth();
@@ -87,7 +88,7 @@ const AdminContainer = () => {
       <ConfirmModal {...confirmConfig} onClose={() => setConfirmConfig(p => ({...p, isOpen: false}))} />
 
       <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
-        {['productos', 'pedidos', 'usuarios', 'banners', 'marcas', 'métricas'].map(tab => (
+        {['productos', 'pedidos', 'usuarios', 'banners', 'marcas', 'métricas', 'cupones'].map(tab => (
           (tab !== 'usuarios' || userData.permisos.isAdmin) && (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-gray-400 border border-slate-100'}`}>
               {tab}
@@ -110,8 +111,8 @@ const AdminContainer = () => {
 
       {activeTab === 'banners' && <AdminBanners />}
       {activeTab === 'marcas' && <AdminBrands />}
-      
       {activeTab === 'métricas' && <AdminAnalytics />}
+      {activeTab === 'cupones' && <AdminCoupons />}
     </div>
   );
 };
