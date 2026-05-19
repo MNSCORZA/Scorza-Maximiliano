@@ -4,7 +4,7 @@ import { useAdmin } from '../hooks/useAdmin';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../fireBase/config';
 import { doc, setDoc, updateDoc, collection, getDocs, query, orderBy, addDoc } from 'firebase/firestore';
-import { Lock, UserCheck, Briefcase } from 'lucide-react';
+import { Lock, UserCheck, Briefcase, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import ProductForm from '../components/admin/ProductForm';
@@ -24,6 +24,7 @@ const AdminContainer = () => {
   const [orders, setOrders] = useState([]);
   const [userSubTab, setUserSubTab] = useState('clientes');
   const [showUserModal, setShowUserModal] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
   const [newUser, setNewUser] = useState({ nombre: '', email: '', password: '', permisos: { isAdmin: false, ver: true, editar: false, borrar: false } });
 
@@ -72,7 +73,7 @@ const AdminContainer = () => {
       if (admin.isEditing && admin.currentId) {
         const productRef = doc(db, "productos", admin.currentId);
         await updateDoc(productRef, productData);
-        
+
         toast.success('¡Cambios guardados!', {
           description: `El producto "${admin.formData.titulo}" se actualizó correctamente.`,
           duration: 4000,
@@ -103,6 +104,7 @@ const AdminContainer = () => {
       });
       admin.setIsEditing(false);
       admin.setCurrentId(null);
+      setIsFormOpen(false);
 
       if (admin.refreshProducts) {
         admin.refreshProducts();
@@ -125,11 +127,15 @@ const AdminContainer = () => {
       tieneDescuento: p.tieneDescuento || false,
       porcentajeDescuento: p.porcentajeDescuento || ""
     };
-    
+
     admin.setFormData(productToEdit);
     admin.setCurrentId(p.id);
     admin.setIsEditing(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsFormOpen(true);
+    
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   if (loading || (user && !userData)) return null;
@@ -164,6 +170,7 @@ const AdminContainer = () => {
           admin.refreshUsers();
         }} 
       />
+      
       <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
         {['productos', 'pedidos', 'usuarios', 'banners', 'marcas'].map(tab => (
           (tab !== 'usuarios' || userData.permisos.isAdmin) && (
@@ -173,11 +180,35 @@ const AdminContainer = () => {
           )
         ))}
       </div>
+
       {activeTab === 'productos' && (
         <>
-          <AdminFilters {...admin} />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-8">
-            <div className="lg:col-span-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <AdminFilters {...admin} />
+            <button 
+              onClick={() => {
+                if (isFormOpen && admin.isEditing) {
+                  admin.setIsEditing(false);
+                  admin.setFormData({ titulo: "", descripcion: "", precio: "", stock: "", categoria: "", imagenUrl: "", envioGratis: false, tieneDescuento: false, porcentajeDescuento: "" });
+                }
+                setIsFormOpen(!isFormOpen);
+              }} 
+              className={`lg:hidden flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border ${isFormOpen ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-indigo-600 text-white shadow-md'}`}
+            >
+              {isFormOpen ? (
+                <>
+                  <X size={14} /> Cancelar / Cerrar
+                </>
+              ) : (
+                <>
+                  <Plus size={14} /> Nuevo Producto
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-4">
+            <div className={`lg:col-span-1 ${isFormOpen ? 'block' : 'hidden lg:block'}`}>
               <ProductForm 
                 formData={admin.formData} 
                 setFormData={admin.setFormData} 
@@ -195,6 +226,7 @@ const AdminContainer = () => {
           </div>
         </>
       )}
+
       {activeTab === 'pedidos' && (
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
           <div className="p-8 border-b border-gray-50">
@@ -204,6 +236,7 @@ const AdminContainer = () => {
           <OrderTable orders={orders} onUpdateStatus={handleUpdateOrderStatus} />
         </div>
       )}
+
       {activeTab === 'usuarios' && (
         <div className="space-y-6">
           <div className="flex bg-white p-2 rounded-2xl border border-gray-100 shadow-sm w-fit">
