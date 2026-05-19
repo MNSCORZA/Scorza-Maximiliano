@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { createOrder } from "../fireBase/dataBase";
@@ -9,10 +9,14 @@ import { useCartTotals } from "../hooks/useCartTotals";
 export function Formulario() {
   const { cart, emptyCart } = useContext(CartContext);
   const { user, userData } = useAuth();
-  const total = useCartTotals(cart);
+  const totalFallback = useCartTotals(cart);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const total = location.state?.totalFinalizado ?? totalFallback;
+
   const [formData, setFormData] = useState({ nombre: "", apellido: "", email: "", telefono: "" });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (user && userData) {
