@@ -5,8 +5,6 @@ import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { createOrder } from "../fireBase/dataBase";
 import { useCartTotals } from "../hooks/useCartTotals";
-import { db } from "../fireBase/config";
-import { doc, updateDoc, increment } from "firebase/firestore";
 
 export function Formulario() {
   const { cart, emptyCart } = useContext(CartContext);
@@ -53,10 +51,6 @@ export function Formulario() {
       );
 
       if (activeCouponId) {
-        const couponRef = doc(db, "cupones", activeCouponId);
-        await updateDoc(couponRef, {
-          usosActuales: increment(1)
-        });
         localStorage.removeItem("active_coupon_id");
       }
 
