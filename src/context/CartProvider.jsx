@@ -9,14 +9,15 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [cartOpen, setCartOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
+    if (loading) return;
     if (user?.uid) {
       saveUserCart(user.uid, cart);
     }
-  }, [cart, user]);
+  }, [cart, user, loading]);
 
   const openCart = () => setCartOpen(true);
   const closeCart = () => setCartOpen(false);
