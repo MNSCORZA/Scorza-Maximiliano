@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
     
-    // Al definir el rol aquí, ningún usuario externo puede ser admin al registrarse
     await setDoc(doc(db, "usuarios", uid), {
       nombre: extraData.nombre,
       email: email,
@@ -71,4 +70,18 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    return { 
+      user: null, 
+      userData: null, 
+      loading: true, 
+      login: async () => {}, 
+      logout: async () => {}, 
+      register: async () => {}, 
+      resetPassword: async () => {} 
+    };
+  }
+  return context;
+};
