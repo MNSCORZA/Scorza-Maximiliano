@@ -15,7 +15,8 @@ import {
   orderBy,
   updateDoc,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  deleteDoc
 } from "firebase/firestore";
 import { db } from "./config.js";
 
@@ -180,6 +181,34 @@ export const addProductToHistoryFirebase = async (uid, product) => {
     await updateDoc(userRef, {
       historial: arrayUnion(productData)
     });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const saveUserCart = async (uid, cartItems) => {
+  if (!uid) return;
+  try {
+    const cartRef = doc(db, 'carritos', uid);
+    if (cartItems.length === 0) {
+      await deleteDoc(cartRef);
+      return;
+    }
+    await setDoc(cartRef, {
+      uid,
+      items: cartItems,
+      status: 'activo',
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const deleteUserCart = async (uid) => {
+  if (!uid) return;
+  try {
+    await deleteDoc(doc(db, 'carritos', uid));
   } catch (error) {
     console.error(error);
   }
