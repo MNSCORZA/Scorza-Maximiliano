@@ -1,5 +1,5 @@
 import { CartContext } from "./CartContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { saveUserCart } from "../fireBase/dataBase";
 
@@ -10,13 +10,23 @@ export function CartProvider({ children }) {
   });
   const [cartOpen, setCartOpen] = useState(false);
   const { user, loading } = useAuth();
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
-    if (loading) return;
-    if (user?.uid) {
-      saveUserCart(user.uid, cart);
+    
+    if (loading || !user?.uid) return;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
+
+    const delayDebounce = setTimeout(() => {
+      saveUserCart(user.uid, cart);
+    }, 600);
+
+    return () => clearTimeout(delayDebounce);
   }, [cart, user, loading]);
 
   const openCart = () => setCartOpen(true);
