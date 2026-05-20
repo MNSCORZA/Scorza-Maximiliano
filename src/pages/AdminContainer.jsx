@@ -7,14 +7,15 @@ import { Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { saveLog } from '../fireBase/dataBase';
 
+// Importaciones corregidas con destructuración según tus módulos reales
 import ConfirmModal from '../components/admin/ConfirmModal';
 import ProductsManager from '../components/admin/ProductsManager';
 import OrdersManager from '../components/admin/OrdersManager';
 import UsersManager from '../components/admin/UsersManager';
-import AdminBanners from '../components/admin/AdminBanners';
-import AdminBrands from '../components/admin/AdminBrands';
-import AdminAnalytics from '../components/admin/AdminAnalytics';
-import AdminCoupons from '../components/admin/AdminCoupons';
+import { AdminBanners } from '../components/admin/AdminBanners';
+import { AdminBrands } from '../components/admin/AdminBrands';
+import { AdminAnalytics } from '../components/admin/AdminAnalytics';
+import { AdminCoupons } from '../components/admin/AdminCoupons';
 import AdminLogs from '../components/admin/AdminLogs';
 import AbandonedCarts from '../components/admin/AbandonedCarts';
 
