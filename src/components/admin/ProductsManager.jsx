@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, X, Percent, Layers, Trash2, Check } from 'lucide-react';
+import { Plus, X, Percent, Layers, Trash2, Check, ArrowDown } from 'lucide-react';
 import { writeBatch, doc } from 'firebase/firestore';
 import { db } from '../../fireBase/config';
 import { saveLog } from '../../fireBase/dataBase';
@@ -45,12 +45,12 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
 
   const handleBulkExecute = async () => {
     if (!bulkAction) return;
-    if ((bulkAction === 'precio' || bulkAction === 'stock') && !bulkValue) {
+    if ((bulkAction === 'precio' || bulkAction === 'rebajar' || bulkAction === 'stock') && !bulkValue) {
       toast.error('Por favor, ingresá un valor para la modificación');
       return;
     }
 
-    setIsProcessing(false);
+    setIsProcessing(true);
     try {
       const batch = writeBatch(db);
       const affectedProducts = admin.products.filter(p => selectedIds.includes(p.id));
@@ -67,12 +67,40 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           const productRef = doc(db, "productos", p.id);
           batch.update(productRef, { 
             precio: finalPrice,
-            precioAnterior: currentPrice 
+            precioAnterior: currentPrice,
+            tieneDescuento: false,
+            porcentajeDescuento: 0
           });
         });
-        descriptionLog = `Aumentó el precio un ${percentage}% de de forma masiva a un bloque de ${selectedIds.length} productos.`;
+        descriptionLog = `Aumentó el precio un ${percentage}% de forma masiva a un bloque de ${selectedIds.length} productos.`;
       } 
       
+      else if (bulkAction === 'rebajar') {
+        const percentage = Number(bulkValue);
+        if (percentage <= 0 || percentage >= 100) {
+          toast.error('El porcentaje de descuento debe ser entre 1 y 99');
+          setIsProcessing(false);
+          return;
+        }
+
+        affectedProducts.forEach(p => {
+          // Si el producto ya tenía una oferta, calculamos sobre su precio base real (precioAnterior)
+          // Si no, tomamos el precio actual comercial como base de la lista
+          const basePrice = p.precioAnterior ? Number(p.precioAnterior) : Number(p.precio);
+          const discountAmount = basePrice * (percentage / 100);
+          const finalPrice = Math.round(basePrice - discountAmount);
+          
+          const productRef = doc(db, "productos", p.id);
+          batch.update(productRef, { 
+            precio: finalPrice,
+            precioAnterior: basePrice,
+            tieneDescuento: true,
+            porcentajeDescuento: percentage
+          });
+        });
+        descriptionLog = `Aplicó un descuento masivo del ${percentage}% OFF a un bloque de ${selectedIds.length} productos.`;
+      }
+
       else if (bulkAction === 'stock') {
         const targetStock = Number(bulkValue);
         affectedProducts.forEach(p => {
@@ -194,16 +222,17 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
               >
                 <option value="">Elegir acción masiva...</option>
                 <option value="precio">Aumentar Precio (%)</option>
+                <option value="rebajar">Rebajar Precio (% OFF)</option>
                 <option value="stock">Modificar Stock Fijo</option>
                 <option value="eliminar">Eliminar del catálogo</option>
               </select>
 
-              {bulkAction === 'precio' && (
+              {(bulkAction === 'precio' || bulkAction === 'rebajar') && (
                 <div className="relative flex items-center max-w-[100px]">
-                  <Percent size={12} className="absolute left-3 text-slate-400" />
+                  {bulkAction === 'rebajar' ? <ArrowDown size={12} className="absolute left-3 text-orange-400" /> : <Percent size={12} className="absolute left-3 text-slate-400" />}
                   <input
                     type="number"
-                    placeholder="Ej: 10"
+                    placeholder={bulkAction === 'rebajar' ? "Ej: 15" : "Ej: 10"}
                     value={bulkValue}
                     onChange={(e) => setBulkValue(e.target.value)}
                     className="w-full bg-slate-800 text-white rounded-xl py-2 pl-8 pr-3 font-bold text-xs border border-slate-700 outline-none focus:border-indigo-500"
@@ -231,6 +260,8 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
                   className={`p-2.5 rounded-xl text-white transition-all font-bold text-xs cursor-pointer ${
                     bulkAction === 'eliminar' 
                       ? 'bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-900/20' 
+                      : bulkAction === 'rebajar'
+                      ? 'bg-orange-600 hover:bg-orange-700 shadow-md shadow-orange-900/20'
                       : 'bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-900/20'
                   }`}
                 >
