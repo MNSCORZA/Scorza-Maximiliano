@@ -39,11 +39,11 @@ const WhatsAppWrapper = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <FavoritesProvider>
-          <div className="min-h-screen flex flex-col">
-            <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <FavoritesProvider>
+            <div className="min-h-screen flex flex-col">
               <ScrollToTop />
               <NavBar />
               <SideCart />
@@ -68,12 +68,12 @@ function App() {
               </main>
               <Footer />
               <WhatsAppWrapper />
-            </BrowserRouter>
-            <Toaster position="top-right" richColors />
-          </div>
-        </FavoritesProvider>
-      </CartProvider>
-    </AuthProvider>
+              <Toaster position="top-right" richColors />
+            </div>
+          </FavoritesProvider>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
