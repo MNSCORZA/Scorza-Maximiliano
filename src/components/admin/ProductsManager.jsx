@@ -13,7 +13,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
   const { user, userData } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   
-  // Estados para la Gestión Masiva de Inventario (Bulk Actions)
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkAction, setBulkAction] = useState(''); 
   const [bulkValue, setBulkValue] = useState('');
@@ -24,14 +23,12 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
     setIsFormOpen(true);
   };
 
-  // Manejo de selección individual de productos
   const handleToggleSelect = (id) => {
     setSelectedIds(prev => 
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
 
-  // Manejo de selección maestra (Checkbox de la cabecera) por página actual
   const handleToggleSelectAll = (currentPageItems) => {
     const currentPageIds = currentPageItems.map(p => p.id);
     const allSelectedOnPage = currentPageIds.every(id => selectedIds.includes(id));
@@ -46,7 +43,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
     }
   };
 
-  // Ejecución de las actualizaciones masivas en Firebase utilizando writeBatch
   const handleBulkExecute = async () => {
     if (!bulkAction) return;
     if ((bulkAction === 'precio' || bulkAction === 'rebajar' || bulkAction === 'stock') && !bulkValue) {
@@ -61,7 +57,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
       
       let descriptionLog = '';
 
-      // 1. Aumento masivo de precios por porcentaje
       if (bulkAction === 'precio') {
         const percentage = Number(bulkValue);
         affectedProducts.forEach(p => {
@@ -80,7 +75,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         descriptionLog = `Aumentó el precio un ${percentage}% de forma masiva a un bloque de ${selectedIds.length} productos.`;
       } 
       
-      // 2. Rebaja masiva de precios (% OFF) conservando históricos
       else if (bulkAction === 'rebajar') {
         const percentage = Number(bulkValue);
         if (percentage <= 0 || percentage >= 100) {
@@ -105,7 +99,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         descriptionLog = `Aplicó un descuento masivo del ${percentage}% OFF a un bloque de ${selectedIds.length} productos.`;
       }
 
-      // 3. Modificación masiva de stock fijo
       else if (bulkAction === 'stock') {
         const targetStock = Number(bulkValue);
         affectedProducts.forEach(p => {
@@ -115,7 +108,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         descriptionLog = `Actualizó el stock a ${targetStock} unidades de forma masiva a un bloque de ${selectedIds.length} productos.`;
       } 
       
-      // 4. Eliminación masiva del catálogo
       else if (bulkAction === 'eliminar') {
         affectedProducts.forEach(p => {
           const productRef = doc(db, "productos", p.id);
@@ -124,10 +116,8 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         descriptionLog = `Eliminó permanentemente del catálogo un bloque masivo de ${selectedIds.length} productos.`;
       }
 
-      // Impactamos todos los cambios juntos en una sola petición
       await batch.commit();
       
-      // Registramos el movimiento en la colección de Logs de Auditoría
       await saveLog(
         user.uid, 
         user.email, 
@@ -153,7 +143,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
 
   return (
     <>
-      {/* Filtros superiores y botón de creación adaptable */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <AdminFilters {...admin} />
         <button 
@@ -184,9 +173,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         </button>
       </div>
 
-      {/* Grilla principal del panel de administración */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-4 relative pb-24">
-        {/* Formulario lateral de producto */}
         <div className={`lg:col-span-1 ${isFormOpen ? 'block' : 'hidden lg:block'}`}>
           <ProductForm 
             formData={admin.formData} 
@@ -199,7 +186,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           />
         </div>
         
-        {/* Tabla de visualización del catálogo */}
         <div className="lg:col-span-2">
           <ProductTable 
             products={admin.products} 
@@ -215,23 +201,18 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           />
         </div>
 
-        {/* Barra de Herramientas de Control Masivo (Flotante Premium) */}
         {selectedIds.length > 0 && (
           <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-4 rounded-[24px] shadow-2xl flex flex-col md:flex-row items-center gap-3.5 z-50 border border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-300 w-[94%] max-w-2xl">
             
-            {/* Indicador de cantidad de ítems bajo control */}
             <div className="flex items-center gap-2 flex-shrink-0 w-full md:w-auto justify-center md:justify-start">
               <span className="w-5 h-5 bg-indigo-600 rounded-lg flex items-center justify-center text-[10px] font-black">{selectedIds.length}</span>
               <p className="text-xs font-bold text-slate-300">artículos seleccionados</p>
             </div>
 
-            {/* Separador de entornos estructurado (Oculto en pantallas pequeñas) */}
             <div className="hidden md:block h-5 w-px bg-slate-800" />
 
-            {/* Contenedor adaptativo de inputs y gatillos de ejecución */}
             <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:justify-end">
               
-              {/* Menú de selección de operaciones globales */}
               <select
                 value={bulkAction}
                 onChange={(e) => {
@@ -247,10 +228,8 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
                 <option value="eliminar">Eliminar del catálogo</option>
               </select>
 
-              {/* Fila de controles numéricos y ejecución simplificada */}
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 
-                {/* Inputs numéricos acoplados dinámicamente con altura fija */}
                 {(bulkAction === 'precio' || bulkAction === 'rebajar') && (
                   <div className="relative flex items-center w-full sm:max-w-[100px]">
                     {bulkAction === 'rebajar' ? (
@@ -281,7 +260,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
                   </div>
                 )}
 
-                {/* Botón definitivo de guardado masivo */}
                 {bulkAction && (
                   <button
                     onClick={handleBulkExecute}
@@ -298,7 +276,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
                   </button>
                 )}
 
-                {/* Botón de cancelación / Limpieza de referencias */}
                 <button 
                   onClick={() => {
                     setSelectedIds([]);
