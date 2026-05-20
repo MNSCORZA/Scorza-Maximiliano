@@ -1,15 +1,118 @@
 import React, { useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Percent, Layers, Trash2, Check } from 'lucide-react';
+import { writeBatch, doc } from 'firebase/firestore';
+import { db } from '../../fireBase/config';
+import { saveLog } from '../../fireBase/dataBase';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'sonner';
 import AdminFilters from './AdminFilters';
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
 
 const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
+  const { user, userData } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkAction, setBulkAction] = useState(''); 
+  const [bulkValue, setBulkValue] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleEditIntercept = (product) => {
     onEdit(product);
     setIsFormOpen(true);
+  };
+
+  const handleToggleSelect = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = (currentPageItems) => {
+    const currentPageIds = currentPageItems.map(p => p.id);
+    const allSelectedOnPage = currentPageIds.every(id => selectedIds.includes(id));
+
+    if (allSelectedOnPage) {
+      setSelectedIds(prev => prev.filter(id => !currentPageIds.includes(id)));
+    } else {
+      setSelectedIds(prev => {
+        const structuralUnique = new Set([...prev, ...currentPageIds]);
+        return Array.from(structuralUnique);
+      });
+    }
+  };
+
+  const handleBulkExecute = async () => {
+    if (!bulkAction) return;
+    if ((bulkAction === 'precio' || bulkAction === 'stock') && !bulkValue) {
+      toast.error('Por favor, ingresá un valor para la modificación');
+      return;
+    }
+
+    setIsProcessing(false);
+    try {
+      const batch = writeBatch(db);
+      const affectedProducts = admin.products.filter(p => selectedIds.includes(p.id));
+      
+      let descriptionLog = '';
+
+      if (bulkAction === 'precio') {
+        const percentage = Number(bulkValue);
+        affectedProducts.forEach(p => {
+          const currentPrice = Number(p.precio);
+          const incremental = currentPrice * (percentage / 100);
+          const finalPrice = Math.round(currentPrice + incremental);
+          
+          const productRef = doc(db, "productos", p.id);
+          batch.update(productRef, { 
+            precio: finalPrice,
+            precioAnterior: currentPrice 
+          });
+        });
+        descriptionLog = `Aumentó el precio un ${percentage}% de de forma masiva a un bloque de ${selectedIds.length} productos.`;
+      } 
+      
+      else if (bulkAction === 'stock') {
+        const targetStock = Number(bulkValue);
+        affectedProducts.forEach(p => {
+          const productRef = doc(db, "productos", p.id);
+          batch.update(productRef, { stock: targetStock });
+        });
+        descriptionLog = `Actualizó el stock a ${targetStock} unidades de forma masiva a un bloque de ${selectedIds.length} productos.`;
+      } 
+      
+      else if (bulkAction === 'eliminar') {
+        affectedProducts.forEach(p => {
+          const productRef = doc(db, "productos", p.id);
+          batch.delete(productRef);
+        });
+        descriptionLog = `Eliminó permanentemente del catálogo un bloque masivo de ${selectedIds.length} productos.`;
+      }
+
+      await batch.commit();
+      
+      await saveLog(
+        user.uid, 
+        user.email, 
+        userData?.nombre || 'Admin Masivo', 
+        'Acción Masiva', 
+        descriptionLog
+      );
+
+      toast.success('¡Acción masiva aplicada con éxito!');
+      setSelectedIds([]);
+      setBulkAction('');
+      setBulkValue('');
+      
+      if (admin.refreshProducts) await admin.refreshProducts();
+
+    } catch (error) {
+      console.error(error);
+      toast.error('Hubo un inconveniente al procesar la actualización masiva');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -44,7 +147,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-4 relative pb-24">
         <div className={`lg:col-span-1 ${isFormOpen ? 'block' : 'hidden lg:block'}`}>
           <ProductForm 
             formData={admin.formData} 
@@ -61,12 +164,93 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
             products={admin.products} 
             onEdit={handleEditIntercept} 
             onDelete={onDeleteCustom}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
+            onToggleSelectAll={handleToggleSelectAll}
             onSort={(key) => admin.setSortConfig(p => ({ 
               key, 
               direction: p.key === key && p.direction === 'asc' ? 'desc' : 'asc' 
             }))}
           />
         </div>
+
+        {selectedIds.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-[24px] shadow-2xl flex flex-col sm:flex-row items-center gap-4 z-50 border border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-300 w-[92%] max-w-2xl">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="w-5 h-5 bg-indigo-600 rounded-lg flex items-center justify-center text-[10px] font-black">{selectedIds.length}</span>
+              <p className="text-xs font-bold text-slate-300">artículos seleccionados</p>
+            </div>
+
+            <div className="h-px sm:h-5 w-full sm:w-px bg-slate-800" />
+
+            <div className="flex flex-wrap items-center gap-2 w-full justify-end">
+              <select
+                value={bulkAction}
+                onChange={(e) => {
+                  setBulkAction(e.target.value);
+                  setBulkValue('');
+                }}
+                className="bg-slate-800 border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-wider px-3 py-2.5 outline-none focus:border-indigo-500 transition-colors text-white cursor-pointer"
+              >
+                <option value="">Elegir acción masiva...</option>
+                <option value="precio">Aumentar Precio (%)</option>
+                <option value="stock">Modificar Stock Fijo</option>
+                <option value="eliminar">Eliminar del catálogo</option>
+              </select>
+
+              {bulkAction === 'precio' && (
+                <div className="relative flex items-center max-w-[100px]">
+                  <Percent size={12} className="absolute left-3 text-slate-400" />
+                  <input
+                    type="number"
+                    placeholder="Ej: 10"
+                    value={bulkValue}
+                    onChange={(e) => setBulkValue(e.target.value)}
+                    className="w-full bg-slate-800 text-white rounded-xl py-2 pl-8 pr-3 font-bold text-xs border border-slate-700 outline-none focus:border-indigo-500"
+                  />
+                </div>
+              )}
+
+              {bulkAction === 'stock' && (
+                <div className="relative flex items-center max-w-[100px]">
+                  <Layers size={12} className="absolute left-3 text-slate-400" />
+                  <input
+                    type="number"
+                    placeholder="Stock"
+                    value={bulkValue}
+                    onChange={(e) => setBulkValue(e.target.value)}
+                    className="w-full bg-slate-800 text-white rounded-xl py-2 pl-8 pr-3 font-bold text-xs border border-slate-700 outline-none focus:border-indigo-500"
+                  />
+                </div>
+              )}
+
+              {bulkAction && (
+                <button
+                  onClick={handleBulkExecute}
+                  disabled={isProcessing}
+                  className={`p-2.5 rounded-xl text-white transition-all font-bold text-xs cursor-pointer ${
+                    bulkAction === 'eliminar' 
+                      ? 'bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-900/20' 
+                      : 'bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-900/20'
+                  }`}
+                >
+                  {bulkAction === 'eliminar' ? <Trash2 size={14} /> : <Check size={14} />}
+                </button>
+              )}
+
+              <button 
+                onClick={() => {
+                  setSelectedIds([]);
+                  setBulkAction('');
+                  setBulkValue('');
+                }}
+                className="p-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
