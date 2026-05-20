@@ -6,6 +6,7 @@ import {
   getDoc, 
   doc, 
   setDoc,
+  addDoc,
   serverTimestamp,
   writeBatch,
   increment,
@@ -17,6 +18,21 @@ import {
   arrayRemove
 } from "firebase/firestore";
 import { db } from "./config.js";
+
+export const saveLog = async (userId, userEmail, userNombre, accion, detalles) => {
+  try {
+    await addDoc(collection(db, "logs"), {
+      userId,
+      userEmail,
+      userNombre,
+      accion,
+      detalles,
+      fecha: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Error al guardar log:", error);
+  }
+};
 
 export const getItems = async () => {
   const querySnapshot = await getDocs(collection(db, 'productos'));
