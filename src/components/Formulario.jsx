@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useNavigate, useLocation } from "react-router";
 import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { createOrder } from "../fireBase/dataBase";
+import { createOrder, deleteUserCart } from "../fireBase/dataBase";
 import { useCartTotals } from "../hooks/useCartTotals";
 
 export function Formulario() {
@@ -41,7 +41,7 @@ export function Formulario() {
     setLoading(true);
     try {
       const activeCouponId = localStorage.getItem("active_coupon_id");
-      
+
       const orderId = await createOrder(
         formData, 
         cart, 
@@ -49,6 +49,10 @@ export function Formulario() {
         user?.uid || null,
         activeCouponId || null
       );
+
+      if (user?.uid) {
+        await deleteUserCart(user.uid);
+      }
 
       if (activeCouponId) {
         localStorage.removeItem("active_coupon_id");
