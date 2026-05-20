@@ -1,5 +1,7 @@
 import { CartContext } from "./CartContext";
 import { useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
+import { saveUserCart } from "../fireBase/dataBase";
 
 export function CartProvider({ children }) {
   const [cart, setCart] = useState(() => {
@@ -7,10 +9,14 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [cartOpen, setCartOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    if (user?.uid) {
+      saveUserCart(user.uid, cart);
+    }
+  }, [cart, user]);
 
   const openCart = () => setCartOpen(true);
   const closeCart = () => setCartOpen(false);
