@@ -31,11 +31,21 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
-const WhatsAppWrapper = () => {
-  if (typeof window !== "undefined" && window.location.pathname.startsWith('/admin')) {
-    return null;
-  }
-  return <WhatsAppBtn />;
+const LayoutWrapper = ({ children }) => {
+  const isDocAdmin = typeof window !== "undefined" && window.location.pathname.startsWith('/admin');
+  
+  return (
+    <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
+      <NavBar />
+      <SideCart />
+      <main className="flex-grow">
+        {children}
+      </main>
+      <Footer />
+      {!isDocAdmin && <WhatsAppBtn />}
+    </div>
+  );
 };
 
 function App() {
@@ -44,33 +54,26 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <FavoritesProvider>
-            <div className="min-h-screen flex flex-col">
-              <ScrollToTop />
-              <NavBar />
-              <SideCart />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<HomeContent />} />
-                  <Route path="/Catalogo" element={<ItemListContainer />} />
-                  <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
-                  <Route path="/item/:id" element={<ItemDetailContainer />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/favoritos" element={<Favoritos />} />
-                  <Route path="/ofertas" element={<OfertasContainer />} />
-                  <Route path="/form" element={<Formulario />} />
-                  <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<SignUp />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
-                  <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
-                  <Route path="/*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <Footer />
-              <WhatsAppWrapper />
-              <Toaster position="top-right" richColors />
-            </div>
+            <LayoutWrapper>
+              <Routes>
+                <Route path="/" element={<HomeContent />} />
+                <Route path="/Catalogo" element={<ItemListContainer />} />
+                <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
+                <Route path="/item/:id" element={<ItemDetailContainer />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/favoritos" element={<Favoritos />} />
+                <Route path="/ofertas" element={<OfertasContainer />} />
+                <Route path="/form" element={<Formulario />} />
+                <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
+                <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
+                <Route path="/*" element={<NotFound />} />
+              </Routes>
+            </LayoutWrapper>
+            <Toaster position="top-right" richColors />
           </FavoritesProvider>
         </CartProvider>
       </AuthProvider>
