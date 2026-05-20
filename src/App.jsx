@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { NavBar } from "./components/NavBar";
 import { ItemListContainer } from "./components/ItemListContainer";
 import { ItemDetailContainer } from "./components/ItemDetailContainer";
@@ -32,8 +32,9 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 };
 
 const WhatsAppWrapper = () => {
-  const location = useLocation();
-  if (location.pathname.startsWith('/admin')) return null;
+  if (typeof window !== "undefined" && window.location.pathname.startsWith('/admin')) {
+    return null;
+  }
   return <WhatsAppBtn />;
 };
 
