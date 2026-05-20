@@ -12,7 +12,6 @@ import ProductTable from './ProductTable';
 const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
   const { user, userData } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkAction, setBulkAction] = useState(''); 
   const [bulkValue, setBulkValue] = useState('');
@@ -54,7 +53,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
     try {
       const batch = writeBatch(db);
       const affectedProducts = admin.products.filter(p => selectedIds.includes(p.id));
-      
       let descriptionLog = '';
 
       if (bulkAction === 'precio') {
@@ -63,7 +61,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           const currentPrice = Number(p.precio);
           const incremental = currentPrice * (percentage / 100);
           const finalPrice = Math.round(currentPrice + incremental);
-          
           const productRef = doc(db, "productos", p.id);
           batch.update(productRef, { 
             precio: finalPrice,
@@ -74,7 +71,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         });
         descriptionLog = `Aumentó el precio un ${percentage}% de forma masiva a un bloque de ${selectedIds.length} productos.`;
       } 
-      
       else if (bulkAction === 'rebajar') {
         const percentage = Number(bulkValue);
         if (percentage <= 0 || percentage >= 100) {
@@ -82,12 +78,10 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           setIsProcessing(false);
           return;
         }
-
         affectedProducts.forEach(p => {
           const basePrice = p.precioAnterior ? Number(p.precioAnterior) : Number(p.precio);
           const discountAmount = basePrice * (percentage / 100);
           const finalPrice = Math.round(basePrice - discountAmount);
-          
           const productRef = doc(db, "productos", p.id);
           batch.update(productRef, { 
             precio: finalPrice,
@@ -98,7 +92,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         });
         descriptionLog = `Aplicó un descuento masivo del ${percentage}% OFF a un bloque de ${selectedIds.length} productos.`;
       }
-
       else if (bulkAction === 'stock') {
         const targetStock = Number(bulkValue);
         affectedProducts.forEach(p => {
@@ -107,7 +100,6 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         });
         descriptionLog = `Actualizó el stock a ${targetStock} unidades de forma masiva a un bloque de ${selectedIds.length} productos.`;
       } 
-      
       else if (bulkAction === 'eliminar') {
         affectedProducts.forEach(p => {
           const productRef = doc(db, "productos", p.id);
@@ -117,22 +109,13 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
       }
 
       await batch.commit();
-      
-      await saveLog(
-        user.uid, 
-        user.email, 
-        userData?.nombre || 'Admin Masivo', 
-        'Acción Masiva', 
-        descriptionLog
-      );
+      await saveLog(user.uid, user.email, userData?.nombre || 'Admin Masivo', 'Acción Masiva', descriptionLog);
 
       toast.success('¡Acción masiva aplicada con éxito!');
       setSelectedIds([]);
       setBulkAction('');
       setBulkValue('');
-      
       if (admin.refreshProducts) await admin.refreshProducts();
-
     } catch (error) {
       console.error(error);
       toast.error('Hubo un inconveniente al procesar la actualización masiva');
@@ -202,7 +185,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
         </div>
 
         {selectedIds.length > 0 && (
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-4 rounded-[24px] shadow-2xl flex flex-col md:flex-row items-center gap-3.5 z-50 border border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-300 w-[94%] max-w-2xl">
+          <div className="mt-6 md:mt-0 md:fixed md:bottom-4 md:left-1/2 md:-translate-x-1/2 bg-slate-900 text-white px-5 py-4 rounded-[24px] shadow-2xl flex flex-col md:flex-row items-center gap-3.5 z-50 border border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full md:w-[94%] md:max-w-2xl">
             
             <div className="flex items-center gap-2 flex-shrink-0 w-full md:w-auto justify-center md:justify-start">
               <span className="w-5 h-5 bg-indigo-600 rounded-lg flex items-center justify-center text-[10px] font-black">{selectedIds.length}</span>
