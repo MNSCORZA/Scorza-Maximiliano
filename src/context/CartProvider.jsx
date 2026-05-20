@@ -10,7 +10,9 @@ export function CartProvider({ children }) {
   });
   const [cartOpen, setCartOpen] = useState(false);
   const { user, loading } = useAuth();
+  
   const isInitialMount = useRef(true);
+  const previousCartRef = useRef(JSON.stringify(cart));
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -22,9 +24,15 @@ export function CartProvider({ children }) {
       return;
     }
 
+    const currentCartStr = JSON.stringify(cart);
+    if (previousCartRef.current === currentCartStr) {
+      return;
+    }
+    previousCartRef.current = currentCartStr;
+
     const delayDebounce = setTimeout(() => {
       saveUserCart(user.uid, cart);
-    }, 600);
+    }, 1000);
 
     return () => clearTimeout(delayDebounce);
   }, [cart, user, loading]);
