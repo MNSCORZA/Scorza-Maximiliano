@@ -1,100 +1,144 @@
-import React, { useEffect, useState } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
 import { db } from '../../fireBase/config';
-import { ShoppingBag, Clock, User, DollarSign } from 'lucide-react';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { ShoppingBag, Clock, User, DollarSign, Trash2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const AbandonedCarts = () => {
   const [carts, setCarts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchCarts = async () => {
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, "carritos"));
+      const cartsList = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCarts(cartsList);
+    } catch (error) {
+      console.error("Error al traer carritos:", error);
+      toast.error("No se pudieron cargar los carritos abandonados");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const q = query(collection(db, 'carritos'), where('status', '==', 'activo'));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.items && data.items.length > 0) {
-          docs.push({ id: doc.id, ...data });
-        }
-      });
-      setCarts(docs);
-      setLoading(false);
-    }, (error) => {
-      console.error(error);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    fetchCarts();
   }, []);
 
+  const handleDeleteCart = async (cartId) => {
+    try {
+      await deleteDoc(doc(db, "carritos", cartId));
+      toast.success("Carrito eliminado correctamente");
+      setCarts(carts.filter(cart => cart.id !== cartId));
+    } catch (error) {
+      console.error("Error al eliminar carrito:", error);
+      toast.error("No se pudo eliminar el carrito");
+    }
+  };
+
   const calculateCartTotal = (items) => {
+    if (!Array.isArray(items)) return 0;
     return items.reduce((acc, item) => acc + (Number(item.precio) * (item.cantidad || 1)), 0);
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "Fecha desconocida";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-48">
+      <div className="flex justify-center items-center p-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-md shadow-slate-100/40 text-slate-900">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-amber-500/10 text-amber-600 rounded-2xl">
-          <ShoppingBag size={20} />
-        </div>
-        <div>
-          <h2 className="text-sm font-black uppercase tracking-wider text-slate-800">Carritos Abandonados</h2>
-          <p className="text-xs text-slate-400 font-medium">Usuarios registrados que no finalizaron la orden de pago</p>
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl">
+            <ShoppingBag size={24} />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Carritos Abandonados</h2>
+            <p className="text-xs text-slate-400 font-medium">Monitoreá los productos que los usuarios dejaron guardados.</p>
+          </div>
         </div>
       </div>
 
       {carts.length === 0 ? (
-        <p className="text-xs text-slate-400 py-12 text-center font-bold uppercase tracking-wider">No hay carritos abandonados registrados</p>
+        <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center flex flex-col items-center justify-center">
+          <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mb-4">
+            <ShoppingBag size={32} />
+          </div>
+          <p className="text-slate-500 font-bold uppercase tracking-wider text-xs">No hay carritos abandonados actualmente</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {carts.map((cart) => {
-            const total = calculateCartTotal(cart.items);
-            const date = cart.updatedAt?.toDate();
-            const timeString = date ? date.toLocaleString('es-AR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) : '---';
-
-            return (
-              <div key={cart.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 flex flex-col justify-between gap-5">
-                <div>
-                  <div className="flex justify-between items-start gap-2 mb-4">
-                    <div className="flex items-center gap-1.5 text-slate-700">
-                      <User size={13} className="text-indigo-500" />
-                      <span className="text-[11px] font-black tracking-tight uppercase">ID: {cart.id.slice(0, 10)}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[9px] bg-white border border-slate-200/60 px-2 py-1 rounded-lg font-black text-slate-400 tracking-wider">
-                      <Clock size={10} />
-                      {timeString}
-                    </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {carts.map((cart) => (
+            <div key={cart.id} className="bg-white border border-slate-100 rounded-3xl shadow-sm hover:shadow-md transition-all p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start border-b border-slate-50 pb-4 mb-4">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <User size={16} />
+                    <span className="text-xs font-bold uppercase tracking-wider truncate max-w-[180px]">
+                      ID: {cart.uid || cart.id}
+                    </span>
                   </div>
-
-                  <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
-                    {cart.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-xs bg-white p-2.5 rounded-xl border border-slate-200/40 shadow-sm shadow-slate-100">
-                        <span className="text-slate-600 font-bold truncate max-w-[150px]">{item.titulo}</span>
-                        <span className="font-black text-indigo-600 text-[11px] bg-indigo-50 px-2 py-0.5 rounded-md">x{item.cantidad || 1}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <button onClick={() => handleDeleteCart(cart.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                    <Trash2 size={16} />
+                  </button>
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-slate-200/60">
-                  <span className="text-[9px] uppercase font-black tracking-widest text-slate-400">Total retenido</span>
-                  <div className="flex items-center font-black text-emerald-600 text-sm bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-100">
-                    <DollarSign size={13} />
-                    {total.toLocaleString('es-AR')}
-                  </div>
+                <div className="space-y-3">
+                  {Array.isArray(cart.items) && cart.items.map((item, idx) => (
+                    <div key={item.id || idx} className="flex items-center justify-between gap-4 bg-slate-50 p-3 rounded-2xl">
+                      <div className="flex items-center gap-3 truncate">
+                        {item.imagenUrl || item.img ? (
+                          <img src={item.imagenUrl || item.img} alt={item.titulo} className="w-10 h-10 object-cover rounded-xl bg-white border border-slate-100 flex-shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 flex-shrink-0">
+                            <ShoppingBag size={16} />
+                          </div>
+                        )}
+                        <div className="truncate">
+                          <h4 className="text-xs font-black text-slate-800 truncate">{item.titulo}</h4>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Cant: {item.cantidad || 1}</p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-black text-slate-700 flex-shrink-0">
+                        ${(Number(item.precio) * (item.cantidad || 1)).toLocaleString('es-AR')}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            );
-          })}
+
+              <div className="border-t border-slate-50 pt-4 mt-6 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Clock size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">{formatDate(cart.updatedAt)}</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl self-end sm:self-auto">
+                  <DollarSign size={14} className="-mr-0.5" />
+                  <span className="text-xs font-black uppercase tracking-wider">Total: ${calculateCartTotal(cart.items).toLocaleString('es-AR')}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
