@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../fireBase/config';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { ShoppingBag, Clock, User, DollarSign, Trash2, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Clock, User, DollarSign, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AbandonedCarts = () => {
@@ -18,7 +18,7 @@ const AbandonedCarts = () => {
       }));
       setCarts(cartsList);
     } catch (error) {
-      console.error("Error al traer carritos:", error);
+      console.error(error);
       toast.error("No se pudieron cargar los carritos abandonados");
     } finally {
       setLoading(false);
@@ -35,7 +35,7 @@ const AbandonedCarts = () => {
       toast.success("Carrito eliminado correctamente");
       setCarts(carts.filter(cart => cart.id !== cartId));
     } catch (error) {
-      console.error("Error al eliminar carrito:", error);
+      console.error(error);
       toast.error("No se pudo eliminar el carrito");
     }
   };
