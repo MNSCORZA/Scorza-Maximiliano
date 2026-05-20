@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Edit3, Trash2, ArrowUpDown, PackageX, ShoppingBag, Truck, Percent, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
+const ProductTable = ({ products, onEdit, onDelete, onSort, selectedIds, onToggleSelect, onToggleSelectAll }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -10,9 +10,15 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [products]);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const isAllCurrentPageSelected = currentItems.length > 0 && currentItems.every(p => selectedIds.includes(p.id));
 
   return (
     <div className="bg-white rounded-[28px] border border-gray-100 shadow-xl shadow-slate-100/40 overflow-hidden flex flex-col justify-between min-h-[500px]">
@@ -20,6 +26,14 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-slate-50/70 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400 tracking-wider">
             <tr>
+              <th className="p-5 w-12 text-center">
+                <input 
+                  type="checkbox" 
+                  checked={isAllCurrentPageSelected}
+                  onChange={() => onToggleSelectAll(currentItems)}
+                  className="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                />
+              </th>
               <th className="p-5 cursor-pointer hover:text-indigo-600 transition-colors group select-none" onClick={() => onSort('titulo')}>
                 <div className="flex items-center gap-1.5">Producto <ArrowUpDown size={12} className="text-slate-300 group-hover:text-indigo-500 transition-colors" /></div>
               </th>
@@ -36,7 +50,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
           <tbody className="divide-y divide-slate-50">
             {currentItems.length === 0 ? (
               <tr>
-                <td colSpan="5" className="p-12 text-center">
+                <td colSpan="6" className="p-12 text-center">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center">
                       <ShoppingBag size={20} />
@@ -49,9 +63,18 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
               currentItems.map(p => {
                 const isOutofStock = Number(p.stock) <= 0;
                 const hasOffer = p.tieneDescuento || (p.precioAnterior && Number(p.precioAnterior) > Number(p.precio));
+                const isSelected = selectedIds.includes(p.id);
 
                 return (
-                  <tr key={p.id} className="hover:bg-slate-50/40 transition-colors group/row">
+                  <tr key={p.id} className={`hover:bg-slate-50/40 transition-colors group/row ${isSelected ? 'bg-indigo-50/20 hover:bg-indigo-50/30' : ''}`}>
+                    <td className="p-5 text-center">
+                      <input 
+                        type="checkbox" 
+                        checked={isSelected}
+                        onChange={() => onToggleSelect(p.id)}
+                        className="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                      />
+                    </td>
                     <td className="p-5">
                       <div className="flex items-center gap-4">
                         <div className="relative flex-shrink-0 select-none">
@@ -75,7 +98,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="p-5">
                       <div className="flex flex-col">
                         <span className="text-sm font-black text-slate-900">${Number(p.precio).toLocaleString('es-AR')}</span>
@@ -130,7 +153,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort }) => {
               Siguiente
             </button>
           </div>
-          
+
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">
