@@ -64,7 +64,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           const productRef = doc(db, "productos", p.id);
           batch.update(productRef, { 
             precio: finalPrice,
-            precioAnterior: currentPrice,
+            precioAnterior: 0,
             tieneDescuento: false,
             porcentajeDescuento: 0
           });
@@ -79,7 +79,9 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
           return;
         }
         affectedProducts.forEach(p => {
-          const basePrice = p.precioAnterior ? Number(p.precioAnterior) : Number(p.precio);
+          const basePrice = p.precioAnterior && Number(p.precioAnterior) > Number(p.precio) 
+            ? Number(p.precioAnterior) 
+            : Number(p.precio);
           const discountAmount = basePrice * (percentage / 100);
           const finalPrice = Math.round(basePrice - discountAmount);
           const productRef = doc(db, "productos", p.id);
@@ -135,7 +137,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
               admin.setFormData({ 
                 titulo: "", descripcion: "", precio: "", stock: "", 
                 categoria: "", imagenUrl: "", envioGratis: false, 
-                tieneDescuento: false, porcentajeDescuento: "" 
+                tieneDescuento: false, porcentajeDescuento: "", marca: ""
               });
             }
             setIsFormOpen(!isFormOpen);
@@ -168,7 +170,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
             }}
           />
         </div>
-        
+
         <div className="lg:col-span-2">
           <ProductTable 
             products={admin.products} 
@@ -186,7 +188,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
 
         {selectedIds.length > 0 && (
           <div className="mt-6 md:mt-0 md:fixed md:bottom-4 md:left-1/2 md:-translate-x-1/2 bg-slate-900 text-white px-5 py-4 rounded-[24px] shadow-2xl flex flex-col md:flex-row items-center gap-3.5 z-50 border border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full md:w-[94%] md:max-w-2xl">
-            
+
             <div className="flex items-center gap-2 flex-shrink-0 w-full md:w-auto justify-center md:justify-start">
               <span className="w-5 h-5 bg-indigo-600 rounded-lg flex items-center justify-center text-[10px] font-black">{selectedIds.length}</span>
               <p className="text-xs font-bold text-slate-300">artículos seleccionados</p>
@@ -195,7 +197,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
             <div className="hidden md:block h-5 w-px bg-slate-800" />
 
             <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:justify-end">
-              
+
               <select
                 value={bulkAction}
                 onChange={(e) => {
@@ -212,7 +214,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
               </select>
 
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                
+
                 {(bulkAction === 'precio' || bulkAction === 'rebajar') && (
                   <div className="relative flex items-center w-full sm:max-w-[100px]">
                     {bulkAction === 'rebajar' ? (
