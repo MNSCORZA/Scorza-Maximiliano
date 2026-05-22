@@ -8,7 +8,7 @@ const OrdersManager = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
-  
+
   const [statusTab, setStatusTab] = useState('generada');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,12 +48,12 @@ const OrdersManager = () => {
 
   const filteredOrders = orders.filter(order => {
     const matchesStatus = order.status === statusTab;
-    
+
     const clientName = `${order.buyer?.nombre || ''} ${order.buyer?.apellido || ''}`.toLowerCase();
     const clientEmail = (order.buyer?.email || '').toLowerCase();
     const orderId = order.id.toLowerCase();
     const search = searchQuery.toLowerCase();
-    
+
     const matchesSearch = clientName.includes(search) || 
                           clientEmail.includes(search) || 
                           orderId.includes(search);
@@ -80,7 +80,7 @@ const OrdersManager = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-1 w-full lg:w-max">
         <button 
           onClick={() => setStatusTab('generada')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${
+          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'generada' ? 'bg-amber-50 text-amber-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
@@ -88,7 +88,7 @@ const OrdersManager = () => {
         </button>
         <button 
           onClick={() => setStatusTab('enviada')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${
+          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'enviada' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
@@ -96,7 +96,7 @@ const OrdersManager = () => {
         </button>
         <button 
           onClick={() => setStatusTab('entregada')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${
+          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'entregada' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
@@ -138,14 +138,14 @@ const OrdersManager = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className="p-2.5 rounded-xl border bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white transition-all"
+                className="p-2.5 rounded-xl border bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className="p-2.5 rounded-xl border bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white transition-all"
+                className="p-2.5 rounded-xl border bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer"
               >
                 <ChevronRight size={16} />
               </button>
