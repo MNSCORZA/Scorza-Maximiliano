@@ -22,7 +22,7 @@ export const Cart = () => {
 
   const handleValidarCupón = async () => {
     if (!inputCupón.trim()) return;
-    
+
     if (!user) {
       toast.error("Iniciá sesión para validar las restricciones del cupón");
       return;
@@ -31,7 +31,7 @@ export const Cart = () => {
     try {
       const q = query(collection(db, "cupones"), where("codigo", "==", inputCupón.trim().toUpperCase()));
       const querySnapshot = await getDocs(q);
-      
+
       if (querySnapshot.empty) {
         toast.error("El cupón ingresado no existe");
         return;
@@ -40,9 +40,18 @@ export const Cart = () => {
       const couponId = querySnapshot.docs[0].id;
       const couponData = querySnapshot.docs[0].data();
 
+      if (couponData.montoMinimo && totalBase < couponData.montoMinimo) {
+        toast.error(`Monto insuficiente. Este cupón requiere una compra mínima de $${couponData.montoMinimo.toLocaleString('es-AR')}`);
+        return;
+      }
+
       if (couponData.fechaExpiracion) {
-        const hoy = new Date().toISOString().split('T')[0];
-        if (hoy > couponData.fechaExpiracion) {
+        const hoy = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+        const [fechaHoy] = hoy.split(" ");
+        const [dia, mes, anio] = fechaHoy.replace(",", "").split("/");
+        const hoyFormateado = `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+
+        if (hoyFormateado > couponData.fechaExpiracion) {
           toast.error("Este cupón ya expiró");
           return;
         }
@@ -55,7 +64,7 @@ export const Cart = () => {
 
       const qOrders = query(collection(db, "orders"), where("uid", "==", user.uid));
       const ordersSnapshot = await getDocs(qOrders);
-      
+
       const yaLoUso = ordersSnapshot.docs.some(doc => doc.data().cuponAplicadoId === couponId);
       if (yaLoUso) {
         toast.error("Ya utilizaste este cupón en una compra anterior");
@@ -64,9 +73,13 @@ export const Cart = () => {
 
       setDescuento(couponData.porcentaje);
       setCupónAplicado(couponData.codigo);
-      localStorage.setItem("active_coupon_id", couponId);
-      toast.success(`Cupón ${couponData.codigo} aplicado: ${couponData.porcentaje}% de descuento`);
       
+      localStorage.setItem("active_coupon_id", couponId);
+      localStorage.setItem("active_coupon_pct", String(couponData.porcentaje));
+      localStorage.setItem("active_coupon_min", String(couponData.montoMinimo || 0));
+
+      toast.success(`Cupón ${couponData.codigo} aplicado: ${couponData.porcentaje}% de descuento`);
+
     } catch (error) {
       console.error(error);
       toast.error("Error al procesar la validación");
@@ -78,6 +91,8 @@ export const Cart = () => {
   const HandleEmptyCart = () => {
     emptyCart();
     localStorage.removeItem("active_coupon_id");
+    localStorage.removeItem("active_coupon_pct");
+    localStorage.removeItem("active_coupon_min");
     toast('El carrito se vació correctamente', {
       duration: 3000,
       style: {
