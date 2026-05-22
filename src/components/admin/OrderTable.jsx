@@ -109,7 +109,7 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
                     )}
                     <button 
                       onClick={() => handleSendOrderWhatsApp(order)}
-                      className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
+                      className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all cursor-pointer"
                       title="Notificar Estado por WhatsApp"
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
