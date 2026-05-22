@@ -11,7 +11,8 @@ import {
   where, 
   writeBatch, 
   increment, 
-  serverTimestamp 
+  serverTimestamp,
+  setDoc
 } from "firebase/firestore";
 
 export const createOrder = async (buyerData, items, total, userId = null, couponId = null) => {
@@ -108,4 +109,16 @@ export const deleteUserCart = async (userId) => {
   if (!userId) return;
   const cartRef = doc(db, "carritos", userId);
   await deleteDoc(cartRef);
+};
+
+export const addFavoriteToFirebase = async (userId, productId) => {
+  if (!userId || !productId) return;
+  const favRef = doc(db, "usuarios", userId, "favoritos", productId);
+  await setDoc(favRef, { id: productId, addedAt: serverTimestamp() });
+};
+
+export const removeFavoriteFromFirebase = async (userId, productId) => {
+  if (!userId || !productId) return;
+  const favRef = doc(db, "usuarios", userId, "favoritos", productId);
+  await deleteDoc(favRef);
 };
