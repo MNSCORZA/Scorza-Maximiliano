@@ -15,7 +15,17 @@ export function Formulario() {
 
   const total = location.state?.totalFinalizado ?? totalFallback;
 
-  const [formData, setFormData] = useState({ nombre: "", apellido: "", email: "", telefono: "" });
+  const [formData, setFormData] = useState({ 
+    nombre: "", 
+    apellido: "", 
+    email: "", 
+    telefono: "",
+    direccion: "",
+    cp: "",
+    provincia: "Buenos Aires",
+    localidad: "",
+    entreCalles: ""
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,6 +40,11 @@ export function Formulario() {
         apellido: userData.apellido || apellidoSolo || "",
         email: user.email || "",
         telefono: userData.telefono || "",
+        direccion: userData.direccion || "",
+        cp: userData.cp || "",
+        provincia: userData.provincia || "Buenos Aires",
+        localidad: userData.localidad || "",
+        entreCalles: userData.entreCalles || ""
       });
     }
   }, [user, userData]);
@@ -71,10 +86,10 @@ export function Formulario() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 flex justify-center items-center">
-      <form onSubmit={handleFinalizarCompra} className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-lg w-full space-y-6">
+      <form onSubmit={handleFinalizarCompra} className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-2xl w-full space-y-6 my-12">
         <h2 className="text-3xl font-black text-center text-gray-900 uppercase tracking-tighter">Finalizar Compra</h2>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Nombre</label>
             <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" required />
@@ -93,6 +108,37 @@ export function Formulario() {
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Teléfono</label>
             <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" required />
+          </div>
+        </div>
+
+        <div className="border-t border-gray-100 pt-4 space-y-4">
+          <h3 className="text-xs font-black uppercase text-gray-400 tracking-wider">Datos de Envío</h3>
+          
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Dirección (Calle y Altura)</label>
+            <input name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Ej: Av. Rivadavia 1234" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" required />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Código Postal</label>
+              <input name="cp" value={formData.cp} onChange={handleChange} placeholder="Ej: 1425" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" required />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Localidad</label>
+              <input name="localidad" value={formData.localidad} onChange={handleChange} placeholder="Localidad" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" required />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Provincia</label>
+              <input name="provincia" value={formData.provincia} onChange={handleChange} placeholder="Provincia" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" required />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Entre calles / Piso / Departamento</label>
+            <input name="entreCalles" value={formData.entreCalles} onChange={handleChange} placeholder="Información adicional del domicilio" className="w-full bg-gray-50 rounded-2xl py-4 px-5 font-bold outline-none border-2 border-transparent focus:border-indigo-600/20" />
           </div>
         </div>
 
