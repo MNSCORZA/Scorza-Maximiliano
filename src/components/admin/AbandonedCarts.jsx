@@ -40,6 +40,25 @@ const AbandonedCarts = () => {
     }
   };
 
+  const handleWhatsAppNotification = (cart) => {
+    const rawPhone = cart.clienteInfo?.telefono || cart.telefono;
+    const phoneNumber = rawPhone ? rawPhone.replace(/[^0-9]/g, '') : '';
+    
+    if (!phoneNumber) {
+      toast.error('Este cliente no dejó un teléfono de contacto');
+      return;
+    }
+
+    const clienteNombre = cart.clienteInfo?.nombre || cart.nombre || 'Cliente';
+    const listaProductos = cart.items
+      .map(item => `- ${item.titulo} (Cant: ${item.cantidad || 1})`)
+      .join('\n');
+
+    const mensaje = `Hola *${clienteNombre}*! 👋 Te contactamos de *De Todo*.\n\nVimos que dejaste algunos productos guardados en tu carrito:\n${listaProductos}\n\nTe podemos ayudar a finalizar tu compra o si tenés alguna duda con el envío nos avisás! 😊`;
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+  };
+
   const calculateCartTotal = (items) => {
     if (!Array.isArray(items)) return 0;
     return items.reduce((acc, item) => acc + (Number(item.precio) * (item.cantidad || 1)), 0);
@@ -92,15 +111,27 @@ const AbandonedCarts = () => {
             <div key={cart.id} className="bg-white border border-slate-100 rounded-3xl shadow-sm hover:shadow-md transition-all p-6 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start border-b border-slate-50 pb-4 mb-4">
-                  <div className="flex items-center gap-2 text-slate-500">
-                    <User size={16} />
-                    <span className="text-xs font-bold uppercase tracking-wider truncate max-w-[180px]">
-                      ID: {cart.uid || cart.id}
-                    </span>
+                  <div className="flex flex-col gap-1 text-slate-500 max-w-[70%]">
+                    <div className="flex items-center gap-2">
+                      <User size={16} />
+                      <span className="text-xs font-bold uppercase tracking-wider truncate">
+                        {cart.clienteInfo?.nombre ? `${cart.clienteInfo.nombre} ${cart.clienteInfo.apellido}` : `ID: ${cart.uid || cart.id}`}
+                      </span>
+                    </div>
+                    {(cart.clienteInfo?.telefono || cart.telefono) && (
+                      <span className="text-[10px] text-slate-400 font-bold pl-6">Tel: {cart.clienteInfo?.telefono || cart.telefono}</span>
+                    )}
                   </div>
-                  <button onClick={() => handleDeleteCart(cart.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleWhatsAppNotification(cart)} className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all" title="Notificar por WhatsApp">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.66.986 3.288 1.491 5.341 1.493 5.344 0 9.71-4.348 9.713-9.688.002-2.586-1.002-5.019-2.83-6.848-1.829-1.83-4.259-2.831-6.852-2.831-5.352 0-9.722 4.35-9.725 9.69-.001 2.145.56 4.237 1.624 6.096L2.832 21.36l4.636-1.21-.821-.496z"/>
+                      </svg>
+                    </button>
+                    <button onClick={() => handleDeleteCart(cart.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
