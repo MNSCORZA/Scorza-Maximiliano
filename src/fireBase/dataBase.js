@@ -194,10 +194,28 @@ export const saveUserCart = async (uid, cartItems) => {
       await deleteDoc(cartRef);
       return;
     }
+
+    let clienteInfo = { nombre: "", apellido: "", telefono: "" };
+    try {
+      const userSnap = await getDoc(doc(db, "usuarios", uid));
+      if (userSnap.exists()) {
+        const uData = userSnap.data();
+        const partes = (uData.nombre || "").trim().split(" ");
+        clienteInfo = {
+          nombre: partes[0] || "",
+          apellido: uData.apellido || partes.slice(1).join(" ") || "",
+          telefono: uData.telefono || ""
+        };
+      }
+    } catch (err) {
+      console.error("Error al cruzar info de usuario para el carrito:", err);
+    }
+
     await setDoc(cartRef, {
       uid,
       items: cartItems,
       status: 'activo',
+      clienteInfo,
       updatedAt: serverTimestamp()
     }, { merge: true });
   } catch (error) {
