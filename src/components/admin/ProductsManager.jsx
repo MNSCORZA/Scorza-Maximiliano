@@ -136,8 +136,8 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
               admin.setIsEditing(false);
               admin.setFormData({ 
                 titulo: "", descripcion: "", precio: "", stock: "", 
-                categoria: "", imagenUrl: "", envioGratis: false, 
-                tieneDescuento: false, porcentajeDescuento: "", marca: ""
+                categoria: "", marca: "", imagenUrl: "", envioGratis: false, 
+                tieneDescuento: false, porcentajeDescuento: "" 
               });
             }
             setIsFormOpen(!isFormOpen);
