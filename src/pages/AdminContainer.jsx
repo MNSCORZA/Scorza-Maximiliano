@@ -41,8 +41,13 @@ const AdminContainer = () => {
       }
 
       const productData = {
-        ...admin.formData, precio: finalPrice, precioAnterior: previousPrice,
-        stock: currentStock, tieneDescuento: hasDiscount, porcentajeDescuento: hasDiscount ? discountPercent : 0
+        ...admin.formData,
+        precio: finalPrice,
+        precioAnterior: previousPrice,
+        stock: currentStock,
+        tieneDescuento: hasDiscount,
+        porcentajeDescuento: hasDiscount ? discountPercent : 0,
+        marca: admin.formData.marca ? admin.formData.marca.trim() : ""
       };
 
       if (admin.isEditing && admin.currentId) {
@@ -56,7 +61,7 @@ const AdminContainer = () => {
         toast.success('¡Producto publicado!', { description: `"${productData.titulo}" ya está en catálogo.` });
       }
 
-      admin.setFormData({ titulo: "", descripcion: "", precio: "", stock: "", categoria: "", imagenUrl: "", envioGratis: false, tieneDescuento: false, porcentajeDescuento: "" });
+      admin.setFormData({ titulo: "", descripcion: "", precio: "", stock: "", categoria: "", marca: "", imagenUrl: "", envioGratis: false, tieneDescuento: false, porcentajeDescuento: "" });
       admin.setIsEditing(false);
       admin.setCurrentId(null);
 
@@ -69,8 +74,11 @@ const AdminContainer = () => {
 
   const handleEdit = (p) => {
     admin.setFormData({
-      ...p, precio: p.precioAnterior ? p.precioAnterior : p.precio,
-      tieneDescuento: p.tieneDescuento || false, porcentajeDescuento: p.porcentajeDescuento || ""
+      ...p,
+      precio: p.precioAnterior && Number(p.precioAnterior) > Number(p.precio) ? p.precioAnterior : p.precio,
+      tieneDescuento: p.tieneDescuento || false,
+      porcentajeDescuento: p.porcentajeDescuento || "",
+      marca: p.marca || ""
     });
     admin.setCurrentId(p.id);
     admin.setIsEditing(true);
