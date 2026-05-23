@@ -1,62 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../fireBase/config';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import React from 'react';
+import { useAdminLogs } from '../../hooks/useAdminLogs';
 import { ShieldAlert, ChevronLeft, ChevronRight, User, Search, Filter } from 'lucide-react';
 
 export default function AdminLogs() {
-  const [allLogs, setAllLogs] = useState([]);
-  const [filteredLogs, setFilteredLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  const [actionFilter, setActionFilter] = useState('todos');
-  
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const {
+    currentItems,
+    loading,
+    searchTerm,
+    actionFilter,
+    currentPage,
+    totalPages,
+    filteredLogsLength,
+    indexOfFirstItem,
+    indexOfLastItem,
+    setSearchTerm,
+    setActionFilter,
+    setCurrentPage
+  } = useAdminLogs();
 
-  useEffect(() => {
-    const fetchAllLogs = async () => {
-      setLoading(true);
-      try {
-        const q = query(collection(db, "logs"), orderBy("fecha", "desc"));
-        const snap = await getDocs(q);
-        const records = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAllLogs(records);
-        setFilteredLogs(records);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllLogs();
-  }, []);
-
-  useEffect(() => {
-    let result = [...allLogs];
-
-    if (searchTerm.trim() !== '') {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(l => 
-        (l.userNombre && l.userNombre.toLowerCase().includes(term)) ||
-        (l.userEmail && l.userEmail.toLowerCase().includes(term)) ||
-        (l.detalles && l.detalles.toLowerCase().includes(term)) ||
-        (l.accion && l.accion.toLowerCase().includes(term))
-      );
-    }
-
-    if (actionFilter !== 'todos') {
-      result = result.filter(l => l.accion === actionFilter);
-    }
-
-    setFilteredLogs(result);
-    setCurrentPage(1);
-  }, [searchTerm, actionFilter, allLogs]);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredLogs.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+  if (loading) {
+    return (
+      <div className="p-20 text-center flex flex-col items-center justify-center gap-4">
+        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cargando registros de auditoría...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -151,10 +120,11 @@ export default function AdminLogs() {
         {totalPages > 1 && (
           <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between sm:px-6">
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">
-              Mostrando <span className="font-black text-slate-800">{indexOfFirstItem + 1}</span> a <span className="font-black text-slate-800">{Math.min(indexOfLastItem, filteredLogs.length)}</span> de <span className="font-black text-slate-800">{filteredLogs.length}</span> registros
+              Mostrando <span className="font-black text-slate-800">{indexOfFirstItem + 1}</span> a <span className="font-black text-slate-800">{Math.min(indexOfLastItem, filteredLogsLength)}</span> de <span className="font-black text-slate-800">{filteredLogsLength}</span> registros
             </p>
             <div className="flex gap-2">
               <button 
+                type="button"
                 onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} 
                 disabled={currentPage === 1} 
                 className="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
@@ -162,6 +132,7 @@ export default function AdminLogs() {
                 <ChevronLeft size={16} />
               </button>
               <button 
+                type="button"
                 onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} 
                 disabled={currentPage === totalPages} 
                 className="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
