@@ -1,147 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Plus, X, Percent, Layers, Trash2, Check, ArrowDown } from 'lucide-react';
-import { writeBatch, doc } from 'firebase/firestore';
-import { db } from '../../fireBase/config';
-import { saveLog } from '../../fireBase/dataBase';
-import { useAuth } from '../../context/AuthContext';
-import { toast } from 'sonner';
+import { useProductsManager } from '../../hooks/useProductsManager';
 import AdminFilters from './AdminFilters';
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
 
 const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
-  const { user, userData } = useAuth();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [bulkAction, setBulkAction] = useState(''); 
-  const [bulkValue, setBulkValue] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleEditIntercept = (product) => {
-    onEdit(product);
-    setIsFormOpen(true);
-  };
-
-  const handleToggleSelect = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleToggleSelectAll = (currentPageItems) => {
-    const currentPageIds = currentPageItems.map(p => p.id);
-    const allSelectedOnPage = currentPageIds.every(id => selectedIds.includes(id));
-
-    if (allSelectedOnPage) {
-      setSelectedIds(prev => prev.filter(id => !currentPageIds.includes(id)));
-    } else {
-      setSelectedIds(prev => {
-        const structuralUnique = new Set([...prev, ...currentPageIds]);
-        return Array.from(structuralUnique);
-      });
-    }
-  };
-
-  const handleBulkExecute = async () => {
-    if (!bulkAction) return;
-    if ((bulkAction === 'precio' || bulkAction === 'rebajar' || bulkAction === 'stock') && !bulkValue) {
-      toast.error('Por favor, ingresá un valor para la modificación');
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const batch = writeBatch(db);
-      const affectedProducts = admin.products.filter(p => selectedIds.includes(p.id));
-      let descriptionLog = '';
-
-      if (bulkAction === 'precio') {
-        const percentage = Number(bulkValue);
-        affectedProducts.forEach(p => {
-          const currentPrice = Number(p.precio);
-          const incremental = currentPrice * (percentage / 100);
-          const finalPrice = Math.round(currentPrice + incremental);
-          const productRef = doc(db, "productos", p.id);
-          batch.update(productRef, { 
-            precio: finalPrice,
-            precioAnterior: 0,
-            tieneDescuento: false,
-            porcentajeDescuento: 0
-          });
-        });
-        descriptionLog = `Aumentó el precio un ${percentage}% de forma masiva a un bloque de ${selectedIds.length} productos.`;
-      } 
-      else if (bulkAction === 'rebajar') {
-        const percentage = Number(bulkValue);
-        if (percentage <= 0 || percentage >= 100) {
-          toast.error('El porcentaje de descuento debe ser entre 1 y 99');
-          setIsProcessing(false);
-          return;
-        }
-        affectedProducts.forEach(p => {
-          const basePrice = p.precioAnterior && Number(p.precioAnterior) > Number(p.precio) 
-            ? Number(p.precioAnterior) 
-            : Number(p.precio);
-          const discountAmount = basePrice * (percentage / 100);
-          const finalPrice = Math.round(basePrice - discountAmount);
-          const productRef = doc(db, "productos", p.id);
-          batch.update(productRef, { 
-            precio: finalPrice,
-            precioAnterior: basePrice,
-            tieneDescuento: true,
-            porcentajeDescuento: percentage
-          });
-        });
-        descriptionLog = `Aplicó un descuento masivo del ${percentage}% OFF a un bloque de ${selectedIds.length} productos.`;
-      }
-      else if (bulkAction === 'stock') {
-        const targetStock = Number(bulkValue);
-        affectedProducts.forEach(p => {
-          const productRef = doc(db, "productos", p.id);
-          batch.update(productRef, { stock: targetStock });
-        });
-        descriptionLog = `Actualizó el stock a ${targetStock} unidades de forma masiva a un bloque de ${selectedIds.length} productos.`;
-      } 
-      else if (bulkAction === 'eliminar') {
-        affectedProducts.forEach(p => {
-          const productRef = doc(db, "productos", p.id);
-          batch.delete(productRef);
-        });
-        descriptionLog = `Eliminó permanentemente del catálogo un bloque masivo de ${selectedIds.length} productos.`;
-      }
-
-      await batch.commit();
-      await saveLog(user.uid, user.email, userData?.nombre || 'Admin Masivo', 'Acción Masiva', descriptionLog);
-
-      toast.success('¡Acción masiva aplicada con éxito!');
-      setSelectedIds([]);
-      setBulkAction('');
-      setBulkValue('');
-      if (admin.refreshProducts) await admin.refreshProducts();
-    } catch (error) {
-      console.error(error);
-      toast.error('Hubo un inconveniente al procesar la actualización masiva');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const {
+    isFormOpen,
+    selectedIds,
+    bulkAction,
+    bulkValue,
+    isProcessing,
+    setBulkAction,
+    setBulkValue,
+    handleEditIntercept,
+    handleToggleSelect,
+    handleToggleSelectAll,
+    handleBulkExecute,
+    resetBulkSelection,
+    closeAndResetForm
+  } = useProductsManager(admin, onEdit, onDeleteCustom);
 
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <AdminFilters {...admin} />
         <button 
-          onClick={() => {
-            if (isFormOpen && admin.isEditing) {
-              admin.setIsEditing(false);
-              admin.setFormData({ 
-                titulo: "", descripcion: "", precio: "", stock: "", 
-                categoria: "", marca: "", imagenUrl: "", envioGratis: false, 
-                tieneDescuento: false, porcentajeDescuento: "" 
-              });
-            }
-            setIsFormOpen(!isFormOpen);
-          }} 
+          type="button"
+          onClick={closeAndResetForm} 
           className={`lg:hidden flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border ${
             isFormOpen ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-indigo-600 text-white shadow-md'
           }`}
@@ -166,7 +53,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
             isEditing={admin.isEditing} 
             handleSubmit={(e) => {
               admin.handleSubmit(e);
-              setIsFormOpen(false);
+              closeAndResetForm();
             }}
           />
         </div>
@@ -247,6 +134,7 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
 
                 {bulkAction && (
                   <button
+                    type="button"
                     onClick={handleBulkExecute}
                     disabled={isProcessing}
                     className={`h-[40px] px-4 rounded-xl text-white transition-all font-bold text-xs cursor-pointer flex items-center justify-center flex-shrink-0 ${
@@ -262,11 +150,8 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
                 )}
 
                 <button 
-                  onClick={() => {
-                    setSelectedIds([]);
-                    setBulkAction('');
-                    setBulkValue('');
-                  }}
+                  type="button"
+                  onClick={resetBulkSelection}
                   className="h-[40px] w-[40px] rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer flex-shrink-0"
                 >
                   <X size={14} />
