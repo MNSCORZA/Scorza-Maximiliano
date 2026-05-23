@@ -1,70 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../fireBase/config';
+import React from 'react';
+import { useOrdersManager } from '../../hooks/useOrdersManager';
 import { Search, Package, Truck, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import OrderTable from './OrderTable';
 
 const OrdersManager = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
-
-  const [statusTab, setStatusTab] = useState('generada');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  const fetchOrders = async () => {
-    try {
-      const q = query(collection(db, "orders"), orderBy("date", "desc"));
-      const querySnapshot = await getDocs(q);
-      setOrders(querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusTab, searchQuery]);
-
-  const handleUpdateOrderStatus = async (id, newStatus) => {
-    setUpdatingId(id);
-    try {
-      await updateDoc(doc(db, "orders", id), { status: newStatus });
-      await fetchOrders();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const filteredOrders = orders.filter(order => {
-    const matchesStatus = order.status === statusTab;
-
-    const clientName = `${order.buyer?.nombre || ''} ${order.buyer?.apellido || ''}`.toLowerCase();
-    const clientEmail = (order.buyer?.email || '').toLowerCase();
-    const orderId = order.id.toLowerCase();
-    const search = searchQuery.toLowerCase();
-
-    const matchesSearch = clientName.includes(search) || 
-                          clientEmail.includes(search) || 
-                          orderId.includes(search);
-
-    return matchesStatus && matchesSearch;
-  });
-
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
+  const {
+    loading,
+    updatingId,
+    statusTab,
+    searchQuery,
+    currentPage,
+    totalPages,
+    currentOrders,
+    filteredOrdersLength,
+    setStatusTab,
+    setSearchQuery,
+    setCurrentPage,
+    handleUpdateOrderStatus,
+    getCountByStatus
+  } = useOrdersManager();
 
   if (loading) {
     return (
@@ -79,28 +33,31 @@ const OrdersManager = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-1 w-full lg:w-max">
         <button 
+          type="button"
           onClick={() => setStatusTab('generada')} 
           className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'generada' ? 'bg-amber-50 text-amber-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
-          <Package size={14}/> Pendientes ({orders.filter(o => o.status === 'generada').length})
+          <Package size={14}/> Pendientes ({getCountByStatus('generada')})
         </button>
         <button 
+          type="button"
           onClick={() => setStatusTab('enviada')} 
           className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'enviada' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
-          <Truck size={14}/> En Camino ({orders.filter(o => o.status === 'enviada').length})
+          <Truck size={14}/> En Camino ({getCountByStatus('enviada')})
         </button>
         <button 
+          type="button"
           onClick={() => setStatusTab('entregada')} 
           className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'entregada' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
-          <CheckCircle size={14}/> Entregadas ({orders.filter(o => o.status === 'entregada').length})
+          <CheckCircle size={14}/> Entregadas ({getCountByStatus('entregada')})
         </button>
       </div>
 
@@ -111,7 +68,7 @@ const OrdersManager = () => {
               {statusTab === 'generada' ? 'Pedidos por Procesar' : statusTab === 'enviada' ? 'Envíos en Curso' : 'Historial de Entregas'}
             </h2>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">
-              {filteredOrders.length} encontrados en esta sección
+              {filteredOrdersLength} encontrados en esta sección
             </p>
           </div>
 
@@ -136,6 +93,7 @@ const OrdersManager = () => {
             </p>
             <div className="flex gap-2">
               <button
+                type="button"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 className="p-2.5 rounded-xl border bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer"
@@ -143,6 +101,7 @@ const OrdersManager = () => {
                 <ChevronLeft size={16} />
               </button>
               <button
+                type="button"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 className="p-2.5 rounded-xl border bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer"
