@@ -1,70 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../fireBase/config';
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
+import React from 'react';
+import { useBrandsManager } from '../../hooks/useBrandsManager';
 import { Plus, Trash2, Edit2, Check, X, ShieldAlert } from 'lucide-react';
 
 export const AdminBrands = () => {
-  const [marcas, setMarcas] = useState([]);
-  const [nuevoNombre, setNuevoNombre] = useState('');
-  const [editandoId, setEditandoId] = useState(null);
-  const [editandoNombre, setEditandoNombre] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const marcasRef = collection(db, 'marcas');
-
-  const fetchMarcas = async () => {
-    try {
-      const querySnapshot = await getDocs(marcasRef);
-      const lista = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMarcas(lista);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchMarcas();
-  }, []);
-
-  const handleAgregar = async (e) => {
-    e.preventDefault();
-    if (!nuevoNombre.trim() || loading) return;
-    setLoading(true);
-    try {
-      await addDoc(marcasRef, { nombre: nuevoNombre.trim() });
-      setNuevoNombre('');
-      await fetchMarcas();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBorrar = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'marcas', id));
-      await fetchMarcas();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleIniciarEdicion = (marca) => {
-    setEditandoId(marca.id);
-    setEditandoNombre(marca.nombre);
-  };
-
-  const handleGuardarEdicion = async (id) => {
-    if (!editandoNombre.trim()) return;
-    try {
-      await updateDoc(doc(db, 'marcas', id), { nombre: editandoNombre.trim() });
-      setEditandoId(null);
-      await fetchMarcas();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const {
+    marcas,
+    nuevoNombre,
+    editandoId,
+    editandoNombre,
+    loading,
+    setNuevoNombre,
+    setEditandoId,
+    setEditandoNombre,
+    handleAgregar,
+    handleBorrar,
+    handleIniciarEdicion,
+    handleGuardarEdicion
+  } = useBrandsManager();
 
   return (
     <div className="w-full max-w-4xl mx-auto font-sans bg-white rounded-3xl border border-gray-100 shadow-sm p-4 sm:p-8 mt-4">
