@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getBannerSettings, updateBannerSettings } from '../../fireBase/dataBase';
+import React from 'react';
+import { useBannerManager } from '../../hooks/useBannerManager';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { FormMarquee } from './FormMarquee';
 import { FormPromoStatic } from './FormPromoStatic';
@@ -7,91 +7,7 @@ import { FormHero } from './FormHero';
 import { FormCountdownOffer } from './FormCountdownOffer';
 
 export const AdminBanners = () => {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [promo, setPromo] = useState({ text: '', link: '', active: true });
-  const [promoStatic, setPromoStatic] = useState({ text: '', link: '', active: true });
-  const [hero, setHero] = useState({ title: '', subtitle: '', imageUrl: '', buttonText: '', link: '' });
-  const [offer, setOffer] = useState({ tagText: '', title: '', description: '', endDate: '', bottomTitle: '', bottomSubtitle: '', buttonText: '', link: '', colorPalette: 'azul', active: true });
-  const [toast, setToast] = useState({ show: false, message: '' });
-
-  useEffect(() => {
-    const loadBanners = async () => {
-      try {
-        const promoData = await getBannerSettings('promo');
-        const staticData = await getBannerSettings('promo_static');
-        const heroData = await getBannerSettings('hero');
-        const offerData = await getBannerSettings('countdown_offer');
-
-        if (promoData) setPromo(promoData);
-        if (staticData) setPromoStatic(staticData);
-        if (heroData) setHero(heroData);
-        if (offerData) setOffer(offerData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadBanners();
-  }, []);
-
-  const triggerToast = (message) => {
-    setToast({ show: true, message });
-    setTimeout(() => setToast({ show: false, message: '' }), 3000);
-  };
-
-  const handleSavePromo = async (e) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      await updateBannerSettings('promo', promo);
-      triggerToast('Marquee (Barra Móvil) actualizado');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSaveStatic = async (e) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      await updateBannerSettings('promo_static', promoStatic);
-      triggerToast('Barra de Anuncios Fija actualizada');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSaveHero = async (e) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      await updateBannerSettings('hero', hero);
-      triggerToast('Banner Principal (Hero) actualizado');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSaveOffer = async (e) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      await updateBannerSettings('countdown_offer', offer);
-      triggerToast('Oferta con Contador actualizada');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
-  };
+  const { loading, saving, toast, banners, setters, handlers } = useBannerManager();
 
   if (loading) {
     return (
@@ -110,10 +26,10 @@ export const AdminBanners = () => {
         </div>
       )}
 
-      <FormMarquee promo={promo} setPromo={setPromo} onSubmit={handleSavePromo} saving={saving} />
-      <FormPromoStatic promoStatic={promoStatic} setPromoStatic={setPromoStatic} onSubmit={handleSaveStatic} saving={saving} />
-      <FormHero hero={hero} setHero={setHero} onSubmit={handleSaveHero} saving={saving} />
-      <FormCountdownOffer offer={offer} setOffer={setOffer} onSubmit={handleSaveOffer} saving={saving} />
+      <FormMarquee promo={banners.promo} setPromo={setters.setPromo} onSubmit={handlers.handleSavePromo} saving={saving} />
+      <FormPromoStatic promoStatic={banners.promoStatic} setPromoStatic={setters.setPromoStatic} onSubmit={handlers.handleSaveStatic} saving={saving} />
+      <FormHero hero={banners.hero} setHero={setters.setHero} onSubmit={handlers.handleSaveHero} saving={saving} />
+      <FormCountdownOffer offer={banners.offer} setOffer={setters.setOffer} onSubmit={handlers.handleSaveOffer} saving={saving} />
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes slideIn {
