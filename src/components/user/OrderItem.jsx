@@ -84,14 +84,14 @@ const OrderItem = ({ pedido, onAddToCart }) => {
             <div className="flex items-center gap-1">
               <button
                 onClick={handleReorder}
-                className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"
                 title="Volver a comprar"
               >
                 <RefreshCw size={16} />
               </button>
               <button 
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"
                 title="Ver productos"
               >
                 {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
