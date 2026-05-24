@@ -89,13 +89,13 @@ export const createOrder = async (buyerData, items, total, userId = null, coupon
   if (couponId) {
     const couponRef = doc(db, "cupones", couponId);
     const couponSnap = await getDoc(couponRef);
-    
+
     if (!couponSnap.exists()) {
       throw new Error("El cupón ingresado no es válido.");
     }
-    
+
     const couponData = couponSnap.data();
-    
+
     if (couponData.fechaExpiracion) {
       const hoy = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
       const [fechaHoy] = hoy.split(" ");
@@ -105,7 +105,7 @@ export const createOrder = async (buyerData, items, total, userId = null, coupon
         throw new Error("El cupón utilizado ya se encuentra expirado.");
       }
     }
-    
+
     if (couponData.limiteUsos !== null && couponData.usosActuales >= couponData.limiteUsos) {
       throw new Error("El cupón alcanzó su límite máximo de canjes.");
     }
@@ -131,7 +131,8 @@ export const createOrder = async (buyerData, items, total, userId = null, coupon
       id: item.id,
       titulo: item.titulo,
       precio: item.precio,
-      cantidad: item.cantidad
+      cantidad: item.cantidad,
+      imagenUrl: item.imagenUrl || item.img || null
     })),
     total: total,
     status: "generada",
