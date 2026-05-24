@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Save, Edit2, Hash, Navigation, FileText, Landmark } from 'lucide-react';
 
 const InputField = React.memo(({ label, icon: Icon, name, placeholder, value, onChange, disabled, colSpan = "col-span-2" }) => (
@@ -23,6 +23,20 @@ const InputField = React.memo(({ label, icon: Icon, name, placeholder, value, on
 InputField.displayName = 'InputField';
 
 const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, handleUpdate }) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await handleUpdate(e);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
       <div className="flex justify-between items-center mb-6">
@@ -40,9 +54,9 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
         )}
       </div>
 
-      <form onSubmit={handleUpdate} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          
+
           <InputField 
             label="DNI / CUIL" 
             icon={FileText} 
@@ -50,7 +64,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="20-12345678-9" 
             value={formData.dni} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-2" 
           />
 
@@ -61,10 +75,10 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="011" 
             value={formData.codArea} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-1" 
           />
-          
+
           <InputField 
             label="Teléfono" 
             icon={Hash} 
@@ -72,7 +86,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="15 1234-5678" 
             value={formData.telefono} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-1" 
           />
 
@@ -83,10 +97,10 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="Buenos Aires" 
             value={formData.provincia} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-1" 
           />
-          
+
           <InputField 
             label="Localidad" 
             icon={MapPin} 
@@ -94,7 +108,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="San Justo" 
             value={formData.localidad} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-1" 
           />
 
@@ -105,7 +119,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="Av. de Mayo 1234" 
             value={formData.direccion} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-2" 
           />
 
@@ -116,10 +130,10 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="4° Piso C" 
             value={formData.depto} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-1" 
           />
-          
+
           <InputField 
             label="Código Postal" 
             icon={Hash} 
@@ -127,7 +141,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="1754" 
             value={formData.cp} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-1" 
           />
 
@@ -138,7 +152,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
             placeholder="Arieta y Almafuerte" 
             value={formData.entreCalles} 
             onChange={handleChange} 
-            disabled={!isEditing} 
+            disabled={!isEditing || isSaving} 
             colSpan="col-span-2" 
           />
 
@@ -147,7 +161,7 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
               Notas para el repartidor
             </label>
             <textarea
-              disabled={!isEditing}
+              disabled={!isEditing || isSaving}
               name="notas"
               placeholder="Ej: Portón negro, tocar timbre dos veces..."
               value={formData.notas || ''}
@@ -162,14 +176,25 @@ const UserAddressForm = ({ formData, isEditing, setIsEditing, handleChange, hand
           <div className="flex gap-2 pt-2">
             <button 
               type="submit" 
-              className="flex-1 bg-indigo-600 text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 cursor-pointer border-none"
+              disabled={isSaving}
+              className="flex-1 bg-indigo-600 text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 cursor-pointer border-none disabled:bg-indigo-400 disabled:cursor-not-allowed"
             >
-              <Save size={14} /> Guardar Datos
+              {isSaving ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save size={14} /> Guardar Datos
+                </>
+              )}
             </button>
             <button 
               type="button" 
+              disabled={isSaving}
               onClick={() => setIsEditing(false)} 
-              className="px-5 bg-slate-100 text-slate-500 py-3.5 rounded-xl text-[10px] font-black uppercase hover:bg-slate-200 transition-all cursor-pointer border-none"
+              className="px-5 bg-slate-100 text-slate-500 py-3.5 rounded-xl text-[10px] font-black uppercase hover:bg-slate-200 transition-all cursor-pointer border-none disabled:opacity-60 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
