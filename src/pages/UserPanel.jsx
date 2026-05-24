@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../fireBase/config';
 import { getOrdersByUserId } from '../fireBase/dataBase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { User, MapPin, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { CartContext } from '../context/CartContext';
 import UserAddressForm from '../components/user/UserAddressForm';
 import UserOrdersHistory from '../components/user/UserOrdersHistory';
 
 const UserPanel = () => {
   const { userData, user } = useAuth();
-  const [activeTab, setActiveTab] = useState('datos'); // 'datos' o 'compras'
+  const { addToCart } = useContext(CartContext);
+  const [activeTab, setActiveTab] = useState('datos'); 
   const [pedidos, setPedidos] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [loadingOrders, setLoadingOrders] = useState(true);
-  
+
   const [formData, setFormData] = useState({
     dni: "",
     codArea: "",
@@ -78,7 +80,7 @@ const UserPanel = () => {
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
-        
+
         <div className="bg-white p-6 rounded-[2.5rem] shadow-sm flex items-center gap-5 border border-slate-100">
           <div className="bg-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
             <User size={26} />
@@ -127,6 +129,7 @@ const UserPanel = () => {
             <UserOrdersHistory 
               pedidos={pedidos}
               loading={loadingOrders}
+              onAddToCart={addToCart}
             />
           )}
         </div>
