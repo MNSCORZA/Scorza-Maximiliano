@@ -1,6 +1,6 @@
 import React from 'react';
 import { Package } from 'lucide-react';
-import { Loader } from '../Loader'; // Importa tu hermoso loader personalizado
+import { Loader } from '../Loader';
 import OrderItem from './OrderItem';
 import EmptyOrders from './EmptyOrders';
 
