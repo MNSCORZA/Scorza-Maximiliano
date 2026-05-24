@@ -34,7 +34,7 @@ const OrderItem = ({ pedido }) => {
   return (
     <div className="group border border-slate-100 bg-white p-5 rounded-[2rem] flex flex-col gap-4 hover:shadow-xl hover:shadow-slate-100/50 hover:border-indigo-100 transition-all duration-300">
       
-      {/* Cabecera de la Orden */}
+      
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className="bg-slate-50 p-3.5 rounded-2xl text-slate-700 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
@@ -63,7 +63,7 @@ const OrderItem = ({ pedido }) => {
           </div>
         </div>
 
-        {/* Total y Botón de Expandir */}
+        
         <div className="flex sm:flex-col justify-between sm:justify-center items-center sm:items-end gap-1 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-50">
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest sm:hidden">Total pagado</p>
           <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ const OrderItem = ({ pedido }) => {
         </div>
       </div>
 
-      {/* Desglose de Productos (Se muestra si isOpen es true) */}
+      
       {isOpen && pedido.items && pedido.items.length > 0 && (
         <div className="border-t border-slate-50 pt-4 mt-1 space-y-3 animate-fadeIn">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Detalle de productos</p>
@@ -89,11 +89,11 @@ const OrderItem = ({ pedido }) => {
           {pedido.items.map((item, idx) => (
             <div key={item.id || idx} className="flex items-center justify-between bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
               <div className="flex items-center gap-3">
-                {/* Miniatura del producto (si guardás 'img' o 'imagen' en el item de la orden) */}
+                
                 {item.img && (
                   <img 
-                    src={item.img} 
-                    alt={item.nombre} 
+                    src={item.imgUrl} 
+                    alt={item.titulo} 
                     className="w-10 h-10 object-cover rounded-xl bg-white border border-slate-100"
                   />
                 )}
