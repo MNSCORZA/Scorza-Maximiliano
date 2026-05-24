@@ -23,6 +23,7 @@ const AdminContainer = () => {
   const admin = useAdmin(user, userData, loading);
   const [activeTab, setActiveTab] = useState('productos');
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
+  const [stockFilter, setStockFilter] = useState('all');
 
   const handleCustomFormSubmit = async (e) => {
     e.preventDefault();
@@ -120,6 +121,12 @@ const AdminContainer = () => {
     );
   }
 
+  const processedProducts = (admin.products || []).filter(p => {
+    if (stockFilter === 'noStock') return Number(p.stock) === 0;
+    if (stockFilter === 'criticalStock') return Number(p.stock) > 0 && Number(p.stock) <= 3;
+    return true;
+  });
+
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 min-h-screen bg-gray-50">
       <ConfirmModal {...confirmConfig} onClose={() => setConfirmConfig(p => ({...p, isOpen: false}))} />
@@ -136,7 +143,13 @@ const AdminContainer = () => {
 
       {activeTab === 'productos' && (
         <ProductsManager 
-          admin={{ ...admin, handleSubmit: handleCustomFormSubmit }} 
+          admin={{ 
+            ...admin, 
+            products: processedProducts,
+            stockFilter,
+            setStockFilter,
+            handleSubmit: handleCustomFormSubmit 
+          }} 
           onEdit={handleEdit} 
           onDeleteCustom={handleDeleteProduct}
         />
