@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Calendar, ArrowUpRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShoppingBag, Calendar, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 const getStatusStyles = (status) => {
   switch (status?.toLowerCase()) {
@@ -27,8 +27,22 @@ const formatDate = (timestamp) => {
   });
 };
 
-const OrderItem = ({ pedido }) => {
+const OrderItem = ({ pedido, onAddToCart }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleReorder = (e) => {
+    e.stopPropagation();
+    if (!pedido.items || !onAddToCart) return;
+    pedido.items.forEach(item => {
+      onAddToCart({
+        id: item.id,
+        titulo: item.titulo || item.nombre,
+        precio: item.precio,
+        imagenUrl: item.imagenUrl || item.imgUrl || item.img || null,
+        cantidad: item.cantidad || 1
+      });
+    });
+  };
 
   return (
     <div className="group border border-slate-100 bg-white p-5 rounded-[2rem] flex flex-col gap-4 hover:shadow-xl hover:shadow-slate-100/50 hover:border-indigo-100 transition-all duration-300">
@@ -67,13 +81,22 @@ const OrderItem = ({ pedido }) => {
             <p className="font-black text-slate-900 text-lg tracking-tight">
               $ {pedido.total?.toLocaleString('es-AR')}
             </p>
-            <button 
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-              title="Ver productos"
-            >
-              {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleReorder}
+                className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                title="Volver a comprar"
+              >
+                <RefreshCw size={16} />
+              </button>
+              <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-1.5 bg-slate-50 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                title="Ver productos"
+              >
+                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -86,11 +109,11 @@ const OrderItem = ({ pedido }) => {
             <div key={item.id || idx} className="flex items-center justify-between bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
               <div className="flex items-center gap-3">
 
-                {(item.imgUrl || item.img) && (
+                {(item.imagenUrl || item.imgUrl || item.img) && (
                   <img 
-                    src={item.imgUrl || item.img} 
+                    src={item.imagenUrl || item.imgUrl || item.img} 
                     alt={item.titulo} 
-                    className="w-10 h-10 object-cover rounded-xl bg-white border border-slate-100"
+                    className="w-10 h-10 object-cover rounded-xl bg-white border border-slate-100 flex-shrink-0"
                   />
                 )}
                 <div>
