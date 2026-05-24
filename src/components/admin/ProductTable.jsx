@@ -119,10 +119,22 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, selectedIds, onToggl
                     </td>
 
                     <td className="p-5 hidden md:table-cell">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-xl ${isOutofStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${isOutofStock ? 'bg-rose-500' : 'bg-emerald-500'}`} />
-                        {isOutofStock ? 'Agotado' : `${p.stock} u.`}
-                      </span>
+                      {isOutofStock ? (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                          Agotado
+                        </span>
+                      ) : Number(p.stock) <= 3 ? (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 animate-pulse">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          Crítico: {p.stock} u.
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          {p.stock} u.
+                        </span>
+                      )}
                     </td>
 
                     <td className="p-5 text-right pr-8">
