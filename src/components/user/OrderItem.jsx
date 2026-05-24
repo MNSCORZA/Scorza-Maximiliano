@@ -28,7 +28,6 @@ const formatDate = (timestamp) => {
 };
 
 const OrderItem = ({ pedido }) => {
-  // Estado por si querés que los detalles se puedan expandir/colapsar (opcional pero recomendado en mobile)
   const [isOpen, setIsOpen] = useState(false);
 
   return (
