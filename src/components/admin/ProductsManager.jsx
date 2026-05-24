@@ -4,6 +4,7 @@ import { useProductsManager } from '../../hooks/useProductsManager';
 import AdminFilters from './AdminFilters';
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
+import BulkUploadZone from './BulkUploadZone';
 
 const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
   const {
@@ -24,6 +25,10 @@ const ProductsManager = ({ admin, onEdit, onDeleteCustom }) => {
 
   return (
     <>
+      <div className="mb-6">
+        <BulkUploadZone refreshProducts={admin.refreshProducts} />
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <AdminFilters {...admin} />
         <button 
