@@ -1,12 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { ImagePlus, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ProductForm = ({ formData, setFormData, isEditing, handleSubmit }) => {
+  const [compressing, setCompressing] = useState(false);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const handleImageCompression = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('El archivo seleccionado debe ser una imagen válida');
+      return;
+    }
+
+    setCompressing(true);
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        
+        setFormData(prev => ({
+          ...prev,
+          imagenUrl: compressedBase64
+        }));
+        
+        setCompressing(false);
+        toast.success('Imagen cargada y optimizada de forma segura');
+      };
+      img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -125,17 +183,41 @@ const ProductForm = ({ formData, setFormData, isEditing, handleSubmit }) => {
           </div>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 block ml-1">URL de la Imagen</label>
-          <input
-            type="url"
-            name="imagenUrl"
-            required
-            value={formData.imagenUrl || ''}
-            onChange={handleChange}
-            placeholder="https://ejemplo.com/foto.jpg"
-            className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 font-bold text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white transition-all"
-          />
+        <div className="grid grid-cols-1 gap-2">
+          <div className="space-y-1">
+            <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 block ml-1">URL o Archivo de Imagen</label>
+            <input
+              type="url"
+              name="imagenUrl"
+              required
+              value={formData.imagenUrl || ''}
+              onChange={handleChange}
+              placeholder="https://ejemplo.com/foto.jpg u optimización Base64"
+              className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 font-bold text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white transition-all"
+            />
+          </div>
+          
+          <div className="relative flex items-center justify-center w-full">
+            <label className="flex flex-col items-center justify-center w-full h-20 border-2 border-slate-200 border-dashed rounded-xl cursor-pointer bg-slate-50/50 hover:bg-indigo-50/20 hover:border-indigo-300 transition-all">
+              <div className="flex flex-col items-center justify-center pt-2 pb-2">
+                {compressing ? (
+                  <Loader2 size={18} className="text-indigo-600 animate-spin mb-1" />
+                ) : (
+                  <ImagePlus size={18} className="text-slate-400 mb-1 group-hover:text-indigo-500" />
+                )}
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                  {compressing ? 'Compandose...' : 'O optimizar imagen local (.jpg/.png)'}
+                </p>
+              </div>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageCompression} 
+                disabled={compressing}
+                className="hidden" 
+              />
+            </label>
+          </div>
         </div>
 
         <div className="bg-slate-50/50 p-3.5 rounded-xl border border-slate-100 space-y-3">
@@ -164,7 +246,8 @@ const ProductForm = ({ formData, setFormData, isEditing, handleSubmit }) => {
 
         <button
           type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-widest h-12 rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer border-none"
+          disabled={compressing}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-widest h-12 rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer border-none disabled:opacity-50"
         >
           {isEditing ? 'Guardar Cambios' : 'Publicar Producto'}
         </button>
