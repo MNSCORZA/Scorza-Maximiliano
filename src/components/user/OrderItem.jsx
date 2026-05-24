@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Calendar, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { toast } from 'sonner';
 
 const getStatusStyles = (status) => {
   switch (status?.toLowerCase()) {
@@ -33,6 +34,7 @@ const OrderItem = ({ pedido, onAddToCart }) => {
   const handleReorder = (e) => {
     e.stopPropagation();
     if (!pedido.items || !onAddToCart) return;
+    
     pedido.items.forEach(item => {
       onAddToCart({
         id: item.id,
@@ -42,6 +44,8 @@ const OrderItem = ({ pedido, onAddToCart }) => {
         cantidad: item.cantidad || 1
       });
     });
+
+    toast.success("Todos los productos de la orden fueron añadidos al carrito");
   };
 
   return (
