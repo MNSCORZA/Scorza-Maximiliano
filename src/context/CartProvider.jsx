@@ -10,13 +10,13 @@ export function CartProvider({ children }) {
   });
   const [cartOpen, setCartOpen] = useState(false);
   const { user, loading } = useAuth();
-  
+
   const isInitialMount = useRef(true);
   const previousCartRef = useRef(JSON.stringify(cart));
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
-    
+
     if (loading || !user?.uid) return;
 
     if (isInitialMount.current) {
@@ -42,29 +42,30 @@ export function CartProvider({ children }) {
   const toggleCart = () => setCartOpen(!cartOpen);
 
   const addToCart = (productToAdd) => {
-    const existingProductIndex = cart.findIndex(
-      (item) => item.id === productToAdd.id
-    );
+    setCart((prevCart) => {
+      const existingProductIndex = prevCart.findIndex(
+        (item) => item.id === productToAdd.id
+      );
 
-    if (existingProductIndex !== -1) {
-      const updatedCart = cart.map((item, index) => {
-        if (index === existingProductIndex) {
-          const quantityToAdd = productToAdd.cantidad || 1;
-          return {
-            ...item,
-            cantidad: (item.cantidad || 0) + quantityToAdd,
-          };
-        }
-        return item;
-      });
-      setCart(updatedCart);
-    } else {
-      const newProduct = {
-        ...productToAdd,
-        cantidad: productToAdd.cantidad || 1,
-      };
-      setCart([...cart, newProduct]);
-    }
+      if (existingProductIndex !== -1) {
+        return prevCart.map((item, index) => {
+          if (index === existingProductIndex) {
+            const quantityToAdd = productToAdd.cantidad || 1;
+            return {
+              ...item,
+              cantidad: (item.cantidad || 0) + quantityToAdd,
+            };
+          }
+          return item;
+        });
+      } else {
+        const newProduct = {
+          ...productToAdd,
+          cantidad: productToAdd.cantidad || 1,
+        };
+        return [...prevCart, newProduct];
+      }
+    });
   };
 
   const updateItemQuantity = (productId, newQuantity) => {
