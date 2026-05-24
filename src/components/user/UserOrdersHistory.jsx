@@ -4,7 +4,7 @@ import { Loader } from '../Loader';
 import OrderItem from './OrderItem';
 import EmptyOrders from './EmptyOrders';
 
-const UserOrdersHistory = ({ pedidos = [], loading }) => {
+const UserOrdersHistory = ({ pedidos = [], loading, onAddToCart }) => {
   if (loading) {
     return (
       <div className="bg-white p-12 rounded-[2.5rem] shadow-sm border border-slate-100 flex items-center justify-center min-h-[300px]">
@@ -27,7 +27,11 @@ const UserOrdersHistory = ({ pedidos = [], loading }) => {
       <div className="space-y-4">
         {pedidos.length > 0 ? (
           pedidos.map((pedido) => (
-            <OrderItem key={pedido.id} pedido={pedido} />
+            <OrderItem 
+              key={pedido.id} 
+              pedido={pedido} 
+              onAddToCart={onAddToCart}
+            />
           ))
         ) : (
           <EmptyOrders />
