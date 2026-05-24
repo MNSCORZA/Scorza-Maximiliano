@@ -32,8 +32,7 @@ const OrderItem = ({ pedido }) => {
 
   return (
     <div className="group border border-slate-100 bg-white p-5 rounded-[2rem] flex flex-col gap-4 hover:shadow-xl hover:shadow-slate-100/50 hover:border-indigo-100 transition-all duration-300">
-      
-      
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className="bg-slate-50 p-3.5 rounded-2xl text-slate-700 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
@@ -52,7 +51,7 @@ const OrderItem = ({ pedido }) => {
             <div className="flex items-center gap-4 text-slate-400 text-[11px] font-medium flex-wrap">
               <span className="flex items-center gap-1">
                 <Calendar size={12} className="text-slate-300" />
-                {formatDate(pedido.fecha)}
+                {formatDate(pedido.date || pedido.fecha)}
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-slate-200 hidden sm:inline-block"></span>
               <span className="text-slate-500 font-bold">
@@ -62,7 +61,6 @@ const OrderItem = ({ pedido }) => {
           </div>
         </div>
 
-        
         <div className="flex sm:flex-col justify-between sm:justify-center items-center sm:items-end gap-1 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-50">
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest sm:hidden">Total pagado</p>
           <div className="flex items-center gap-2">
@@ -80,34 +78,33 @@ const OrderItem = ({ pedido }) => {
         </div>
       </div>
 
-      
       {isOpen && pedido.items && pedido.items.length > 0 && (
         <div className="border-t border-slate-50 pt-4 mt-1 space-y-3 animate-fadeIn">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Detalle de productos</p>
-          
+
           {pedido.items.map((item, idx) => (
             <div key={item.id || idx} className="flex items-center justify-between bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
               <div className="flex items-center gap-3">
-                
-                {item.img && (
+
+                {(item.imgUrl || item.img) && (
                   <img 
-                    src={item.imgUrl} 
+                    src={item.imgUrl || item.img} 
                     alt={item.titulo} 
                     className="w-10 h-10 object-cover rounded-xl bg-white border border-slate-100"
                   />
                 )}
                 <div>
                   <p className="text-xs font-bold text-slate-800 line-clamp-1">
-                    {item.nombre || item.title}
+                    {item.titulo || item.nombre || "Producto sin nombre"}
                   </p>
                   <p className="text-[10px] text-slate-400 font-medium">
-                    Cantidad: <span className="font-bold text-slate-600">{item.cantidad || item.quantity || 1}</span>
+                    Cantidad: <span className="font-bold text-slate-600">{item.cantidad}</span>
                   </p>
                 </div>
               </div>
-              
+
               <p className="text-xs font-black text-slate-700 whitespace-nowrap">
-                $ {((item.precio || item.price) * (item.cantidad || item.quantity || 1))?.toLocaleString('es-AR')}
+                $ {(item.precio * item.cantidad)?.toLocaleString('es-AR')}
               </p>
             </div>
           ))}
