@@ -11,7 +11,15 @@ const UserModal = ({ isOpen, onClose, newUser, setNewUser, onSubmit }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await onSubmit(e);
+      const userToSave = {
+        ...newUser,
+        permisos: {
+          isAdmin: newUser.permisos?.isAdmin || false,
+          editar: newUser.permisos?.editar || false,
+          borrar: newUser.permisos?.borrar || false
+        }
+      };
+      await onSubmit(e, userToSave);
     } catch (error) {
       console.error(error);
     } finally {
