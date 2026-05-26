@@ -45,11 +45,16 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, extraData) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
-    
+
     await setDoc(doc(db, "usuarios", uid), {
       nombre: extraData.nombre,
       email: email,
       rol: "cliente",
+      permisos: {
+        isAdmin: false,
+        editar: false,
+        borrar: false
+      },
       fechaRegistro: new Date(),
       codArea: "",
       telefono: "",
