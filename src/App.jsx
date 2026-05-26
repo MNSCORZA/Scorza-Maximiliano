@@ -23,18 +23,20 @@ import { SideCart } from "./components/SideCart";
 import { Favoritos } from "./components/Favoritos";
 import { OfertasContainer } from "./components/OfertasContainer";
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false, requireEdit = false, requireDelete = false }) => {
   const { user, userData, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" />;
   if (adminOnly && !userData?.permisos?.isAdmin) return <Navigate to="/" />;
+  if (requireEdit && !userData?.permisos?.editar) return <Navigate to="/admin" />;
+  if (requireDelete && !userData?.permisos?.borrar) return <Navigate to="/admin" />;
   return children;
 };
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const isDocAdmin = location.pathname.startsWith('/admin');
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
