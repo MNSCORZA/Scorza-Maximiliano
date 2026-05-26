@@ -29,7 +29,7 @@ const UserModal = ({ isOpen, onClose, newUser, setNewUser, onSubmit }) => {
       await onSubmit(e, userToSave);
     } catch (error) {
       console.error(error);
-    } finaly {
+    } finally {
       setIsSubmitting(false);
     }
   };
