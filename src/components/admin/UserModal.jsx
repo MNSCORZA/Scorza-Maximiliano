@@ -16,13 +16,20 @@ const UserModal = ({ isOpen, onClose, newUser, setNewUser, onSubmit }) => {
         permisos: {
           isAdmin: newUser.permisos?.isAdmin || false,
           editar: newUser.permisos?.editar || false,
-          borrar: newUser.permisos?.borrar || false
+          borrar: newUser.permisos?.borrar || false,
+          pedidos: newUser.permisos?.pedidos || false,
+          banners: newUser.permisos?.banners || false,
+          marcas: newUser.permisos?.marcas || false,
+          metricas: newUser.permisos?.metricas || false,
+          cupones: newUser.permisos?.cupones || false,
+          carritos: newUser.permisos?.carritos || false,
+          historial: newUser.permisos?.historial || false
         }
       };
       await onSubmit(e, userToSave);
     } catch (error) {
       console.error(error);
-    } finally {
+    } finaly {
       setIsSubmitting(false);
     }
   };
@@ -94,25 +101,36 @@ const UserModal = ({ isOpen, onClose, newUser, setNewUser, onSubmit }) => {
             <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest flex items-center gap-2">
               <Shield size={13} /> Permisos Iniciales
             </p>
-            <div className="grid grid-cols-3 gap-2">
-              {['isAdmin', 'editar', 'borrar'].map((perm) => {
-                const isChecked = newUser.permisos?.[perm] || false;
+            <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1">
+              {[
+                { id: 'isAdmin', label: 'Admin' },
+                { id: 'editar', label: 'Editar' },
+                { id: 'borrar', label: 'Borrar' },
+                { id: 'pedidos', label: 'Pedidos' },
+                { id: 'banners', label: 'Banners' },
+                { id: 'marcas', label: 'Marcas' },
+                { id: 'metricas', label: 'Métricas' },
+                { id: 'cupones', label: 'Cupones' },
+                { id: 'carritos', label: 'Carritos' },
+                { id: 'historial', label: 'Historial' }
+              ].map((perm) => {
+                const isChecked = newUser.permisos?.[perm.id] || false;
                 return (
                   <button
-                    key={perm} 
+                    key={perm.id} 
                     type="button"
                     disabled={isSubmitting}
                     onClick={() => setNewUser({
                       ...newUser, 
-                      permisos: { ...newUser.permisos, [perm]: !isChecked }
+                      permisos: { ...newUser.permisos, [perm.id]: !isChecked }
                     })}
-                    className={`py-3 px-2 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border ${
+                    className={`py-2.5 px-1 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border ${
                       isChecked 
                         ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' 
                         : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
                     }`}
                   >
-                    {perm === 'isAdmin' ? 'Admin' : perm}
+                    {perm.label}
                   </button>
                 );
               })}
