@@ -16,7 +16,8 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
-  deleteDoc
+  deleteDoc,
+  onSnapshot
 } from "firebase/firestore";
 import { db } from "./config.js";
 
@@ -242,7 +243,7 @@ export const saveUserCart = async (uid, cartItems) => {
         };
       }
     } catch (err) {
-      console.error("Error al cruzar info de usuario para el carrito:", err);
+      console.error(err);
     }
 
     await setDoc(cartRef, {
@@ -261,6 +262,33 @@ export const deleteUserCart = async (uid) => {
   if (!uid) return;
   try {
     await deleteDoc(doc(db, 'carritos', uid));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const listenAlertasNotRead = (callback) => {
+  const q = query(
+    collection(db, "alertas"),
+    where("leida", "==", false),
+    orderBy("fecha", "desc")
+  );
+  
+  return onSnapshot(q, (snapshot) => {
+    const alertas = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    callback(alertas);
+  }, (error) => {
+    console.error(error);
+  });
+};
+
+export const markAlertaAsRead = async (alertaId) => {
+  try {
+    const alertaRef = doc(db, "alertas", alertaId);
+    await updateDoc(alertaRef, { leida: true });
   } catch (error) {
     console.error(error);
   }
