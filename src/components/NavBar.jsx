@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import { getCategories } from '../fireBase/dataBase';
 import { MobileMenu } from './MobileMenu';
+import { NotificationBell } from './NotificationBell';
 import logoImg from '../assets/images/Logo.png';
 
 export const NavBar = () => {
@@ -72,6 +73,11 @@ export const NavBar = () => {
             </form>
 
             <div className="flex items-center gap-2 shrink-0">
+              
+              {user && userData?.rol === 'admin' && (
+                <NotificationBell />
+              )}
+
               <div className="hidden sm:flex items-center">
                 {user ? (
                   <div className="flex items-center gap-3 bg-slate-50 p-1 pr-4 rounded-full border border-slate-100">
