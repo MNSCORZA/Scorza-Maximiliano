@@ -140,6 +140,32 @@ const AdminContainer = () => {
     );
   }
 
+  const hasTabPermission = (tabName) => {
+    if (userData.permisos.isAdmin) return true;
+    if (tabName === 'productos') return true; 
+    if (tabName === 'pedidos' && userData.permisos.pedidos) return true;
+    if (tabName === 'banners' && userData.permisos.banners) return true;
+    if (tabName === 'marcas' && userData.permisos.marcas) return true;
+    if (tabName === 'métricas' && userData.permisos.metricas) return true;
+    if (tabName === 'cupones' && userData.permisos.cupones) return true;
+    if (tabName === 'carritos' && userData.permisos.carritos) return true;
+    if (tabName === 'historial' && userData.permisos.historial) return true;
+    if (tabName === 'usuarios' && userData.permisos.isAdmin) return true;
+    return false;
+  };
+
+  const tabsMapping = [
+    { id: 'productos', label: 'productos' },
+    { id: 'pedidos', label: 'pedidos' },
+    { id: 'usuarios', label: 'usuarios' },
+    { id: 'banners', label: 'banners' },
+    { id: 'marcas', label: 'marcas' },
+    { id: 'métricas', label: 'métricas' },
+    { id: 'cupones', label: 'cupones' },
+    { id: 'carritos', label: 'carritos' },
+    { id: 'historial', label: 'historial' }
+  ];
+
   const processedProducts = (admin.products || []).filter(p => {
     if (stockFilter === 'noStock') return Number(p.stock) === 0;
     if (stockFilter === 'criticalStock') return Number(p.stock) > 0 && Number(p.stock) <= 3;
@@ -151,16 +177,16 @@ const AdminContainer = () => {
       <ConfirmModal {...confirmConfig} onClose={() => setConfirmConfig(p => ({...p, isOpen: false}))} />
 
       <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
-        {['productos', 'pedidos', 'usuarios', 'banners', 'marcas', 'métricas', 'cupones', 'carritos', 'historial'].map(tab => (
-          (tab !== 'usuarios' && tab !== 'historial' || userData.permisos.isAdmin) && (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-gray-400 border border-slate-100'}`}>
-              {tab}
+        {tabsMapping.map(tab => (
+          hasTabPermission(tab.id) && (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-gray-400 border border-slate-100'}`}>
+              {tab.label}
             </button>
           )
         ))}
       </div>
 
-      {activeTab === 'productos' && (
+      {activeTab === 'productos' && hasTabPermission('productos') && (
         <ProductsManager 
           admin={{ 
             ...admin, 
@@ -174,14 +200,14 @@ const AdminContainer = () => {
         />
       )}
 
-      {activeTab === 'pedidos' && <OrdersManager />}
-      {activeTab === 'usuarios' && <UsersManager admin={admin} currentUser={user} />}
-      {activeTab === 'banners' && <AdminBanners />}
-      {activeTab === 'marcas' && <AdminBrands />}
-      {activeTab === 'métricas' && <AdminAnalytics />}
-      {activeTab === 'cupones' && <AdminCoupons />}
-      {activeTab === 'carritos' && <AbandonedCarts />}
-      {activeTab === 'historial' && <AdminLogs />}
+      {activeTab === 'pedidos' && hasTabPermission('pedidos') && <OrdersManager />}
+      {activeTab === 'usuarios' && hasTabPermission('usuarios') && <UsersManager admin={admin} currentUser={user} />}
+      {activeTab === 'banners' && hasTabPermission('banners') && <AdminBanners />}
+      {activeTab === 'marcas' && hasTabPermission('marcas') && <AdminBrands />}
+      {activeTab === 'métricas' && hasTabPermission('métricas') && <AdminAnalytics />}
+      {activeTab === 'cupones' && Henry && hasTabPermission('cupones') && <AdminCoupons />}
+      {activeTab === 'carritos' && hasTabPermission('carritos') && <AbandonedCarts />}
+      {activeTab === 'historial' && hasTabPermission('historial') && <AdminLogs />}
     </div>
   );
 };
