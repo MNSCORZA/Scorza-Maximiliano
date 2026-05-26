@@ -27,6 +27,16 @@ const AdminContainer = () => {
 
   const handleCustomFormSubmit = async (e) => {
     e.preventDefault();
+    
+    if (admin.isEditing && !userData?.permisos?.editar) {
+      toast.error('Acceso denegado', { description: 'No posees permisos de edición de contenidos.' });
+      return;
+    }
+    if (!admin.isEditing && !userData?.permisos?.editar) {
+      toast.error('Acceso denegado', { description: 'No posees permisos para crear nuevos productos.' });
+      return;
+    }
+
     try {
       let basePrice = Number(admin.formData.precio);
       const currentStock = Number(admin.formData.stock);
@@ -74,6 +84,10 @@ const AdminContainer = () => {
   };
 
   const handleEdit = (p) => {
+    if (!userData?.permisos?.editar) {
+      toast.error('Acceso denegado', { description: 'No posees permisos suficientes para editar.' });
+      return;
+    }
     admin.setFormData({
       ...p,
       precio: p.precioAnterior && Number(p.precioAnterior) > Number(p.precio) ? p.precioAnterior : p.precio,
@@ -87,6 +101,11 @@ const AdminContainer = () => {
   };
 
   const handleDeleteProduct = (id) => {
+    if (!userData?.permisos?.borrar) {
+      toast.error('Acceso denegado', { description: 'No posees permisos de eliminación asignados.' });
+      return;
+    }
+
     const targetProduct = admin.products.find(p => p.id === id);
     const productTitle = targetProduct ? targetProduct.titulo : id;
 
