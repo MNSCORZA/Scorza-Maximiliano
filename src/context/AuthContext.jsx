@@ -53,7 +53,14 @@ export const AuthProvider = ({ children }) => {
       permisos: {
         isAdmin: false,
         editar: false,
-        borrar: false
+        borrar: false,
+        pedidos: false,
+        banners: false,
+        marcas: false,
+        metricas: false,
+        cupones: false,
+        carritos: false,
+        historial: false
       },
       fechaRegistro: new Date(),
       codArea: "",
