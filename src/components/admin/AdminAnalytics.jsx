@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAnalyticsData } from '../../hooks/useAnalyticsData';
+import { AnalyticsReports } from './AnalyticsReports';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -42,9 +43,11 @@ const AdminAnalytics = () => {
 
   return (
     <div className="space-y-8">
+      
+      <AnalyticsReports />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        
+
         <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-3.5">
           <div className="bg-emerald-50 p-3 rounded-2xl text-emerald-600 shadow-sm shrink-0">
             <DollarSign size={18} />
