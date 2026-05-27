@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export const exportToExcel = (orders, startDate, endDate, statusFilter) => {
   const headers = [
@@ -119,7 +119,7 @@ export const exportToPDF = (orders, startDate, endDate, statusFilter) => {
     ];
   });
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: 74,
     head: tableHeaders,
     body: tableRows,
