@@ -17,6 +17,7 @@ import AdminAnalytics from '../components/admin/AdminAnalytics';
 import { AdminCoupons } from '../components/admin/AdminCoupons';
 import AdminLogs from '../components/admin/AdminLogs';
 import AbandonedCarts from '../components/admin/AbandonedCarts';
+import { AdminBackup } from '../components/admin/AdminBackup';
 
 const AdminContainer = () => {
   const { user, userData, loading } = useAuth();
@@ -27,7 +28,7 @@ const AdminContainer = () => {
 
   const handleCustomFormSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (admin.isEditing && !userData?.permisos?.editar) {
       toast.error('Acceso denegado', { description: 'No posees permisos de edición de contenidos.' });
       return;
@@ -151,6 +152,7 @@ const AdminContainer = () => {
     if (tabName === 'carritos' && userData.permisos.carritos) return true;
     if (tabName === 'historial' && userData.permisos.historial) return true;
     if (tabName === 'usuarios' && userData.permisos.isAdmin) return true;
+    if (tabName === 'respaldos' && userData.permisos.isAdmin) return true;
     return false;
   };
 
@@ -163,7 +165,8 @@ const AdminContainer = () => {
     { id: 'métricas', label: 'métricas' },
     { id: 'cupones', label: 'cupones' },
     { id: 'carritos', label: 'carritos' },
-    { id: 'historial', label: 'historial' }
+    { id: 'historial', label: 'historial' },
+    { id: 'respaldos', label: 'respaldos' }
   ];
 
   const processedProducts = (admin.products || []).filter(p => {
@@ -205,9 +208,10 @@ const AdminContainer = () => {
       {activeTab === 'banners' && hasTabPermission('banners') && <AdminBanners />}
       {activeTab === 'marcas' && hasTabPermission('marcas') && <AdminBrands />}
       {activeTab === 'métricas' && hasTabPermission('métricas') && <AdminAnalytics />}
-      {activeTab === 'cupones' && Henry && hasTabPermission('cupones') && <AdminCoupons />}
+      {activeTab === 'cupones' && hasTabPermission('cupones') && <AdminCoupons />}
       {activeTab === 'carritos' && hasTabPermission('carritos') && <AbandonedCarts />}
       {activeTab === 'historial' && hasTabPermission('historial') && <AdminLogs />}
+      {activeTab === 'respaldos' && hasTabPermission('respaldos') && <AdminBackup currentUser={user} userData={userData} />}
     </div>
   );
 };
