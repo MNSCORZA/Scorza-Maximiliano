@@ -273,7 +273,7 @@ export const listenAlertasNotRead = (callback) => {
     where("leida", "==", false),
     orderBy("fecha", "desc")
   );
-  
+
   return onSnapshot(q, (snapshot) => {
     const alertas = snapshot.docs.map(doc => ({
       id: doc.id,
@@ -291,5 +291,55 @@ export const markAlertaAsRead = async (alertaId) => {
     await updateDoc(alertaRef, { leida: true });
   } catch (error) {
     console.error(error);
+  }
+};
+
+export const exportAllCollectionsData = async () => {
+  const collectionsToExport = ["productos", "cupones", "banners", "usuarios"];
+  const backupData = {};
+
+  for (const colName of collectionsToExport) {
+    const querySnapshot = await getDocs(collection(db, colName));
+    backupData[colName] = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  }
+  return backupData;
+};
+
+export const restoreCollectionData = async (backupData) => {
+  const collectionsToRestore = ["productos", "cupones", "banners", "usuarios"];
+
+  for (const colName of collectionsToRestore) {
+    if (!backupData[colName]) continue;
+
+    const currentSnapshot = await getDocs(collection(db, colName));
+    const deleteBatch = writeBatch(db);
+    currentSnapshot.docs.forEach((docSnap) => {
+      deleteBatch.delete(doc(db, colName, docSnap.id));
+    });
+    await deleteBatch.commit();
+
+    const itemsToData = backupData[colName];
+    let batch = writeBatch(db);
+    let counter = 0;
+
+    for (const item of itemsToData) {
+      const { id, ...data } = item;
+      const docRef = doc(db, colName, id);
+      batch.set(docRef, data);
+      counter++;
+
+      if (counter === 400) {
+        await batch.commit();
+        batch = writeBatch(db);
+        counter = 0;
+      }
+    }
+
+    if (counter > 0) {
+      await batch.commit();
+    }
   }
 };
