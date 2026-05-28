@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../fireBase/config';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
 import { ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 import AbandonedCartCard from './AbandonedCartCard';
@@ -12,7 +12,8 @@ const AbandonedCarts = () => {
   const fetchCarts = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, "carritos"));
+      const q = query(collection(db, "carritos"), where("esAbandonado", "==", true));
+      const querySnapshot = await getDocs(q);
       const cartsList = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
