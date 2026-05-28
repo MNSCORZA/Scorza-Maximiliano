@@ -1,78 +1,36 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin } from '../hooks/useAdmin';
-import { doc, updateDoc, collection, addDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../fireBase/config';
 import { Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { saveLog } from '../fireBase/dataBase';
 
 import ConfirmModal from '../components/admin/ConfirmModal';
-import ProductsManager from '../components/admin/ProductsManager';
-import OrdersManager from '../components/admin/OrdersManager';
-import UsersManager from '../components/admin/UsersManager';
-import { AdminBanners } from '../components/admin/AdminBanners';
-import { AdminBrands } from '../components/admin/AdminBrands';
-import AdminAnalytics from '../components/admin/AdminAnalytics';
-import { AdminCoupons } from '../components/admin/AdminCoupons';
-import AdminLogs from '../components/admin/AdminLogs';
-import AbandonedCarts from '../components/admin/AbandonedCarts';
-import ReglasCarrito from '../components/admin/ReglasCarrito';
-import { AdminBackup } from '../components/admin/AdminBackup';
+import AdminContentSwitcher from '../components/admin/AdminContentSwitcher';
+import { 
+  TABS_CONFIG, 
+  hasTabPermission, 
+  saveProductService, 
+  deleteProductService 
+} from '../services/adminService';
 
 const AdminContainer = () => {
   const { user, userData, loading } = useAuth();
   const admin = useAdmin(user, userData, loading);
   const [activeTab, setActiveTab] = useState('productos');
-  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
   const [stockFilter, setStockFilter] = useState('all');
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
 
   const handleCustomFormSubmit = async (e) => {
     e.preventDefault();
-
-    if (admin.isEditing && !userData?.permisos?.editar) {
-      toast.error('Acceso denegado', { description: 'No posees permisos de edición de contenidos.' });
-      return;
-    }
-    if (!admin.isEditing && !userData?.permisos?.editar) {
-      toast.error('Acceso denegado', { description: 'No posees permisos para crear nuevos productos.' });
+    if (!userData?.permisos?.editar) {
+      toast.error('Acceso denegado', { description: 'No posees permisos de edición.' });
       return;
     }
 
     try {
-      let basePrice = Number(admin.formData.precio);
-      const currentStock = Number(admin.formData.stock);
-      const hasDiscount = admin.formData.tieneDescuento;
-      const discountPercent = Number(admin.formData.porcentajeDescuento || 0);
-
-      let finalPrice = basePrice;
-      let previousPrice = null;
-
-      if (hasDiscount && discountPercent > 0) {
-        previousPrice = basePrice;
-        finalPrice = basePrice - (basePrice * (discountPercent / 100));
-      }
-
-      const productData = {
-        ...admin.formData,
-        precio: finalPrice,
-        precioAnterior: previousPrice,
-        stock: currentStock,
-        tieneDescuento: hasDiscount,
-        porcentajeDescuento: hasDiscount ? discountPercent : 0,
-        marca: admin.formData.marca ? admin.formData.marca.trim() : ""
-      };
-
-      if (admin.isEditing && admin.currentId) {
-        await updateDoc(doc(db, "productos", admin.currentId), productData);
-        await saveLog(user.uid, user.email, userData?.nombre || 'Admin', 'Editar Producto', `Modificó el artículo: "${admin.formData.titulo}"`);
-        toast.success('¡Cambios guardados!', { description: `"${admin.formData.titulo}" se actualizó.` });
-      } else {
-        productData.ventas = productData.ventas || 0;
-        await addDoc(collection(db, "productos"), productData);
-        await saveLog(user.uid, user.email, userData?.nombre || 'Admin', 'Crear Producto', `Publicó un nuevo artículo: "${productData.titulo}"`);
-        toast.success('¡Producto publicado!', { description: `"${productData.titulo}" ya está en catálogo.` });
-      }
+      await saveProductService(user, userData, admin.formData, admin.isEditing, admin.currentId);
+      
+      toast.success(admin.isEditing ? '¡Cambios guardados!' : '¡Producto publicado!');
 
       admin.setFormData({ titulo: "", descripcion: "", precio: "", stock: "", categoria: "", marca: "", imagenUrl: "", envioGratis: false, tieneDescuento: false, porcentajeDescuento: "" });
       admin.setIsEditing(false);
@@ -87,7 +45,7 @@ const AdminContainer = () => {
 
   const handleEdit = (p) => {
     if (!userData?.permisos?.editar) {
-      toast.error('Acceso denegado', { description: 'No posees permisos suficientes para editar.' });
+      toast.error('Acceso denegado');
       return;
     }
     admin.setFormData({
@@ -104,7 +62,7 @@ const AdminContainer = () => {
 
   const handleDeleteProduct = (id) => {
     if (!userData?.permisos?.borrar) {
-      toast.error('Acceso denegado', { description: 'No posees permisos de eliminación asignados.' });
+      toast.error('Acceso denegado');
       return;
     }
 
@@ -118,8 +76,7 @@ const AdminContainer = () => {
       type: 'danger',
       onConfirm: async () => {
         try {
-          await deleteDoc(doc(db, "productos", id));
-          await saveLog(user.uid, user.email, userData?.nombre || 'Admin', 'Eliminar Producto', `Removió del catálogo: "${productTitle}"`);
+          await deleteProductService(user, userData, id, productTitle);
           toast.success('Producto eliminado');
           setConfirmConfig(p => ({...p, isOpen: false}));
           if (admin.refreshProducts) admin.refreshProducts();
@@ -142,36 +99,6 @@ const AdminContainer = () => {
     );
   }
 
-  const hasTabPermission = (tabName) => {
-    if (userData.permisos.isAdmin) return true;
-    if (tabName === 'productos') return true; 
-    if (tabName === 'pedidos' && userData.permisos.pedidos) return true;
-    if (tabName === 'banners' && userData.permisos.banners) return true;
-    if (tabName === 'marcas' && userData.permisos.marcas) return true;
-    if (tabName === 'métricas' && userData.permisos.metricas) return true;
-    if (tabName === 'cupones' && userData.permisos.cupones) return true;
-    if (tabName === 'carritos' && userData.permisos.carritos) return true;
-    if (tabName === 'reglas' && userData.permisos.carritos) return true;
-    if (tabName === 'historial' && userData.permisos.historial) return true;
-    if (tabName === 'usuarios' && userData.permisos.isAdmin) return true;
-    if (tabName === 'respaldos' && userData.permisos.isAdmin) return true;
-    return false;
-  };
-
-  const tabsMapping = [
-    { id: 'productos', label: 'productos' },
-    { id: 'pedidos', label: 'pedidos' },
-    { id: 'usuarios', label: 'usuarios' },
-    { id: 'banners', label: 'banners' },
-    { id: 'marcas', label: 'marcas' },
-    { id: 'métricas', label: 'métricas' },
-    { id: 'cupones', label: 'cupones' },
-    { id: 'carritos', label: 'carritos' },
-    { id: 'reglas', label: 'reglas' },
-    { id: 'historial', label: 'historial' },
-    { id: 'respaldos', label: 'respaldos' }
-  ];
-
   const processedProducts = (admin.products || []).filter(p => {
     if (stockFilter === 'noStock') return Number(p.stock) === 0;
     if (stockFilter === 'criticalStock') return Number(p.stock) > 0 && Number(p.stock) <= 3;
@@ -183,39 +110,33 @@ const AdminContainer = () => {
       <ConfirmModal {...confirmConfig} onClose={() => setConfirmConfig(p => ({...p, isOpen: false}))} />
 
       <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
-        {tabsMapping.map(tab => (
-          hasTabPermission(tab.id) && (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-gray-400 border border-slate-100'}`}>
+        {TABS_CONFIG.map(tab => (
+          hasTabPermission(tab.id, userData) && (
+            <button 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-gray-400 border border-slate-100'}`}
+            >
               {tab.label}
             </button>
           )
         ))}
       </div>
 
-      {activeTab === 'productos' && hasTabPermission('productos') && (
-        <ProductsManager 
-          admin={{ 
-            ...admin, 
-            products: processedProducts,
-            stockFilter,
-            setStockFilter,
-            handleSubmit: handleCustomFormSubmit 
-          }} 
-          onEdit={handleEdit} 
-          onDeleteCustom={handleDeleteProduct}
+      {hasTabPermission(activeTab, userData) && (
+        <AdminContentSwitcher 
+          activeTab={activeTab}
+          admin={admin}
+          user={user}
+          userData={userData}
+          processedProducts={processedProducts}
+          stockFilter={stockFilter}
+          setStockFilter={setStockFilter}
+          handleCustomFormSubmit={handleCustomFormSubmit}
+          handleEdit={handleEdit}
+          handleDeleteProduct={handleDeleteProduct}
         />
       )}
-
-      {activeTab === 'pedidos' && hasTabPermission('pedidos') && <OrdersManager />}
-      {activeTab === 'usuarios' && hasTabPermission('usuarios') && <UsersManager admin={admin} currentUser={user} />}
-      {activeTab === 'banners' && hasTabPermission('banners') && <AdminBanners />}
-      {activeTab === 'marcas' && hasTabPermission('marcas') && <AdminBrands />}
-      {activeTab === 'métricas' && hasTabPermission('métricas') && <AdminAnalytics />}
-      {activeTab === 'cupones' && hasTabPermission('cupones') && <AdminCoupons />}
-      {activeTab === 'carritos' && hasTabPermission('carritos') && <AbandonedCarts />}
-      {activeTab === 'reglas' && hasTabPermission('reglas') && <ReglasCarrito />}
-      {activeTab === 'historial' && hasTabPermission('historial') && <AdminLogs />}
-      {activeTab === 'respaldos' && hasTabPermission('respaldos') && <AdminBackup currentUser={user} userData={userData} />}
     </div>
   );
 };
