@@ -250,6 +250,7 @@ export const saveUserCart = async (uid, cartItems) => {
       uid,
       items: cartItems,
       status: 'activo',
+      esAbandonado: true,
       clienteInfo,
       updatedAt: serverTimestamp()
     }, { merge: true });
@@ -342,4 +343,10 @@ export const restoreCollectionData = async (backupData) => {
       await batch.commit();
     }
   }
+};
+
+export const getCartRules = async () => {
+  const q = query(collection(db, "reglas_carrito"), where("activa", "==", true));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
