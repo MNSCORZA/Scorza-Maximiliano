@@ -17,21 +17,44 @@ export const useCartTotals = (cart) => {
 
       try {
         const rules = await getCartRules();
-        
+
         rules.forEach(rule => {
-          if (rule.tipo === "marca_segunda_unidad_descuento") {
-            const itemsDeMarca = cart.filter(item => (item.marca || "").toLowerCase() === (rule.marcaTarget || "").toLowerCase());
+          const tipoRegla = (rule.tipo || "").toLowerCase();
+          const marcaRegla = (rule.marcaTarget || "").toLowerCase().trim();
+          const categoriaRegla = (rule.categoriaTarget || "").toLowerCase().trim();
+
+          if (tipoRegla.includes("segunda_unidad") || tipoRegla.includes("2da unidad")) {
+            const itemsDeMarca = cart.filter(item => (item.marca || "").toLowerCase().trim() === marcaRegla);
+            
             itemsDeMarca.forEach(item => {
               if (item.cantidad >= 2) {
                 const cantidadPares = Math.floor(item.cantidad / 2);
-                autoDiscount += cantidadPares * (item.precio * (rule.porcentajeDescuento / 100));
+                const porcentaje = Number(rule.porcentajeDescuento) || 50;
+                autoDiscount += cantidadPares * (item.precio * (porcentaje / 100));
               }
             });
+
+            if (rule.envioGratis && cart.some(item => (item.marca || "").toLowerCase().trim() === marcaRegla)) {
+              freeShipping = true;
+            }
           }
 
-          if (rule.tipo === "envio_gratis_monto_y_categoria") {
-            const tieneCategoria = cart.some(item => (item.categoria || "").toLowerCase() === (rule.categoriaTarget || "").toLowerCase());
-            if (calculatedBase >= rule.montoMinimo && tieneCategoria) {
+          if (tipoRegla.includes("envio_gratis_marca") || (tipoRegla.includes("marca") && rule.envioGratis)) {
+            const tieneMarca = cart.some(item => (item.marca || "").toLowerCase().trim() === marcaRegla);
+            if (tieneMarca) {
+              freeShipping = true;
+            }
+          }
+
+          if (tipoRegla.includes("monto_y_categoria")) {
+            const tieneCategoria = cart.some(item => (item.categoria || "").toLowerCase().trim() === categoriaRegla);
+            if (calculatedBase >= Number(rule.montoMinimo) && tieneCategoria) {
+              freeShipping = true;
+            }
+          }
+
+          if (tipoRegla.includes("envio_gratis_monto") || (rule.montoMinimo && rule.envioGratis && !rule.categoriaTarget)) {
+            if (calculatedBase >= Number(rule.montoMinimo)) {
               freeShipping = true;
             }
           }
