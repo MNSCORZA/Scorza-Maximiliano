@@ -6,14 +6,18 @@ import { useCartTotals } from "../hooks/useCartTotals";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import { Trash2, ArrowLeft, Ticket, Truck } from "lucide-react";
+import { Trash2, ArrowLeft } from "lucide-react";
 import { db } from "../fireBase/config";
 import { collection, getDocs, query, where } from "firebase/firestore";
+
+import { CartShippingProgressBar } from "./CartShippingProgressBar";
+import { CartCouponInput } from "./CartCouponInput";
+import { CartTotalBlock } from "./CartTotalBlock";
 
 export const Cart = () => {
   const { cart, emptyCart } = useContext(CartContext);
   const { user } = useAuth();
-  const { base: totalBase, descuentoAutomatico, total: totalConReglas, envioGratis } = useCartTotals(cart);
+  const { base: totalBase, descuentoAutomatico, total: totalConReglas, envioGratis, montoMinimoEnvio } = useCartTotals(cart);
   const navigate = useNavigate();
 
   const [inputCupón, setInputCupón] = useState("");
@@ -149,38 +153,19 @@ export const Cart = () => {
             </div>
           )}
 
-          {envioGratis && (
-            <div className="mx-6 mb-4 p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2 text-xs text-emerald-700 font-black uppercase tracking-wide">
-              <Truck size={16} />
-              <span>¡Envío gratis aplicado automáticamente!</span>
-            </div>
-          )}
+          <CartShippingProgressBar 
+            envioGratis={envioGratis}
+            totalConReglas={totalConReglas}
+            montoMinimoEnvio={montoMinimoEnvio}
+          />
 
-          <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Ticket size={18} className="text-slate-400 shrink-0" />
-              <input 
-                type="text" 
-                placeholder="¿TENÉS UN CUPÓN?" 
-                value={inputCupón}
-                onChange={(e) => setInputCupón(e.target.value)}
-                disabled={!!cupónAplicado}
-                className="bg-white border rounded-xl px-4 py-2.5 text-xs font-black uppercase outline-none focus:border-indigo-500/30 tracking-wider text-slate-800 w-full sm:w-48 disabled:opacity-60"
-              />
-              <button
-                onClick={handleValidarCupón}
-                disabled={!!cupónAplicado}
-                className="bg-slate-900 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50"
-              >
-                Aplicar
-              </button>
-            </div>
-            {cupónAplicado && (
-              <span className="text-[10px] font-black uppercase bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1.5 rounded-xl tracking-widest">
-                Activo: {cupónAplicado} (-{descuento}%)
-              </span>
-            )}
-          </div>
+          <CartCouponInput 
+            inputCupón={inputCupón}
+            setInputCupón={setInputCupón}
+            cupónAplicado={cupónAplicado}
+            descuento={descuento}
+            handleValidarCupón={handleValidarCupón}
+          />
 
           <CartTotalBlock total={totalFinal} />
         </div>
@@ -194,32 +179,5 @@ export const Cart = () => {
         </button>
       </div>
     </main>
-  );
-};
-
-export const CartTotalBlock = ({ total }) => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="p-6 sm:p-8 bg-slate-950 text-white">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-        <div className="flex flex-col items-center sm:items-start">
-          <span className="text-slate-400 text-[10px] uppercase font-black tracking-widest">Total a pagar</span>
-          <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            ${total.toFixed(2)}
-          </span>
-        </div>
-
-        <button
-          onClick={() => navigate("/form", { state: { totalFinalizado: total } })}
-          className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-10 rounded-xl transition-all active:scale-[0.98] text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10"
-        >
-          <span>Finalizar Compra</span>
-          <svg xmlns="http://www.w3.org/2000/xl" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
-      </div>
-    </div>
   );
 };
