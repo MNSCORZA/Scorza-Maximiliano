@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../fireBase/config';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { Sliders, Plus } from 'lucide-react';
+import { Sliders } from 'lucide-react';
 import { toast } from 'sonner';
 import ReglasCarritoCard from './ReglasCarritoCard';
+import NuevaReglaForm from './NuevaReglaForm';
 
 const ReglasCarrito = () => {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tipo, setTipo] = useState('marca_segunda_unidad_descuento');
-  const [marcaTarget, setMarcaTarget] = useState('');
-  const [categoriaTarget, setCategoriaTarget] = useState('');
-  const [porcentajeDescuento, setPorcentajeDescuento] = useState('');
-  const [montoMinimo, setMontoMinimo] = useState('');
 
   const fetchRules = async () => {
     try {
@@ -35,24 +31,20 @@ const ReglasCarrito = () => {
     fetchRules();
   }, []);
 
-  const handleCreateRule = async (e) => {
-    e.preventDefault();
+  const handleCreateRule = async (datos, resetFormulario) => {
     try {
       const nuevaRegla = {
-        tipo,
+        tipo: datos.tipo,
         activa: true,
-        marcaTarget: tipo === 'marca_segunda_unidad_descuento' ? marcaTarget.trim() : null,
-        porcentajeDescuento: tipo === 'marca_segunda_unidad_descuento' ? Number(porcentajeDescuento) : null,
-        categoriaTarget: tipo === 'envio_gratis_monto_y_categoria' ? categoriaTarget.trim() : null,
-        montoMinimo: tipo === 'envio_gratis_monto_y_categoria' ? Number(montoMinimo) : null
+        marcaTarget: datos.tipo === 'marca_segunda_unidad_descuento' ? datos.marcaTarget.trim() : null,
+        porcentajeDescuento: datos.tipo === 'marca_segunda_unidad_descuento' ? Number(datos.porcentajeDescuento) : null,
+        categoriaTarget: datos.tipo === 'envio_gratis_monto_y_categoria' ? datos.categoriaTarget.trim() : null,
+        montoMinimo: datos.tipo === 'envio_gratis_monto_y_categoria' ? Number(datos.montoMinimo) : null
       };
 
       await addDoc(collection(db, "reglas_carrito"), nuevaRegla);
       toast.success("Regla creada correctamente");
-      setMarcaTarget('');
-      setCategoriaTarget('');
-      setPorcentajeDescuento('');
-      setMontoMinimo('');
+      resetFormulario();
       fetchRules();
     } catch (error) {
       console.error(error);
@@ -104,89 +96,11 @@ const ReglasCarrito = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-        <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider mb-4">Nueva Regla Automática</h3>
-        <form onSubmit={handleCreateRule} className="space-y-4">
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Tipo de Regla</label>
-            <select
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500/30"
-            >
-              <option value="marca_segunda_unidad_descuento">Descuento en 2da Unidad por Marca</option>
-              <option value="envio_gratis_monto_y_categoria">Envío Gratis por Monto Mínimo y Categoría</option>
-            </select>
-          </div>
-
-          {tipo === 'marca_segunda_unidad_descuento' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Marca Target</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Osram"
-                  value={marcaTarget}
-                  onChange={(e) => setMarcaTarget(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500/30"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">% Descuento en 2da Unidad</label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  max="100"
-                  placeholder="Ej: 50"
-                  value={porcentajeDescuento}
-                  onChange={(e) => setPorcentajeDescuento(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500/30"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Categoría Target</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Iluminación"
-                  value={categoriaTarget}
-                  onChange={(e) => setCategoriaTarget(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500/30"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Monto Mínimo ($)</label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  placeholder="Ej: 15000"
-                  value={montoMinimo}
-                  onChange={(e) => setMontoMinimo(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500/30"
-                />
-              </div>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="bg-slate-900 hover:bg-indigo-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2"
-          >
-            <Plus size={16} />
-            <span>Crear Regla</span>
-          </button>
-        </form>
-      </div>
+      <NuevaReglaForm onCreateRule={handleCreateRule} />
 
       <div className="space-y-4">
         <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider">Reglas Activas e Historial</h3>
-        
+
         {rules.length === 0 ? (
           <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center flex flex-col items-center justify-center">
             <p className="text-slate-500 font-bold uppercase tracking-wider text-xs">No hay reglas programadas actualmente</p>
