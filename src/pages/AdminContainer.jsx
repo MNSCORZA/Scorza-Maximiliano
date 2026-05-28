@@ -17,6 +17,7 @@ import AdminAnalytics from '../components/admin/AdminAnalytics';
 import { AdminCoupons } from '../components/admin/AdminCoupons';
 import AdminLogs from '../components/admin/AdminLogs';
 import AbandonedCarts from '../components/admin/AbandonedCarts';
+import ReglasCarrito from '../components/admin/ReglasCarrito';
 import { AdminBackup } from '../components/admin/AdminBackup';
 
 const AdminContainer = () => {
@@ -150,6 +151,7 @@ const AdminContainer = () => {
     if (tabName === 'métricas' && userData.permisos.metricas) return true;
     if (tabName === 'cupones' && userData.permisos.cupones) return true;
     if (tabName === 'carritos' && userData.permisos.carritos) return true;
+    if (tabName === 'reglas' && userData.permisos.carritos) return true;
     if (tabName === 'historial' && userData.permisos.historial) return true;
     if (tabName === 'usuarios' && userData.permisos.isAdmin) return true;
     if (tabName === 'respaldos' && userData.permisos.isAdmin) return true;
@@ -165,6 +167,7 @@ const AdminContainer = () => {
     { id: 'métricas', label: 'métricas' },
     { id: 'cupones', label: 'cupones' },
     { id: 'carritos', label: 'carritos' },
+    { id: 'reglas', label: 'reglas' },
     { id: 'historial', label: 'historial' },
     { id: 'respaldos', label: 'respaldos' }
   ];
@@ -210,6 +213,7 @@ const AdminContainer = () => {
       {activeTab === 'métricas' && hasTabPermission('métricas') && <AdminAnalytics />}
       {activeTab === 'cupones' && hasTabPermission('cupones') && <AdminCoupons />}
       {activeTab === 'carritos' && hasTabPermission('carritos') && <AbandonedCarts />}
+      {activeTab === 'reglas' && hasTabPermission('reglas') && <ReglasCarrito />}
       {activeTab === 'historial' && hasTabPermission('historial') && <AdminLogs />}
       {activeTab === 'respaldos' && hasTabPermission('respaldos') && <AdminBackup currentUser={user} userData={userData} />}
     </div>
