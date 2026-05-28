@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router";
 
 export const CartTotalBlock = ({ total }) => {
@@ -14,7 +15,7 @@ export const CartTotalBlock = ({ total }) => {
         </div>
 
         <button
-          onClick={() => navigate("/form")}
+          onClick={() => navigate("/form", { state: { totalFinalizado: total } })}
           className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-950 font-black py-4 px-10 rounded-xl transition-all active:scale-[0.98] text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10"
         >
           <span>Finalizar Compra</span>
