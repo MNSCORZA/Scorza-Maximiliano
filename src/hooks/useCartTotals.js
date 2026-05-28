@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getCartRules } from "../fireBase/dataBase";
 
 export const useCartTotals = (cart) => {
-  const [totals, setTotals] = useState({ base: 0, descuentoAutomatico: 0, total: 0, envioGratis: false });
+  const [totals, setTotals] = useState({ base: 0, descuentoAutomatico: 0, total: 0, envioGratis: false, montoMinimoEnvio: 0 });
 
   useEffect(() => {
     const fetchRulesAndCalculate = async () => {
@@ -14,6 +14,7 @@ export const useCartTotals = (cart) => {
 
       let autoDiscount = 0;
       let freeShipping = false;
+      let minShippingAmount = 0;
 
       try {
         const rules = await getCartRules();
@@ -25,7 +26,7 @@ export const useCartTotals = (cart) => {
 
           if (tipoRegla.includes("segunda_unidad") || tipoRegla.includes("2da unidad")) {
             const itemsDeMarca = cart.filter(item => (item.marca || "").toLowerCase().trim() === marcaRegla);
-            
+
             itemsDeMarca.forEach(item => {
               if (item.cantidad >= 2) {
                 const cantidadPares = Math.floor(item.cantidad / 2);
@@ -47,6 +48,7 @@ export const useCartTotals = (cart) => {
           }
 
           if (tipoRegla.includes("monto_y_categoria")) {
+            if (rule.montoMinimo) minShippingAmount = Number(rule.montoMinimo);
             const tieneCategoria = cart.some(item => (item.categoria || "").toLowerCase().trim() === categoriaRegla);
             if (calculatedBase >= Number(rule.montoMinimo) && tieneCategoria) {
               freeShipping = true;
@@ -54,6 +56,7 @@ export const useCartTotals = (cart) => {
           }
 
           if (tipoRegla.includes("envio_gratis_monto") || (rule.montoMinimo && rule.envioGratis && !rule.categoriaTarget)) {
+            if (rule.montoMinimo) minShippingAmount = Number(rule.montoMinimo);
             if (calculatedBase >= Number(rule.montoMinimo)) {
               freeShipping = true;
             }
@@ -67,7 +70,8 @@ export const useCartTotals = (cart) => {
         base: calculatedBase,
         descuentoAutomatico: autoDiscount,
         total: Math.max(0, calculatedBase - autoDiscount),
-        envioGratis: freeShipping
+        envioGratis: freeShipping,
+        montoMinimoEnvio: minShippingAmount
       });
     };
 
