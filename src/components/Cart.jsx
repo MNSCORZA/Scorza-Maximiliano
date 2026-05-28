@@ -6,14 +6,14 @@ import { useCartTotals } from "../hooks/useCartTotals";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import { Trash2, ArrowLeft, Ticket } from "lucide-react";
+import { Trash2, ArrowLeft, Ticket, Truck } from "lucide-react";
 import { db } from "../fireBase/config";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 export const Cart = () => {
   const { cart, emptyCart } = useContext(CartContext);
   const { user } = useAuth();
-  const totalBase = useCartTotals(cart);
+  const { base: totalBase, descuentoAutomatico, total: totalConReglas, envioGratis } = useCartTotals(cart);
   const navigate = useNavigate();
 
   const [inputCupón, setInputCupón] = useState("");
@@ -40,7 +40,7 @@ export const Cart = () => {
       const couponId = querySnapshot.docs[0].id;
       const couponData = querySnapshot.docs[0].data();
 
-      if (couponData.montoMinimo && totalBase < couponData.montoMinimo) {
+      if (couponData.montoMinimo && totalConReglas < couponData.montoMinimo) {
         toast.error(`Monto insuficiente. Este cupón requiere una compra mínima de $${couponData.montoMinimo.toLocaleString('es-AR')}`);
         return;
       }
@@ -73,7 +73,7 @@ export const Cart = () => {
 
       setDescuento(couponData.porcentaje);
       setCupónAplicado(couponData.codigo);
-      
+
       localStorage.setItem("active_coupon_id", couponId);
       localStorage.setItem("active_coupon_pct", String(couponData.porcentaje));
       localStorage.setItem("active_coupon_min", String(couponData.montoMinimo || 0));
@@ -86,7 +86,7 @@ export const Cart = () => {
     }
   };
 
-  const totalFinal = totalBase - (totalBase * (descuento / 100));
+  const totalFinal = totalConReglas - (totalConReglas * (descuento / 100));
 
   const HandleEmptyCart = () => {
     emptyCart();
@@ -141,6 +141,20 @@ export const Cart = () => {
               />
             ))}
           </div>
+
+          {descuentoAutomatico > 0 && (
+            <div className="mx-6 mb-2 p-3 bg-indigo-50 border border-indigo-100 rounded-2xl flex justify-between items-center text-xs text-indigo-700 font-black uppercase tracking-wide">
+              <span>Regla de carrito aplicada automáticamente:</span>
+              <span>-${descuentoAutomatico.toFixed(2)}</span>
+            </div>
+          )}
+
+          {envioGratis && (
+            <div className="mx-6 mb-4 p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2 text-xs text-emerald-700 font-black uppercase tracking-wide">
+              <Truck size={16} />
+              <span>¡Envío gratis aplicado automáticamente!</span>
+            </div>
+          )}
 
           <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 w-full sm:w-auto">
