@@ -350,3 +350,18 @@ export const getCartRules = async () => {
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
+
+export const getAllUsers = async () => {
+  const querySnapshot = await getDocs(collection(db, "usuarios"));
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const getAllOrders = async () => {
+  const querySnapshot = await getDocs(collection(db, "orders"));
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const updateUserInternalNotes = async (userId, notes) => {
+  const userRef = doc(db, "usuarios", userId);
+  await updateDoc(userRef, { notas: notes });
+};
