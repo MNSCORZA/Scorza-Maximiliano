@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../fireBase/config';
+import { toast } from 'sonner';
 
 export const useCRMManager = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -55,10 +56,22 @@ export const useCRMManager = () => {
     if (!selectedUser) return;
     try {
       setSavingNotes(true);
+      const userRef = doc(db, 'usuarios', selectedUser.id);
+      await updateDoc(userRef, {
+        notasCRM: crmNotes
+      });
+
       selectedUser.notasCRM = crmNotes;
-      setAllUsers([...allUsers]);
+      setAllUsers(allUsers.map(u => u.id === selectedUser.id ? { ...u, notasCRM: crmNotes } : u));
+      
+      toast.success('Notas guardadas', {
+        description: 'Las anotaciones internas se actualizaron correctamente.'
+      });
     } catch (error) {
       console.error(error);
+      toast.error('Error al guardar', {
+        description: 'No se pudieron guardar las notas en la base de datos.'
+      });
     } finally {
       setSavingNotes(false);
     }
