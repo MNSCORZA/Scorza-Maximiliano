@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../fireBase/config';
 
 export const useCRMManager = () => {
@@ -9,11 +9,9 @@ export const useCRMManager = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [crmNotes, setCrmNotes] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
-
-  // Estados de paginación y filtros
   const [visibleUsersCount, setVisibleUsersCount] = useState(8);
   const [searchTerm, setSearchTerm] = useState('');
-  const [minLtvFilter, setMinLtvFilter] = useState('all'); // 'all', '10000', '50000', '100000'
+  const [minLtvFilter, setMinLtvFilter] = useState('all');
 
   useEffect(() => {
     const fetchCRMBaseData = async () => {
@@ -57,7 +55,6 @@ export const useCRMManager = () => {
     if (!selectedUser) return;
     try {
       setSavingNotes(true);
-      // Simulación o pegado directo a tu función de guardado
       selectedUser.notasCRM = crmNotes;
       setAllUsers([...allUsers]);
     } catch (error) {
@@ -67,7 +64,6 @@ export const useCRMManager = () => {
     }
   };
 
-  // Lógica de filtrado en cliente combinando datos calculados
   const filteredUsers = allUsers.filter(u => {
     const { ltv } = getUserCRMDetails(u.id);
     const fullName = `${u.nombre || ''} ${u.apellido || ''}`.toLowerCase();
