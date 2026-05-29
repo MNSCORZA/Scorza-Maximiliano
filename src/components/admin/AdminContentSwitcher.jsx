@@ -61,6 +61,12 @@ const AdminContentSwitcher = ({
             loading={crm.loading} 
             onOpenUser360={crm.handleOpenUser360} 
             getUserCRMDetails={crm.getUserCRMDetails} 
+            searchTerm={crm.searchTerm}
+            setSearchTerm={crm.setSearchTerm}
+            minLtvFilter={crm.minLtvFilter}
+            setMinLtvFilter={crm.setMinLtvFilter}
+            hasMore={crm.hasMore}
+            handleLoadMore={crm.handleLoadMore}
           />
           <User360Panel 
             isOpen={crm.selectedUser !== null} 
