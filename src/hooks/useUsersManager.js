@@ -14,17 +14,29 @@ export const useUsersManager = (admin) => {
     nombre: '', 
     email: '', 
     password: '', 
-    permisos: { isAdmin: false, ver: true, editar: false, borrar: false } 
+    permisos: { 
+      isAdmin: false, 
+      ver: true, 
+      editar: false, 
+      borrar: false, 
+      pedidos: false, 
+      crm: false, 
+      reglas: false, 
+      banners: false, 
+      marcas: false, 
+      metricas: false, 
+      cupones: false, 
+      carritos: false, 
+      historial: false 
+    } 
   });
 
-  // Resetear paginación al cambiar filtros o subpestañas
   useEffect(() => {
     setCurrentPage(1);
   }, [userSubTab, searchQuery]);
 
   const allUsers = useMemo(() => admin.users || [], [admin.users]);
 
-  // Contadores memorizados
   const counts = useMemo(() => {
     let clientes = 0;
     let staff = 0;
@@ -36,7 +48,6 @@ export const useUsersManager = (admin) => {
     return { clientes, staff };
   }, [allUsers]);
 
-  // Lista filtrada en tiempo real memorizada
   const filteredUsers = useMemo(() => {
     const search = searchQuery.toLowerCase();
     return allUsers.filter(u => {
@@ -48,16 +59,14 @@ export const useUsersManager = (admin) => {
     });
   }, [allUsers, userSubTab, searchQuery]);
 
-  // Paginación calculada
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  
+
   const currentUsers = useMemo(() => {
     return filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   }, [filteredUsers, indexOfFirstItem, indexOfLastItem]);
 
-  // Crear nuevo personal en Firebase Auth e inyectarlo en Firestore
   const handleCreateStaff = useCallback(async (e) => {
     e.preventDefault();
     try {
@@ -69,15 +78,33 @@ export const useUsersManager = (admin) => {
         rol: newUser.permisos.isAdmin ? "admin" : "empleado" 
       });
       setShowUserModal(false);
-      setNewUser({ nombre: '', email: '', password: '', permisos: { isAdmin: false, ver: true, editar: false, borrar: false } });
+      setNewUser({ 
+        nombre: '', 
+        email: '', 
+        password: '', 
+        permisos: { 
+          isAdmin: false, 
+          ver: true, 
+          editar: false, 
+          borrar: false, 
+          pedidos: false, 
+          crm: false, 
+          reglas: false, 
+          banners: false, 
+          marcas: false, 
+          metricas: false, 
+          cupones: false, 
+          carritos: false, 
+          historial: false 
+        } 
+      });
       if (admin.refreshUsers) admin.refreshUsers();
     } catch (error) {
       console.error(error);
-      throw error; // El modal captura esto para apagar su spinner
+      throw error;
     }
   }, [newUser, admin]);
 
-  // Actualización transaccional de permisos en tiempo real
   const handleUpdatePerms = useCallback(async (id, perm, value) => {
     await updateDoc(doc(db, "usuarios", id), { [`permisos.${perm}`]: value }); 
     if (admin.refreshUsers) admin.refreshUsers(); 
