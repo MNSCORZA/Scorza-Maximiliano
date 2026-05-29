@@ -97,20 +97,40 @@ const User360Panel = ({ isOpen, onClose, user, crmDetails, notesValue, onNotesCh
             {crmDetails.userOrders.length === 0 ? (
               <p className="text-xs text-gray-400 font-bold italic bg-gray-50 p-4 rounded-xl text-center">Este cliente no registra compras aún.</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {crmDetails.userOrders.map((order) => (
-                  <div key={order.id} className="border border-gray-100 rounded-2xl p-4 bg-white flex flex-col gap-2 shadow-sm hover:border-gray-200 transition-all">
+                  <div key={order.id} className="border border-gray-100 rounded-3xl p-5 bg-white flex flex-col gap-3 shadow-sm hover:border-gray-200 transition-all">
                     <div className="flex justify-between items-center">
-                      <span className="font-mono text-xs font-black text-indigo-600">{order.id}</span>
+                      <div className="flex flex-col">
+                        <span className="font-mono text-xs font-black text-indigo-600">{order.id}</span>
+                        {order.date && (
+                          <span className="text-[10px] font-bold text-gray-400 mt-0.5">
+                            {order.date.toDate ? order.date.toDate().toLocaleDateString('es-AR') : ''}
+                          </span>
+                        )}
+                      </div>
                       <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${order.status === 'entregada' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                         {order.status}
                       </span>
                     </div>
-                    <div className="flex justify-between items-end pt-1 border-t border-gray-50">
-                      <div className="text-[11px] text-gray-500 font-bold uppercase">
-                        {order.items?.length || 0} {order.items?.length === 1 ? 'Producto' : 'Productos'}
-                      </div>
-                      <span className="font-black text-gray-900 text-sm">
+
+                    <div className="py-2 border-t border-b border-gray-50 space-y-2">
+                      {order.items && order.items.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-2 min-w-0">
+                            {item.imagenUrl && (
+                              <img src={item.imagenUrl} alt={item.titulo} className="w-8 h-8 rounded-lg object-cover bg-gray-50 shrink-0 border border-gray-100" />
+                            )}
+                            <p className="font-bold text-gray-700 uppercase truncate"><span className="text-indigo-600 font-black">x{item.cantidad}</span> {item.titulo}</p>
+                          </div>
+                          <span className="font-mono text-gray-500 shrink-0">${Number(item.precio * item.cantidad).toLocaleString('es-AR')}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Total abonado</span>
+                      <span className="font-black text-gray-900 text-base">
                         ${Number(order.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
