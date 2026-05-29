@@ -25,7 +25,6 @@ const CRMUserList = ({
 
   return (
     <div className="space-y-6">
-      {/* Contenedor de Filtros y Búsqueda */}
       <div className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-xl shadow-slate-100/40 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative flex items-center">
           <Search className="absolute left-4 text-gray-400" size={18} />
@@ -53,7 +52,6 @@ const CRMUserList = ({
         </div>
       </div>
 
-      {/* Lista de Fichas */}
       {users.length === 0 ? (
         <div className="bg-white p-12 rounded-[32px] text-center border border-dashed border-gray-200">
           <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No se encontraron clientes con los filtros aplicados</p>
@@ -82,7 +80,6 @@ const CRMUserList = ({
                     </div>
                   </div>
 
-                  {/* Detalle ampliado para Escritorio/Tablet */}
                   <div className="hidden md:flex flex-col min-w-0 max-w-xs">
                     <span className="text-xs font-bold text-gray-600 truncate">{u.email}</span>
                     <span className="text-[10px] font-bold text-gray-400 mt-0.5">{u.telefono || 'Sin teléfono'}</span>
@@ -104,7 +101,6 @@ const CRMUserList = ({
         </div>
       )}
 
-      {/* Botón de Paginación Fluida */}
       {hasMore && (
         <div className="flex justify-center pt-2">
           <button
