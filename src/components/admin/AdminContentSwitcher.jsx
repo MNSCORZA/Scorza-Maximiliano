@@ -1,15 +1,7 @@
 import React from 'react';
-import ProductsManager from './ProductsManager';
-import OrdersManager from './OrdersManager';
-import UsersManager from './UsersManager';
-import { AdminBanners } from './AdminBanners';
-import { AdminBrands } from './AdminBrands';
-import AdminAnalytics from './AdminAnalytics';
-import { AdminCoupons } from './AdminCoupons';
-import AbandonedCarts from './AbandonedCarts';
-import ReglasCarrito from './ReglasCarrito';
-import AdminLogs from './AdminLogs';
-import { AdminBackup } from './AdminBackup';
+import CRMUserList from './CRMUserList';
+import User360Panel from './User360Panel';
+import { useCRMManager } from '../../hooks/useCRMManager';
 
 const AdminContentSwitcher = ({ 
   activeTab, 
@@ -23,44 +15,46 @@ const AdminContentSwitcher = ({
   handleEdit, 
   handleDeleteProduct 
 }) => {
-  switch (activeTab) {
-    case 'productos':
-      return (
-        <ProductsManager 
-          admin={{ 
-            ...admin, 
-            products: processedProducts,
-            stockFilter,
-            setStockFilter,
-            handleSubmit: handleCustomFormSubmit 
-          }} 
-          onEdit={handleEdit} 
-          onDeleteCustom={handleDeleteProduct}
+  const crm = useCRMManager();
+
+  if (activeTab === 'usuarios') {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-black uppercase text-gray-900 tracking-tight">Gestión Integral de Clientes (CRM)</h2>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mt-0.5">Historial unificado, fichas 360 y notas de operadores.</p>
+          </div>
+        </div>
+
+        <CRMUserList 
+          users={crm.users} 
+          loading={crm.loading} 
+          onOpenUser360={crm.handleOpenUser360} 
+          getUserCRMDetails={crm.getUserCRMDetails} 
         />
-      );
-    case 'pedidos': 
-      return <OrdersManager />;
-    case 'usuarios': 
-      return <UsersManager admin={admin} currentUser={user} />;
-    case 'banners': 
-      return <AdminBanners />;
-    case 'marcas': 
-      return <AdminBrands />;
-    case 'métricas': 
-      return <AdminAnalytics />;
-    case 'cupones': 
-      return <AdminCoupons />;
-    case 'carritos': 
-      return <AbandonedCarts />;
-    case 'reglas': 
-      return <ReglasCarrito />;
-    case 'historial': 
-      return <AdminLogs />;
-    case 'respaldos': 
-      return <AdminBackup currentUser={user} userData={userData} />;
-    default: 
-      return null;
+
+        <User360Panel 
+          isOpen={crm.selectedUser !== null} 
+          onClose={crm.handleCloseUser360} 
+          user={crm.selectedUser} 
+          crmDetails={crm.selectedUser ? crm.getUserCRMDetails(crm.selectedUser.id) : { userOrders: [], ltv: 0 }} 
+          notesValue={crm.crmNotes} 
+          onNotesChange={crm.setCrmNotes} 
+          onSaveNotes={crm.handleSaveNotes} 
+          isSaving={crm.savingNotes} 
+        />
+      </div>
+    );
   }
+
+  return (
+    <div className="bg-white p-6 rounded-2xl border border-slate-100">
+      <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+        Contenedor base para la pestaña activa: <span className="text-indigo-600 font-black">{activeTab}</span>
+      </p>
+    </div>
+  );
 };
 
-export default React.memo(AdminContentSwitcher);
+export default AdminContentSwitcher;
