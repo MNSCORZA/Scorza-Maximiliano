@@ -3,6 +3,7 @@ import { Trash2, Shield, User } from 'lucide-react';
 import { db } from '../../fireBase/config';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
+import PermissionGrid from './PermissionGrid';
 
 const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) => {
   const [actionId, setActionId] = useState(null);
@@ -77,31 +78,18 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
                       </div>
                     </div>
                   </td>
-                  
+
                   {isStaffView && (
                     <td className="px-8 py-6">
-                      <div className="flex gap-4">
-                        {['isAdmin', 'editar', 'borrar'].map((perm) => {
-                          const hasPerm = u.permisos?.[perm] || false;
-                          return (
-                            <label key={perm} className={`flex items-center gap-2 cursor-pointer group ${isMe ? 'opacity-50 pointer-events-none' : ''}`}>
-                              <input
-                                type="checkbox"
-                                checked={hasPerm}
-                                disabled={isMe || isUpdating}
-                                onChange={() => handleTogglePerm(u.id, perm, hasPerm)}
-                                className="w-4 h-4 rounded border-gray-200 text-indigo-600 focus:ring-0 cursor-pointer"
-                              />
-                              <span className={`text-[9px] font-black uppercase transition-colors ${hasPerm ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-700'}`}>
-                                {perm === 'isAdmin' ? 'Admin' : perm}
-                              </span>
-                            </label>
-                          );
-                        })}
-                      </div>
+                      <PermissionGrid 
+                        permisos={u.permisos}
+                        disabled={isMe || isUpdating}
+                        onChange={(permId, currentVal) => handleTogglePerm(u.id, permId, currentVal)}
+                        isMobileGrid={false}
+                      />
                     </td>
                   )}
-                  
+
                   <td className="px-8 py-6 text-right">
                     {!isMe && (
                       <button 
@@ -160,25 +148,12 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
                   <p className="text-[9px] font-black text-gray-400 uppercase mb-3 flex items-center gap-2 tracking-wider">
                     <Shield size={12}/> Permisos de Rol
                   </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['isAdmin', 'editar', 'borrar'].map((perm) => {
-                      const hasPerm = u.permisos?.[perm] || false;
-                      return (
-                        <button
-                          key={perm}
-                          disabled={isMe || isUpdating}
-                          onClick={() => handleTogglePerm(u.id, perm, hasPerm)}
-                          className={`py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tracking-wider ${
-                            hasPerm 
-                              ? 'bg-indigo-600 text-white shadow-sm' 
-                              : 'bg-white border border-gray-100 text-gray-400'
-                          } ${isMe ? 'opacity-40' : ''}`}
-                        >
-                          {perm === 'isAdmin' ? 'Admin' : perm}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <PermissionGrid 
+                    permisos={u.permisos}
+                    disabled={isMe || isUpdating}
+                    onChange={(permId, currentVal) => handleTogglePerm(u.id, permId, currentVal)}
+                    isMobileGrid={true}
+                  />
                 </div>
               )}
             </div>
