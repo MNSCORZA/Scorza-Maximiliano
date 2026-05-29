@@ -1,93 +1,120 @@
 import React from 'react';
-import { User, Eye, Mail, Phone, Calendar } from 'lucide-react';
+import { Search, Filter, ArrowRight, User, Loader2 } from 'lucide-react';
 
-const CRMUserList = ({ users, loading, onOpenUser360, getUserCRMDetails }) => {
+const CRMUserList = ({ 
+  users, 
+  loading, 
+  onOpenUser360, 
+  getUserCRMDetails,
+  searchTerm,
+  setSearchTerm,
+  minLtvFilter,
+  setMinLtvFilter,
+  hasMore,
+  handleLoadMore
+}) => {
+
   if (loading) {
     return (
-      <div className="w-full text-center py-12 text-gray-400 font-black uppercase tracking-widest text-xs animate-pulse">
-        Cargando base de datos de clientes...
-      </div>
-    );
-  }
-
-  if (users.length === 0) {
-    return (
-      <div className="w-full text-center py-12 text-gray-400 font-black uppercase tracking-widest text-xs">
-        No se encontraron usuarios registrados.
+      <div className="flex flex-col items-center justify-center p-20 space-y-4">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+        <p className="text-xs font-black uppercase text-gray-400 tracking-widest">Sincronizando Base de Clientes...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-100/40 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Cliente / Usuario</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Contacto</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Compras</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Métricas (LTV)</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {users.map((user) => {
-              const details = getUserCRMDetails(user.id);
+    <div className="space-y-6">
+      {/* Contenedor de Filtros y Búsqueda */}
+      <div className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-xl shadow-slate-100/40 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="relative flex items-center">
+          <Search className="absolute left-4 text-gray-400" size={18} />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar por nombre, apellido o email..."
+            className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-bold text-gray-700 placeholder:text-gray-400 outline-none focus:bg-white focus:border-indigo-600/30 transition-all"
+          />
+        </div>
+
+        <div className="relative flex items-center">
+          <Filter className="absolute left-4 text-gray-400" size={18} />
+          <select
+            value={minLtvFilter}
+            onChange={(e) => setMinLtvFilter(e.target.value)}
+            className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-bold text-gray-500 outline-none focus:bg-white focus:border-indigo-600/30 transition-all appearance-none cursor-pointer"
+          >
+            <option value="all">Todos los Volúmenes de Compra</option>
+            <option value="10000">Clientes Oro (+ $10.000)</option>
+            <option value="50000">Clientes Platino (+ $50.000)</option>
+            <option value="100000">Clientes VIP (+ $100.000)</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Lista de Fichas */}
+      {users.length === 0 ? (
+        <div className="bg-white p-12 rounded-[32px] text-center border border-dashed border-gray-200">
+          <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No se encontraron clientes con los filtros aplicados</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-slate-100/30 overflow-hidden">
+          <div className="divide-y divide-gray-50">
+            {users.map((u) => {
+              const { userOrders, ltv } = getUserCRMDetails(u.id);
               return (
-                <tr key={user.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center font-bold text-sm uppercase">
-                        {user.nombre ? user.nombre.charAt(0) : <User size={16} />}
-                      </div>
-                      <div>
-                        <p className="font-black text-gray-800 uppercase text-xs leading-tight">
-                          {user.nombre || "Sin Nombre"} {user.apellido || ""}
-                        </p>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
-                          ID: {user.id.substring(0, 8)}...
-                        </p>
-                      </div>
+                <div 
+                  key={u.id} 
+                  onClick={() => onOpenUser360(u)}
+                  className="p-5 flex items-center justify-between gap-4 hover:bg-slate-50/80 cursor-pointer transition-all group"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-11 h-11 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-black text-sm uppercase group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors shrink-0">
+                      {u.nombre ? u.nombre.charAt(0) : <User size={16} />}
                     </div>
-                  </td>
-                  <td className="p-5">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-bold text-gray-600 flex items-center gap-1">
-                        <Mail size={12} className="text-gray-400 shrink-0" /> {user.email || "---"}
-                      </span>
-                      {(user.codArea || user.telefono) && (
-                        <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
-                          <Phone size={12} className="text-gray-400 shrink-0" /> {user.codArea || ""} {user.telefono || ""}
-                        </span>
-                      )}
+                    <div className="min-w-0">
+                      <h4 className="font-black text-sm text-gray-900 uppercase truncate leading-tight">
+                        {u.nombre || 'Sin Nombre'} {u.apellido || ''}
+                      </h4>
+                      <p className="text-[10px] font-mono text-gray-400 mt-0.5 truncate">ID: {u.id.substring(0, 8)}...</p>
+                      <p className="text-[11px] text-gray-500 font-medium mt-1 truncate md:hidden">{u.email}</p>
                     </div>
-                  </td>
-                  <td className="p-5 text-center">
-                    <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full font-black text-xs">
-                      {details.userOrders.length}
-                    </span>
-                  </td>
-                  <td className="p-5 text-right">
-                    <span className="font-black text-gray-900 text-xs">
-                      ${Number(details.ltv).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                    </span>
-                  </td>
-                  <td className="p-5 text-center">
-                    <button
-                      onClick={() => onOpenUser360(user)}
-                      className="px-4 py-2 bg-slate-900 text-white font-black text-[10px] uppercase tracking-wider rounded-xl hover:bg-indigo-600 transition-all inline-flex items-center gap-1.5 shadow-sm"
-                    >
-                      <Eye size={12} />
-                      Ver Ficha 360°
-                    </button>
-                  </td>
-                </tr>
+                  </div>
+
+                  {/* Detalle ampliado para Escritorio/Tablet */}
+                  <div className="hidden md:flex flex-col min-w-0 max-w-xs">
+                    <span className="text-xs font-bold text-gray-600 truncate">{u.email}</span>
+                    <span className="text-[10px] font-bold text-gray-400 mt-0.5">{u.telefono || 'Sin teléfono'}</span>
+                  </div>
+
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="text-right">
+                      <p className="text-xs font-black text-gray-950">${Number(ltv).toLocaleString('es-AR')}</p>
+                      <p className="text-[9px] font-black uppercase text-indigo-500 tracking-wider mt-0.5">{userOrders.length} compras</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                      <ArrowRight size={14} />
+                    </div>
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </div>
+      )}
+
+      {/* Botón de Paginación Fluida */}
+      {hasMore && (
+        <div className="flex justify-center pt-2">
+          <button
+            onClick={handleLoadMore}
+            className="px-8 py-3.5 bg-white border border-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-md shadow-slate-100 hover:bg-slate-50 transition-all"
+          >
+            Cargar Más Clientes
+          </button>
+        </div>
+      )}
     </div>
   );
 };
