@@ -5,7 +5,8 @@ import { saveLog } from '../fireBase/dataBase';
 export const TABS_CONFIG = [
   { id: 'productos', label: 'productos', permissionKey: 'productos' },
   { id: 'pedidos', label: 'pedidos', permissionKey: 'pedidos' },
-  { id: 'usuarios', label: 'usuarios', permissionKey: 'isAdmin' },
+  { id: 'crm', label: 'Clientes CRM 360', permissionKey: 'isAdmin' },
+  { id: 'usuarios', label: 'Alta y Permisos', permissionKey: 'isAdmin' },
   { id: 'banners', label: 'banners', permissionKey: 'banners' },
   { id: 'marcas', label: 'marcas', permissionKey: 'marcas' },
   { id: 'métricas', label: 'métricas', permissionKey: 'metricas' },
