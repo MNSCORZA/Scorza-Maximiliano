@@ -4,7 +4,7 @@ import { useConfig } from '../context/ConfigContext';
 
 export const FooterSocials = () => {
   const { siteConfig } = useConfig();
-  const { socials } = siteConfig.footer;
+  const socials = siteConfig?.footer?.socials || {};
 
   return (
     <div className="flex gap-4 pt-2">
