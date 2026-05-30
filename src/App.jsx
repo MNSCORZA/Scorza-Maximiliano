@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../fireBase/config';
+import { db } from './fireBase/config';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { NavBar } from "./components/NavBar";
 import { ItemListContainer } from "./components/ItemListContainer";
