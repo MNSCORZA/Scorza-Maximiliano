@@ -14,6 +14,8 @@ import WhatsAppBtn from "./components/WhatsAppBtn";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartProvider";
 import { FavoritesProvider } from "./context/FavoritesContext";
+import { ConfigProvider, useConfig } from "./context/ConfigContext";
+import { MaintenanceBlock } from "./components/MaintenanceBlock";
 import AdminContainer from "./pages/AdminContainer";
 import { Login } from "./pages/Login";
 import { SignUp } from "./pages/SignUp";
@@ -36,6 +38,12 @@ const ProtectedRoute = ({ children, adminOnly = false, requireEdit = false, requ
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const isDocAdmin = location.pathname.startsWith('/admin');
+  const { siteConfig, loadingConfig } = useConfig();
+  const { userData } = useAuth();
+
+  if (!loadingConfig && siteConfig.maintenanceMode && !userData?.permisos) {
+    return <MaintenanceBlock />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -55,30 +63,32 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <CartProvider>
-          <FavoritesProvider>
-            <LayoutWrapper>
-              <Routes>
-                <Route path="/" element={<HomeContent />} />
-                <Route path="/Catalogo" element={<ItemListContainer />} />
-                <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
-                <Route path="/item/:id" element={<ItemDetailContainer />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/favoritos" element={<Favoritos />} />
-                <Route path="/ofertas" element={<OfertasContainer />} />
-                <Route path="/form" element={<Formulario />} />
-                <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
-                <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
-                <Route path="/*" element={<NotFound />} />
-              </Routes>
-            </LayoutWrapper>
-            <Toaster position="top-right" richColors />
-          </FavoritesProvider>
-        </CartProvider>
+        <ConfigProvider>
+          <CartProvider>
+            <FavoritesProvider>
+              <LayoutWrapper>
+                <Routes>
+                  <Route path="/" element={<HomeContent />} />
+                  <Route path="/Catalogo" element={<ItemListContainer />} />
+                  <Route path="/categoria/:categoryName" element={<ItemListContainer />} />
+                  <Route path="/item/:id" element={<ItemDetailContainer />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/favoritos" element={<Favoritos />} />
+                  <Route path="/ofertas" element={<OfertasContainer />} />
+                  <Route path="/form" element={<Formulario />} />
+                  <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
+                  <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
+                  <Route path="/*" element={<NotFound />} />
+                </Routes>
+              </LayoutWrapper>
+              <Toaster position="top-right" richColors />
+            </FavoritesProvider>
+          </CartProvider>
+        </ConfigProvider>
       </AuthProvider>
     </BrowserRouter>
   );
