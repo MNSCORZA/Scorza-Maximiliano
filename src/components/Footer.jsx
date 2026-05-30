@@ -7,7 +7,7 @@ import { useConfig } from '../context/ConfigContext';
 
 export const Footer = () => {
   const { siteConfig } = useConfig();
-  const { footer } = siteConfig;
+  const footer = siteConfig?.footer || {};
 
   return (
     <footer className="bg-gray-900 border-t border-gray-800 pt-16 pb-8 font-sans text-gray-400">
