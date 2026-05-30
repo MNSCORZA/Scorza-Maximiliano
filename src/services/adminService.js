@@ -14,6 +14,7 @@ export const TABS_CONFIG = [
   { id: 'carritos', label: 'carritos', permissionKey: 'carritos' },
   { id: 'reglas', label: 'reglas', permissionKey: 'reglas' },
   { id: 'historial', label: 'historial', permissionKey: 'historial' },
+  { id: 'configuracion', label: 'configuración', permissionKey: 'isAdmin' },
   { id: 'respaldos', label: 'respaldos', permissionKey: 'isAdmin' }
 ];
 
