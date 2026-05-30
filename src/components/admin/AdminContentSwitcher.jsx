@@ -13,6 +13,7 @@ import { AdminBackup } from './AdminBackup';
 import CRMUserList from './CRMUserList';
 import User360Panel from './User360Panel';
 import { useCRMManager } from '../../hooks/useCRMManager';
+import { AdminConfig } from './AdminConfig';
 
 const AdminContentSwitcher = ({ 
   activeTab, 
@@ -94,6 +95,9 @@ const AdminContentSwitcher = ({
       return <ReglasCarrito />;
     case 'historial': 
       return <AdminLogs />;
+    case 'configuracion':
+    case 'configuración':
+      return <AdminConfig user={user} userData={userData} />;
     case 'respaldos': 
       return <AdminBackup currentUser={user} userData={userData} />;
     default: 
