@@ -1,3 +1,6 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../fireBase/config';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { NavBar } from "./components/NavBar";
 import { ItemListContainer } from "./components/ItemListContainer";
@@ -24,6 +27,43 @@ import UserPanel from "./pages/UserPanel";
 import { SideCart } from "./components/SideCart";
 import { Favoritos } from "./components/Favoritos";
 import { OfertasContainer } from "./components/OfertasContainer";
+
+const ConfigContext = createContext();
+
+export const ConfigContextComponent = ({ children }) => {
+  const [siteConfig, setSiteConfig] = useState({
+    maintenanceMode: false,
+    footer: {
+      address: '',
+      phone: '',
+      email: '',
+      socials: { instagram: '', facebook: '', whatsapp: '' }
+    }
+  });
+  const [loadingConfig, setLoadingConfig] = useState(true);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'config', 'global'), (docSnap) => {
+      if (docSnap.exists()) {
+        setSiteConfig(docSnap.data());
+      }
+      setLoadingConfig(false);
+    }, (error) => {
+      console.error(error);
+      setLoadingConfig(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  return (
+    <ConfigContext.Provider value={{ siteConfig, loadingConfig }}>
+      {children}
+    </ConfigContext.Provider>
+  );
+};
+
+export const useConfigContext = () => useContext(ConfigContext);
 
 const ProtectedRoute = ({ children, adminOnly = false, requireEdit = false, requireDelete = false }) => {
   const { user, userData, loading } = useAuth();
