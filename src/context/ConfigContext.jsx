@@ -19,14 +19,26 @@ export const ConfigProvider = ({ children }) => {
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'config', 'global'), (docSnap) => {
       if (docSnap.exists()) {
-        setSiteConfig(docSnap.data());
+        const data = docSnap.data();
+        setSiteConfig({
+          maintenanceMode: !!data.maintenanceMode,
+          footer: {
+            address: data.footer?.address || '',
+            phone: data.footer?.phone || '',
+            email: data.footer?.email || '',
+            socials: {
+              instagram: data.footer?.socials?.instagram || '',
+              facebook: data.footer?.socials?.facebook || '',
+              whatsapp: data.footer?.socials?.whatsapp || ''
+            }
+          }
+        });
       }
       setLoadingConfig(false);
     }, (error) => {
       console.error(error);
       setLoadingConfig(false);
     });
-
     return () => unsub();
   }, []);
 

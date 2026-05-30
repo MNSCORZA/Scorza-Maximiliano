@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../fireBase/config';
-import { saveLog } from '../../fireBase/dataBase';
 import { toast } from 'sonner';
-import { AlertTriangle, Layout, Save, ToggleLeft, ToggleRight, MapPin, Phone, Mail, Settings, Users, Globe } from 'lucide-react';
+import { AlertTriangle, MapPin, Phone, Mail, Settings, ToggleLeft, ToggleRight } from 'lucide-react';
 
 export const AdminConfig = ({ user, userData }) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -17,41 +16,39 @@ export const AdminConfig = ({ user, userData }) => {
     }
   });
 
-  // Verificar si el usuario logueado tiene permisos de edición según tus reglas de Firebase
   const tienePermisosEdicion = userData?.permisos?.editar === true || userData?.permisos?.isAdmin === true;
 
   useEffect(() => {
     const fetchConfig = async () => {
-      try {
-        const docSnap = await getDoc(doc(db, 'config', 'global'));
-        if (docSnap.exists()) {
-          setConfigData(docSnap.data());
-        }
-      } catch (error) {
-        console.error("Error al leer configuración:", error);
+      const docSnap = await getDoc(doc(db, 'config', 'global'));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setConfigData({
+          maintenanceMode: !!data.maintenanceMode,
+          footer: {
+            address: data.footer?.address || '',
+            phone: data.footer?.phone || '',
+            email: data.footer?.email || '',
+            socials: {
+              instagram: data.footer?.socials?.instagram || '',
+              facebook: data.footer?.socials?.facebook || '',
+              whatsapp: data.footer?.socials?.whatsapp || ''
+            }
+          }
+        });
       }
     };
     fetchConfig();
   }, []);
 
   const handleToggleMaintenance = () => {
-    if (!tienePermisosEdicion) {
-      toast.error('Acceso denegado', { description: 'No tienes permisos para modificar el sistema.' });
-      return;
-    }
-    setConfigData(prev => ({
-      ...prev,
-      maintenanceMode: !prev.maintenanceMode
-    }));
+    setConfigData(prev => ({ ...prev, maintenanceMode: !prev.maintenanceMode }));
   };
 
   const handleFooterChange = (field, value) => {
     setConfigData(prev => ({
       ...prev,
-      footer: {
-        ...prev.footer,
-        [field]: value
-      }
+      footer: { ...prev.footer, [field]: value }
     }));
   };
 
@@ -60,143 +57,70 @@ export const AdminConfig = ({ user, userData }) => {
       ...prev,
       footer: {
         ...prev.footer,
-        socials: {
-          ...prev.footer.socials,
-          [platform]: value
-        }
+        socials: { ...prev.footer.socials, [platform]: value }
       }
     }));
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    
-    if (!tienePermisosEdicion) {
-      toast.error('Acceso denegado', { description: 'Tu cuenta no posee permisos de edición en la base de datos.' });
-      return;
-    }
-
+    if (!tienePermisosEdicion) return;
     setIsSaving(true);
     try {
-      await updateDoc(doc(db, 'config', 'global'), configData);
-      const adminName = userData?.nombre || 'Admin';
-      await saveLog(user.uid, user.email, adminName, 'Configuración Sistema', `Actualizó preferencias globales (Mantenimiento: ${configData.maintenanceMode ? 'ACTIVO' : 'INACTIVO'})`);
-      toast.success('Configuración guardada correctamente');
+      await setDoc(doc(db, 'config', 'global'), configData);
+      toast.success('Cambios guardados con éxito');
     } catch (error) {
-      console.error("Error detallado de Firebase:", error);
-      toast.error('Error al guardar la configuración', { description: 'Verifica las reglas o permisos de tu usuario.' });
+      toast.error('Error al guardar');
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
-      <div>
-        <h2 className="text-xl font-black uppercase text-gray-900 tracking-tight">Preferencias del Sistema</h2>
-        <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mt-0.5">Control de estado de la tienda y personalización del footer.</p>
-      </div>
-
-      {!tienePermisosEdicion && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 text-red-800 text-xs font-bold uppercase tracking-wider">
-          🛑 Modo lectura: Tu usuario actual no tiene asignados los permisos requeridos para modificar la configuración.
-        </div>
-      )}
-
-      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className={`p-3 rounded-2xl ${configData.maintenanceMode ? 'bg-amber-50 text-amber-500' : 'bg-indigo-50 text-indigo-600'}`}>
-              <AlertTriangle size={24} />
-            </div>
-            <div>
-              <h3 className="font-black text-xs uppercase tracking-wider text-gray-900">Modo Mantenimiento (Pausa)</h3>
-              <p className="text-xs text-gray-400 mt-1 leading-relaxed max-w-md">
-                Al activarse, la tienda pública se congelará mostrando una pantalla informativa. Los clientes no podrán navegar ni comprar hasta que sea desactivado.
-              </p>
-            </div>
+    <form onSubmit={handleSave} className="max-w-3xl mx-auto space-y-6 p-4">
+      <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl ${configData.maintenanceMode ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400'}`}>
+            <AlertTriangle size={24} />
           </div>
-          <button type="button" onClick={handleToggleMaintenance} disabled={!tienePermisosEdicion} className="focus:outline-none transition-colors disabled:opacity-50">
-            {configData.maintenanceMode ? (
-              <ToggleRight size={56} className="text-amber-500 cursor-pointer" />
-            ) : (
-              <ToggleLeft size={56} className="text-gray-300 cursor-pointer" />
-            )}
-          </button>
-        </div>
-
-        {configData.maintenanceMode && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-800 text-xs font-bold uppercase tracking-wider">
-            ⚠️ El sitio web se encuentra actualmente pausado para los clientes públicos.
-          </div>
-        )}
-      </div>
-
-      <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-          <Layout size={18} className="text-indigo-600" />
-          <h3 className="font-black text-xs uppercase tracking-wider text-gray-900">Gestión de Datos de Contacto (Footer)</h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Dirección Física</label>
-            <div className="relative">
-              <MapPin className="absolute left-4 top-3.5 text-gray-400" size={16} />
-              <input type="text" disabled={!tienePermisosEdicion} value={configData.footer?.address || ''} onChange={(e) => handleFooterChange('address', e.target.value)} placeholder="Ej: Av. Mitre 1234, Laferrere" className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors disabled:opacity-60" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Teléfono de Soporte</label>
-            <div className="relative">
-              <Phone className="absolute left-4 top-3.5 text-gray-400" size={16} />
-              <input type="text" disabled={!tienePermisosEdicion} value={configData.footer?.phone || ''} onChange={(e) => handleFooterChange('phone', e.target.value)} placeholder="Ej: +54 11 1234-5678" className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors disabled:opacity-60" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Email Comercial</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-3.5 text-gray-400" size={16} />
-              <input type="email" disabled={!tienePermisosEdicion} value={configData.footer?.email || ''} onChange={(e) => handleFooterChange('email', e.target.value)} placeholder="Ej: ventas@detodo.com" className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors disabled:opacity-60" />
-            </div>
+          <div>
+            <h3 className="font-bold text-slate-800">Modo Mantenimiento</h3>
+            <p className="text-sm text-slate-500">Pausa la navegación y compras del sitio.</p>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Enlace de Instagram</label>
-            <div className="relative">
-              <Settings className="absolute left-4 top-3.5 text-gray-400" size={16} />
-              <input type="text" disabled={!tienePermisosEdicion} value={configData.footer?.socials?.instagram || ''} onChange={(e) => handleSocialChange('instagram', e.target.value)} placeholder="https://instagram.com/..." className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors disabled:opacity-60" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Enlace de Facebook</label>
-            <div className="relative">
-              <Users className="absolute left-4 top-3.5 text-gray-400" size={16} />
-              <input type="text" disabled={!tienePermisosEdicion} value={configData.footer?.socials?.facebook || ''} onChange={(e) => handleSocialChange('facebook', e.target.value)} placeholder="https://facebook.com/..." className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors disabled:opacity-60" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Enlace o Número WhatsApp</label>
-            <div className="relative">
-              <Globe className="absolute left-4 top-3.5 text-gray-400" size={16} />
-              <input type="text" disabled={!tienePermisosEdicion} value={configData.footer?.socials?.whatsapp || ''} onChange={(e) => handleSocialChange('whatsapp', e.target.value)} placeholder="https://wa.me/..." className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors disabled:opacity-60" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button type="submit" disabled={isSaving || !tienePermisosEdicion} className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-100 hover:bg-indigo-500 transition-all flex items-center gap-2 disabled:opacity-50">
-          <Save size={14} />
-          {isSaving ? 'Guardando...' : 'Guardar Configuración'}
+        <button type="button" onClick={handleToggleMaintenance}>
+          {configData.maintenanceMode ? <ToggleRight size={48} className="text-amber-500" /> : <ToggleLeft size={48} className="text-slate-300" />}
         </button>
       </div>
+
+      <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Settings size={18} className="text-indigo-600" />
+          <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Configuración del Footer</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="relative">
+            <MapPin className="absolute left-3 top-3 text-slate-400" size={16} />
+            <input placeholder="Dirección" value={configData.footer.address} onChange={(e) => handleFooterChange('address', e.target.value)} className="w-full pl-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none" />
+          </div>
+          <div className="relative">
+            <Phone className="absolute left-3 top-3 text-slate-400" size={16} />
+            <input placeholder="Teléfono" value={configData.footer.phone} onChange={(e) => handleFooterChange('phone', e.target.value)} className="w-full pl-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none" />
+          </div>
+        </div>
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 text-slate-400" size={16} />
+          <input placeholder="Email" value={configData.footer.email} onChange={(e) => handleFooterChange('email', e.target.value)} className="w-full pl-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none" />
+        </div>
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+          <input placeholder="Instagram" value={configData.footer.socials.instagram} onChange={(e) => handleSocialChange('instagram', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none" />
+          <input placeholder="Facebook" value={configData.footer.socials.facebook} onChange={(e) => handleSocialChange('facebook', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none" />
+          <input placeholder="WhatsApp" value={configData.footer.socials.whatsapp} onChange={(e) => handleSocialChange('whatsapp', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none" />
+        </div>
+      </div>
+      <button type="submit" disabled={isSaving || !tienePermisosEdicion} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 disabled:opacity-50 transition-all">
+        {isSaving ? 'Guardando...' : 'Guardar Cambios Globales'}
+      </button>
     </form>
   );
 };

@@ -282,6 +282,9 @@ export const listenAlertasNotRead = (callback) => {
     }));
     callback(alertas);
   }, (error) => {
+    if (error.code === 'permission-denied') {
+      return;
+    }
     console.error(error);
   });
 };
