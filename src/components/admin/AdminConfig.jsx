@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../fireBase/config';
 import { saveLog } from '../../fireBase/dataBase';
 import { toast } from 'sonner';
-import { AlertTriangle, Layout, Save, ToggleLeft, ToggleRight, MapPin, Phone, Mail, Instagram, Facebook } from 'lucide-react';
+import { AlertTriangle, Layout, Save, ToggleLeft, ToggleRight, MapPin, Phone, Mail, Facebook } from 'lucide-react';
 
 export const AdminConfig = ({ user, userData }) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -154,7 +154,7 @@ export const AdminConfig = ({ user, userData }) => {
           <div className="space-y-2">
             <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Enlace de Instagram</label>
             <div className="relative">
-              <Instagram className="absolute left-4 top-3.5 text-gray-400" size={16} />
+              <Share2 className="absolute left-4 top-3.5 text-gray-400" size={16} />
               <input type="text" value={configData.footer.socials.instagram} onChange={(e) => handleSocialChange('instagram', e.target.value)} placeholder="https://instagram.com/..." className="w-full bg-gray-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-3 text-xs font-medium text-gray-900 outline-none focus:border-indigo-500 transition-colors" />
             </div>
           </div>
