@@ -14,6 +14,7 @@ import CRMUserList from './CRMUserList';
 import User360Panel from './User360Panel';
 import { useCRMManager } from '../../hooks/useCRMManager';
 import { AdminConfig } from './AdminConfig';
+import ArrepentimientosManager from './ArrepentimientosManager';
 
 const AdminContentSwitcher = ({ 
   activeTab, 
@@ -100,6 +101,8 @@ const AdminContentSwitcher = ({
       return <AdminConfig user={user} userData={userData} />;
     case 'respaldos': 
       return <AdminBackup currentUser={user} userData={userData} />;
+    case 'arrepentimientos':
+      return <ArrepentimientosManager user={user} userData={userData} />;
     default: 
       return null;
   }
