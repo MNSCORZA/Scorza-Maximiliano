@@ -15,7 +15,8 @@ export const TABS_CONFIG = [
   { id: 'reglas', label: 'reglas', permissionKey: 'reglas' },
   { id: 'historial', label: 'historial', permissionKey: 'historial' },
   { id: 'configuracion', label: 'configuración', permissionKey: 'isAdmin' },
-  { id: 'respaldos', label: 'respaldos', permissionKey: 'isAdmin' }
+  { id: 'respaldos', label: 'respaldos', permissionKey: 'isAdmin' },
+  { id: 'arrepentimientos', label: 'arrepentimientos', permissionKey: 'arrepentimientos' }
 ];
 
 export const hasTabPermission = (tabId, userData) => {
