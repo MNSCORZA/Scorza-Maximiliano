@@ -1,6 +1,6 @@
 export const footerLinks = [
   { label: "Centro de Ayuda", href: "#" },
-  { label: "Botón de Arrepentimiento", href: "#" },
+  { label: "Botón de Arrepentimiento", href: "/arrepentimiento" },
   { label: "Mis Pedidos", href: "#" },
   { label: "Términos y Condiciones", href: "#" }
 ];
