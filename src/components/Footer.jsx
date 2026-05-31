@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { Link } from 'react-router';
 import { footerLinks } from '../constants/footerData';
 import { FooterSocials } from './FooterSocials';
 import { FooterSubscribe } from './FooterSubscribe';
@@ -29,9 +30,9 @@ export const Footer = () => {
             <ul className="space-y-2.5 text-sm">
               {footerLinks.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="hover:text-blue-400 transition-colors block">
+                  <Link to={link.href} className="hover:text-blue-400 transition-colors block">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
