@@ -27,6 +27,7 @@ import UserPanel from "./pages/UserPanel";
 import { SideCart } from "./components/SideCart";
 import { Favoritos } from "./components/Favoritos";
 import { OfertasContainer } from "./components/OfertasContainer";
+import { Arrepentimiento } from "./components/Arrepentimiento";
 
 const ConfigContext = createContext();
 
@@ -115,6 +116,7 @@ function App() {
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/favoritos" element={<Favoritos />} />
                   <Route path="/ofertas" element={<OfertasContainer />} />
+                  <Route path="/arrepentimiento" element={<Arrepentimiento />} />
                   <Route path="/form" element={<Formulario />} />
                   <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
                   <Route path="/login" element={<Login />} />
