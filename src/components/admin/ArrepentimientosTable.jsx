@@ -31,6 +31,22 @@ const ArrepentimientosTable = ({ requests, onUpdateStatus, updatingId }) => {
         <tbody className="divide-y divide-gray-50">
           {requests.map((req) => (
             {/* AQUÍ VAMOS A RELLENAR LAS FILAS EN EL SIGUIENTE PASO */}
+<tr key={req.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+  
+  {/* COLUMNA 1: CLIENTE */}
+  <td className="px-6 py-4 whitespace-nowrap text-left">
+    <div className="text-xs font-black text-slate-900 uppercase tracking-wider">
+      {req.nombre}
+    </div>
+    <div className="text-[10px] font-bold text-gray-400 lowercase tracking-normal mt-0.5">
+      {req.email}
+    </div>
+  </td>
+
+  {/* ACÁ VA A IR LA COLUMNA DE CONTACTO EN EL SIGUIENTE PASO */}
+
+</tr>
+
           ))}
         </tbody>
       </table>
