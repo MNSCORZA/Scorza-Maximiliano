@@ -1,44 +1,36 @@
-import React, { useState } from 'react';
-import TableRow from './TableRow';
+import React from 'react';
+import { MessageSquare, Loader2, ChevronDown } from 'lucide-react';
 
 const ArrepentimientosTable = ({ requests, onUpdateStatus, updatingId }) => {
-  // Estado para controlar qué dropdown de cambio de estado está abierto por su ID
-  const [activeDropdownId, setActiveDropdownId] = useState(null);
-
-  if (!requests || requests.length === 0) {
+  
+  // 1. Validamos si no hay ninguna solicitud en la pestaña o búsqueda actual
+  if (requests.length === 0) {
     return (
-      <div className="p-16 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest bg-white">
-        No se encontraron solicitudes en esta categoría
+      <div className="p-16 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+        No se encontraron solicitudes
       </div>
     );
   }
 
   return (
-    <div className="w-full overflow-x-auto custom-scrollbar">
-      <table className="w-full text-left border-collapse min-w-[800px]">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full min-w-[700px] border-collapse text-left">
+        {/* CABECERA DE LA TABLA */}
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50/50">
-            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Cliente</th>
-            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</th>
-            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nro Orden</th>
-            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha Solicitud</th>
-            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Motivo</th>
-            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Cliente</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Contacto</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Nro Orden</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Fecha</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Motivo</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Acciones</th>
           </tr>
         </thead>
+        
+        {/* CUERPO DE LA TABLA */}
         <tbody className="divide-y divide-gray-50">
-          {requests.map((request) => (
-            <TableRow
-              key={request.id}
-              request={request}
-              onUpdateStatus={onUpdateStatus}
-              updatingId={updatingId}
-              isDropdownOpen={activeDropdownId === request.id}
-              toggleDropdown={() => 
-                setActiveDropdownId(activeDropdownId === request.id ? null : request.id)
-              }
-              closeDropdown={() => setActiveDropdownId(null)}
-            />
+          {requests.map((req) => (
+            {/* AQUÍ VAMOS A RELLENAR LAS FILAS EN EL SIGUIENTE PASO */}
           ))}
         </tbody>
       </table>
