@@ -1,7 +1,7 @@
 import React from 'react';
 import { useArrepentimientosManager } from '../../hooks/useArrepentimientosManager';
 import { Search, AlertCircle, CheckCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import ArrepentimientosTable from './ArrepentimientosTable';
+import ArrepentimientosTable from './ArrepTable';
 
 const ArrepentimientosManager = ({ user, userData }) => {
   const {
@@ -34,7 +34,11 @@ const ArrepentimientosManager = ({ user, userData }) => {
         ))}
       </div>
 
-      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+      {/* 
+        CAMBIO CLAVE: Cambiamos 'overflow-hidden' por 'overflow-visible' 
+        para que el z-50 del dropdown flote libremente por encima del borde de la tarjeta 
+      */}
+      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-visible">
         <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="font-black uppercase text-xs tracking-widest text-slate-900">Solicitudes de Arrepentimiento</h2>

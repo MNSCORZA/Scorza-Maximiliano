@@ -87,13 +87,13 @@ const ArrepTable = ({ requests, onUpdateStatus, updatingId }) => {
                   )}
                 </td>
 
-                <td className="px-8 py-6 text-right overflow-visible">
-                  <ArrepDropdown 
-                    req={req} 
-                    onUpdateStatus={onUpdateStatus} 
-                    updatingId={updatingId} 
-                  />
-                </td>
+              <td className="px-8 py-6 text-right overflow-visible">
+  <ArrepDropdown 
+    req={req} 
+    onUpdateStatus={onUpdateStatus} 
+    updatingId={updatingId} 
+  />
+</td>
               </tr>
             );
           })}
