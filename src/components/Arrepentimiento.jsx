@@ -26,8 +26,9 @@ export const Arrepentimiento = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.nombre || !formData.email || !formData.nroOrden) {
-      toast.error('Por favor, completa los campos obligatorios.');
+    
+    if (!formData.nombre || !formData.email || !formData.telefono || !formData.nroOrden || !formData.motivo) {
+      toast.error('Por favor, completa todos los campos del formulario.');
       return;
     }
 
@@ -55,7 +56,6 @@ export const Arrepentimiento = () => {
     <div className="min-h-[85vh] flex items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 px-4 py-16">
       <div className="max-w-lg w-full bg-slate-900/80 backdrop-blur-md border border-slate-800/80 p-8 md:p-10 rounded-2xl shadow-2xl shadow-black/50">
         
-        
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-4 shadow-inner">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -66,11 +66,10 @@ export const Arrepentimiento = () => {
             Botón de Arrepentimiento
           </h2>
           <p className="text-xs md:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
-            Si te arrepentiste de una compra, completá este formulario. Tenés <span className="text-slate-200 font-medium">10 días corridos</span> desde que recibiste el producto.
+            Todos los campos son obligatorios. Tenés <span className="text-slate-200 font-medium">10 días corridos</span> desde que recibiste el producto para revocar la compra.
           </p>
         </div>
 
-        
         <form onSubmit={handleSubmit} className="space-y-5">
           <InputField
             label="Nombre Completo"
@@ -92,12 +91,15 @@ export const Arrepentimiento = () => {
               placeholder="juan@ejemplo.com"
             />
             <InputField
-              label="Teléfono"
+              label="Teléfono / Celular"
               name="telefono"
-              type="tel"
+              type="text"
               value={formData.telefono}
               onChange={handleChange}
+              required
               placeholder="11 2345-6789"
+              pattern="[0-9\s\-]{8,15}"
+              title="Ingresá un número de teléfono válido (solo números, espacios o guiones, mínimo 8 dígitos)."
             />
           </div>
 
@@ -111,14 +113,14 @@ export const Arrepentimiento = () => {
           />
 
           <TextAreaField
-            label="Detalle / Motivo (Opcional)"
+            label="Detalle / Motivo de la cancelación"
             name="motivo"
             value={formData.motivo}
             onChange={handleChange}
-            placeholder="Contanos brevemente el motivo de la cancelación..."
+            required
+            placeholder="Contanos brevemente por qué solicitás la cancelación de la orden..."
           />
 
-          
           <button
             type="submit"
             disabled={loading}
