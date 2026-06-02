@@ -78,6 +78,8 @@ export const Arrepentimiento = () => {
             onChange={handleChange}
             required
             placeholder="Juan Pérez"
+            pattern="^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$"
+            title="El nombre solo puede contener letras y espacios."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
