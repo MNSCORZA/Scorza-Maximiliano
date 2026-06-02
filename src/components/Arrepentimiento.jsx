@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../fireBase/config'; // Sube a src/ y entra a fireBase
+import { db } from '../fireBase/config';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
-import { InputField } from './InputField'; // Mismo nivel
-import { TextAreaField } from './TextAreaField'; // Mismo nivel
+import { InputField } from './InputField';
+import { TextAreaField } from './TextAreaField';
 
 export const Arrepentimiento = () => {
   const [formData, setFormData] = useState({
