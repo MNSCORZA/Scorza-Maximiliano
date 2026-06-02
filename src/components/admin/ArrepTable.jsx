@@ -1,9 +1,10 @@
 import React from 'react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import ArrepDropdown from './ArrepDropdown';
 
 const ArrepTable = ({ requests, onUpdateStatus, updatingId }) => {
-  
+
   const formatDate = (firebaseDate) => {
     if (!firebaseDate) return 'S/D';
     try {
@@ -18,6 +19,31 @@ const ArrepTable = ({ requests, onUpdateStatus, updatingId }) => {
     } catch (e) {
       return 'Fecha inválida';
     }
+  };
+
+  const handleSendArrepentimientoWhatsApp = (req) => {
+    const rawPhone = req.telefono;
+    const phoneNumber = rawPhone ? rawPhone.replace(/[^0-9]/g, '') : '';
+
+    if (!phoneNumber) {
+      toast.error('Esta solicitud no posee un teléfono de contacto válido');
+      return;
+    }
+
+    const clienteNombre = req.nombre || 'Cliente';
+    const orderRef = req.nroOrden || 'N/A';
+    let mensaje = '';
+
+    if (req.estado === 'Pendiente') {
+      mensaje = `Hola *${clienteNombre}*! 👋 Te contactamos de *De Todo*.\n\nRecibimos tu solicitud de arrepentimiento sobre la orden *#${orderRef}*. Ya la pasamos al sector administrativo para revisar el caso y procesar la revocación correspondiente. Nos mantenemos en contacto por este medio!`;
+    } else if (req.estado === 'En Proceso') {
+      mensaje = `Hola *${clienteNombre}*! 👋 Con respecto a tu solicitud de arrepentimiento por la orden *#${orderRef}*, te comentamos que ya está siendo procesada.\n\nPronto te enviaremos la confirmación de la cancelación o la orden de reintegro de los fondos.`;
+    } else if (req.estado === 'Finalizado') {
+      mensaje = `Hola *${clienteNombre}*! 👋 Te informamos que tu solicitud de arrepentimiento sobre la orden *#${orderRef}* ya fue gestionada y *Finalizada* con éxito. 😊\n\nCualquier duda quedamos a tu disposición.`;
+    }
+
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
   };
 
   if (requests.length === 0) {
@@ -87,13 +113,26 @@ const ArrepTable = ({ requests, onUpdateStatus, updatingId }) => {
                   )}
                 </td>
 
-              <td className="px-8 py-6 text-right overflow-visible">
-  <ArrepDropdown 
-    req={req} 
-    onUpdateStatus={onUpdateStatus} 
-    updatingId={updatingId} 
-  />
-</td>
+                <td className="px-8 py-6 text-right overflow-visible">
+                  <div className="inline-flex items-center gap-2 justify-end w-full relative">
+                    {isRowUpdating ? (
+                      <Loader2 size={16} className="text-indigo-600 animate-spin mr-1" />
+                    ) : (
+                      <button 
+                        onClick={() => handleSendArrepentimientoWhatsApp(req)}
+                        className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 active:scale-95 rounded-xl transition-all cursor-pointer flex items-center justify-center border border-transparent hover:border-indigo-100 bg-slate-50/50 sm:bg-transparent shadow-sm sm:shadow-none"
+                        title="Enviar notificación de arrepentimiento"
+                      >
+                        <MessageSquare size={16} />
+                      </button>
+                    )}
+                    <ArrepDropdown 
+                      req={req} 
+                      onUpdateStatus={onUpdateStatus} 
+                      updatingId={updatingId} 
+                    />
+                  </div>
+                </td>
               </tr>
             );
           })}
