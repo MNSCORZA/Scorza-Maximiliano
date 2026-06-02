@@ -37,6 +37,8 @@ const ArrepDropdown = ({ req, onUpdateStatus, updatingId }) => {
       updateCoords();
       window.addEventListener('resize', updateCoords);
       window.addEventListener('scroll', updateCoords, true);
+    } else {
+      setCoords({ top: 0, left: 0, width: 0 });
     }
     return () => {
       window.removeEventListener('resize', updateCoords);
@@ -71,7 +73,7 @@ const ArrepDropdown = ({ req, onUpdateStatus, updatingId }) => {
         <ChevronDown size={12} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && createPortal(
+      {isOpen && coords.top > 0 && createPortal(
         <div
           ref={dropdownRef}
           style={{
