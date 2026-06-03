@@ -127,7 +127,7 @@ function App() {
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminContainer /></ProtectedRoute>} />
-                  <Route path="/mi-cuenta" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
+                  <Route path="/mi-cuenta/:tab?" element={<ProtectedRoute><UserPanel /></ProtectedRoute>} />
                   <Route path="/*" element={<NotFound />} />
                 </Routes>
               </LayoutWrapper>
