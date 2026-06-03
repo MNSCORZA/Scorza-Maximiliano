@@ -7,6 +7,7 @@ export const TABS_CONFIG = [
   { id: 'pedidos', label: 'pedidos', permissionKey: 'pedidos' },
   { id: 'crm', label: 'Clientes CRM 360', permissionKey: 'isAdmin' },
   { id: 'usuarios', label: 'Alta y Permisos', permissionKey: 'isAdmin' },
+  { id: 'newsletter', label: 'newsletter', permissionKey: 'isAdmin' },
   { id: 'banners', label: 'banners', permissionKey: 'banners' },
   { id: 'marcas', label: 'marcas', permissionKey: 'marcas' },
   { id: 'métricas', label: 'métricas', permissionKey: 'metricas' },
