@@ -2,6 +2,7 @@ import React from 'react';
 import ProductsManager from './ProductsManager';
 import OrdersManager from './OrdersManager';
 import UsersManager from './UsersManager';
+import AdminNewsletter from './AdminNewsletter';
 import { AdminBanners } from './AdminBanners';
 import { AdminBrands } from './AdminBrands';
 import AdminAnalytics from './AdminAnalytics';
@@ -50,6 +51,8 @@ const AdminContentSwitcher = ({
       return <OrdersManager />;
     case 'usuarios': 
       return <UsersManager admin={admin} currentUser={user} />;
+    case 'newsletter':
+      return <AdminNewsletter />;
     case 'crm':
     case 'clientes crm 360':
       return (
