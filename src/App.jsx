@@ -29,6 +29,7 @@ import { Favoritos } from "./components/Favoritos";
 import { OfertasContainer } from "./components/OfertasContainer";
 import { Arrepentimiento } from "./components/Arrepentimiento";
 import { Ayuda } from "./pages/Ayuda";
+import { Terminos } from "./pages/Terminos";
 
 const ConfigContext = createContext();
 
@@ -119,6 +120,7 @@ function App() {
                   <Route path="/ofertas" element={<OfertasContainer />} />
                   <Route path="/arrepentimiento" element={<Arrepentimiento />} />
                   <Route path="/ayuda" element={<Ayuda />} />
+                  <Route path="/terminos" element={<Terminos />} />
                   <Route path="/form" element={<Formulario />} />
                   <Route path="/orden-confirmacion/:orderId" element={<OrdenConfirmacion />} />
                   <Route path="/login" element={<Login />} />
