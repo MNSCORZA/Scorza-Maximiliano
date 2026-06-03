@@ -17,17 +17,22 @@ export const useUsersManager = (admin) => {
     permisos: { 
       isAdmin: false, 
       ver: true, 
+      productos: false,
       editar: false, 
       borrar: false, 
       pedidos: false, 
       crm: false, 
+      newsletter: false,
       reglas: false, 
       banners: false, 
       marcas: false, 
       metricas: false, 
       cupones: false, 
       carritos: false, 
-      historial: false 
+      historial: false,
+      configuracion: false,
+      respaldos: false,
+      arrepentimientos: false
     } 
   });
 
@@ -67,15 +72,16 @@ export const useUsersManager = (admin) => {
     return filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   }, [filteredUsers, indexOfFirstItem, indexOfLastItem]);
 
-  const handleCreateStaff = useCallback(async (e) => {
+  const handleCreateStaff = useCallback(async (e, userToSave) => {
     e.preventDefault();
     try {
-      const cred = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
+      const userPayload = userToSave || newUser;
+      const cred = await createUserWithEmailAndPassword(auth, userPayload.email, userPayload.password);
       await setDoc(doc(db, "usuarios", cred.user.uid), { 
-        nombre: newUser.nombre, 
-        email: newUser.email, 
-        permisos: newUser.permisos, 
-        rol: newUser.permisos.isAdmin ? "admin" : "empleado" 
+        nombre: userPayload.nombre, 
+        email: userPayload.email, 
+        permisos: userPayload.permisos, 
+        rol: userPayload.permisos.isAdmin ? "admin" : "empleado" 
       });
       setShowUserModal(false);
       setNewUser({ 
@@ -85,17 +91,22 @@ export const useUsersManager = (admin) => {
         permisos: { 
           isAdmin: false, 
           ver: true, 
+          productos: false,
           editar: false, 
           borrar: false, 
           pedidos: false, 
           crm: false, 
+          newsletter: false,
           reglas: false, 
           banners: false, 
           marcas: false, 
           metricas: false, 
           cupones: false, 
           carritos: false, 
-          historial: false 
+          historial: false,
+          configuracion: false,
+          respaldos: false,
+          arrepentimientos: false
         } 
       });
       if (admin.refreshUsers) admin.refreshUsers();
