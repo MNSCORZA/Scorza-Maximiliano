@@ -3,17 +3,22 @@ import { ShieldCheck } from 'lucide-react';
 
 const PERMISSIONS_LIST = [
   { id: 'isAdmin', label: 'Admin' },
+  { id: 'productos', label: 'Productos' },
   { id: 'editar', label: 'Editar' },
   { id: 'borrar', label: 'Borrar' },
   { id: 'pedidos', label: 'Pedidos' },
   { id: 'crm', label: 'CRM 360' },
+  { id: 'newsletter', label: 'Newsletter' },
   { id: 'reglas', label: 'Reglas' },
   { id: 'banners', label: 'Banners' },
   { id: 'marcas', label: 'Marcas' },
   { id: 'metricas', label: 'Métricas' },
   { id: 'cupones', label: 'Cupones' },
   { id: 'carritos', label: 'Carritos' },
-  { id: 'historial', label: 'Historial' }
+  { id: 'historial', label: 'Historial' },
+  { id: 'configuracion', label: 'Configuración' },
+  { id: 'respaldos', label: 'Respaldos' },
+  { id: 'arrepentimientos', label: 'Arrepentimientos' }
 ];
 
 const PermissionGrid = ({ permisos = {}, onChange, disabled, isMobileGrid = false }) => {
