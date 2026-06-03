@@ -1,57 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../fireBase/config';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { Mail, Copy, Check, Calendar } from 'lucide-react';
+import React from 'react';
+import { Mail, Copy, Check } from 'lucide-react';
+import { useNewsletter } from '../../hooks/useNewsletter';
+import { NewsletterRow } from './NewsletterRow';
 import { Loader } from '../Loader';
-import { toast } from 'sonner';
 
 const AdminNewsletter = () => {
-  const [emails, setEmails] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        const q = query(collection(db, 'newsletter'), orderBy('fecha', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setEmails(data);
-      } catch (error) {
-        console.error(error);
-        toast.error('Error al cargar la lista de suscriptores');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmails();
-  }, []);
-
-  const handleCopyAll = () => {
-    if (emails.length === 0) return;
-    
-    const allEmailsString = emails.map(e => e.email).join(', ');
-    navigator.clipboard.writeText(allEmailsString);
-    setCopied(true);
-    toast.success('Todos los emails fueron copiados al portapapeles');
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const formatDate = (timestamp) => {
-    if (!timestamp) return 'Reciente';
-    const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
-    return date.toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const { emails, loading, copied, handleCopyAll } = useNewsletter();
 
   if (loading) {
     return (
@@ -92,13 +46,7 @@ const AdminNewsletter = () => {
         <div className="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
           {emails.length > 0 ? (
             emails.map((item) => (
-              <div key={item.id} className="p-4 px-6 md:px-8 flex justify-between items-center hover:bg-slate-50/50 transition-all">
-                <span className="text-xs md:text-sm font-bold text-slate-800 tracking-tight">{item.email}</span>
-                <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5 whitespace-nowrap">
-                  <Calendar size={12} className="text-slate-300" />
-                  {formatDate(item.fecha)}
-                </span>
-              </div>
+              <NewsletterRow key={item.id} item={item} />
             ))
           ) : (
             <div className="text-center py-16">
