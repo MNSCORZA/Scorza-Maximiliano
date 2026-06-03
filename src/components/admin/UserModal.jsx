@@ -16,17 +16,22 @@ const UserModal = ({ isOpen, onClose, newUser, setNewUser, onSubmit }) => {
         ...newUser,
         permisos: {
           isAdmin: newUser.permisos?.isAdmin || false,
+          productos: newUser.permisos?.productos || false,
           editar: newUser.permisos?.editar || false,
           borrar: newUser.permisos?.borrar || false,
           pedidos: newUser.permisos?.pedidos || false,
           crm: newUser.permisos?.crm || false,
+          newsletter: newUser.permisos?.newsletter || false,
           reglas: newUser.permisos?.reglas || false,
           banners: newUser.permisos?.banners || false,
           marcas: newUser.permisos?.marcas || false,
           metricas: newUser.permisos?.metricas || false,
           cupones: newUser.permisos?.cupones || false,
           carritos: newUser.permisos?.carritos || false,
-          historial: newUser.permisos?.historial || false
+          historial: newUser.permisos?.historial || false,
+          configuracion: newUser.permisos?.configuracion || false,
+          respaldos: newUser.permisos?.respaldos || false,
+          arrepentimientos: newUser.permisos?.arrepentimientos || false
         }
       };
       await onSubmit(e, userToSave);
