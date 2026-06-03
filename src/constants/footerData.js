@@ -1,9 +1,10 @@
 export const footerLinks = [
-  { label: "Centro de Ayuda", href: "#" },
+  { label: "Centro de Ayuda", href: "/ayuda" },
   { label: "Botón de Arrepentimiento", href: "/arrepentimiento" },
   { label: "Mis Pedidos", href: "#" },
   { label: "Términos y Condiciones", href: "#" }
 ];
+
 
 export const paymentMethods = ['VISA', 'MASTER', 'AMEX', 'EFECTIVO'];
 
