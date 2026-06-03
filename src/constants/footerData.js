@@ -2,7 +2,7 @@ export const footerLinks = [
   { label: "Centro de Ayuda", href: "/ayuda" },
   { label: "Botón de Arrepentimiento", href: "/arrepentimiento" },
   { label: "Mis Pedidos", href: "#" },
-  { label: "Términos y Condiciones", href: "#" }
+  { label: "Términos y Condiciones", href: "/terminos" }
 ];
 
 
