@@ -40,13 +40,17 @@ const PermissionGrid = ({ permisos = {}, onChange, disabled, isMobileGrid = fals
       <div className="grid grid-cols-3 gap-2">
         {PERMISSIONS_LIST.filter(p => p.id !== 'isAdmin').map((perm) => {
           const hasPerm = permisos[perm.id] || false;
+          const isLongText = perm.label.length > 12;
+          
           return (
             <button
               key={perm.id}
               type="button"
               disabled={disabled}
               onClick={() => onChange(perm.id, hasPerm)}
-              className={`py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tracking-wider ${
+              className={`py-2.5 px-1 rounded-xl font-black uppercase transition-all tracking-wider text-center break-words flex items-center justify-center min-h-[38px] ${
+                isLongText ? 'text-[7.5px] leading-tight tracking-tight' : 'text-[9px]'
+              } ${
                 hasPerm 
                   ? 'bg-indigo-600 text-white shadow-sm' 
                   : 'bg-white border border-gray-100 text-gray-400'
