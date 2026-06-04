@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, MessageSquare } from 'lucide-react';
-import { db } from '../../../fireBase/config';
+import { db } from '../../../../src/fireBase/dataBase';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 export const ClaimDetailModal = ({ order, onClose }) => {
