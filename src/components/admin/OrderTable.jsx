@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import OrderStatusDropdown from './OrderStatusDropdown';
 import { AlertCircle } from 'lucide-react';
+import { ClaimDetailModal } from './ClaimDetailModal';
 
 const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
+  const [selectedClaim, setSelectedClaim] = useState(null);
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(price);
   };
@@ -66,26 +69,15 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
                   <p className="font-black text-xs text-gray-900 tracking-tight">{order.buyer?.nombre || 'Sin Nombre'} {order.buyer?.apellido || ''}</p>
                   <p className="text-[10px] text-indigo-600 font-black mt-1 select-all">{order.buyer?.telefono || 'Sin Teléfono'}</p>
                   <p className="text-[10px] text-gray-400 font-bold lowercase mt-0.5 select-all break-all max-w-[200px]">{order.buyer?.email || ''}</p>
-                  
+
                   {isClaim && (
-                    <div className="mt-3 bg-white border border-rose-100 p-3 rounded-xl max-w-[240px] shadow-sm animate-in fade-in duration-200">
-                      <p className="text-[9px] font-black uppercase text-rose-600 tracking-wider flex items-center gap-1 mb-1">
-                        <AlertCircle size={10} /> Motivo del Reclamo:
-                      </p>
-                      <p className="text-xs font-bold text-slate-800 leading-tight">
-                        {order.claimReason || "No especificado"}
-                      </p>
-                      {order.claimComment && (
-                        <>
-                          <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider mt-2 mb-0.5">
-                            Comentarios:
-                          </p>
-                          <p className="text-[11px] font-medium text-slate-600 italic bg-slate-50 p-1.5 rounded-lg border border-slate-100 whitespace-pre-wrap">
-                            "{order.claimComment}"
-                          </p>
-                        </>
-                      )}
-                    </div>
+                    <button 
+                      onClick={() => setSelectedClaim(order)}
+                      className="mt-3 flex items-center gap-2 bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl text-rose-700 hover:bg-rose-100 transition-all cursor-pointer outline-none"
+                    >
+                      <AlertCircle size={14} />
+                      <span className="text-[10px] font-black uppercase tracking-wider">Ver Reclamo Completo</span>
+                    </button>
                   )}
                 </td>
 
@@ -118,6 +110,13 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
           })}
         </tbody>
       </table>
+
+      {selectedClaim && (
+        <ClaimDetailModal 
+          order={selectedClaim} 
+          onClose={() => setSelectedClaim(null)} 
+        />
+      )}
     </div>
   );
 };
