@@ -7,8 +7,7 @@ import { ClaimDropdown } from './ClaimDropdown';
 export const ClaimModal = ({ orderId, onClose }) => {
   const [claimReason, setClaimReason] = useState('');
   const [claimComment, setClaimComment] = useState('');
-  const [isSubmittingClaim} = useState(false);
-  const [isSubmittingClaimState, setIsSubmittingClaimState] = useState(false);
+  const [isSubmittingClaim, setIsSubmittingClaim] = useState(false);
 
   const handleClaimSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +16,7 @@ export const ClaimModal = ({ orderId, onClose }) => {
       return;
     }
 
-    setIsSubmittingClaimState(true);
+    setIsSubmittingClaim(true);
     try {
       await createOrderClaim(orderId, claimReason, claimComment);
       toast.success("Reclamo enviado de forma segura. El equipo lo revisará a la brevedad.");
@@ -26,7 +25,7 @@ export const ClaimModal = ({ orderId, onClose }) => {
     } catch (error) {
       toast.error("Hubo un error al procesar el reclamo");
     } finally {
-      setIsSubmittingClaimState(false);
+      setIsSubmittingClaim(false);
     }
   };
 
@@ -65,10 +64,10 @@ export const ClaimModal = ({ orderId, onClose }) => {
           <div className="flex gap-2 pt-2">
             <button
               type="submit"
-              disabled={isSubmittingClaimState}
+              disabled={isSubmittingClaim}
               className="flex-1 bg-rose-600 text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-rose-100 cursor-pointer border-none disabled:bg-rose-400"
             >
-              {isSubmittingClaimState ? (
+              {isSubmittingClaim ? (
                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
