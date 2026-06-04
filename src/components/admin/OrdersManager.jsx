@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrdersManager } from '../../hooks/useOrdersManager';
-import { Search, Package, Truck, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Package, Truck, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import OrderTable from './OrderTable';
 
 const OrdersManager = () => {
@@ -31,7 +31,8 @@ const OrdersManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-1 w-full lg:w-max">
+      {/* Grid de Pestañas Adaptado a 4 columnas en pantallas medianas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-1 w-full lg:w-max">
         <button 
           type="button"
           onClick={() => setStatusTab('generada')} 
@@ -59,13 +60,29 @@ const OrdersManager = () => {
         >
           <CheckCircle size={14}/> Entregadas ({getCountByStatus('entregada')})
         </button>
+        {/* Nueva Pestaña de Reclamos */}
+        <button 
+          type="button"
+          onClick={() => setStatusTab('reclamo')} 
+          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+            statusTab === 'reclamo' ? 'bg-rose-50 text-rose-600' : 'text-gray-400 hover:text-gray-600'
+          }`}
+        >
+          <AlertCircle size={14}/> Reclamos ({getCountByStatus('reclamo') || 0})
+        </button>
       </div>
 
       <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 md:p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="font-black uppercase text-xs tracking-widest text-slate-900">
-              {statusTab === 'generada' ? 'Pedidos por Procesar' : statusTab === 'enviada' ? 'Envíos en Curso' : 'Historial de Entregas'}
+              {statusTab === 'generada' 
+                ? 'Pedidos por Procesar' 
+                : statusTab === 'enviada' 
+                ? 'Envíos en Curso' 
+                : statusTab === 'entregada' 
+                ? 'Historial de Entregas' 
+                : 'Incidentes y Reclamos Abiertos'}
             </h2>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">
               {filteredOrdersLength} encontrados en esta sección
