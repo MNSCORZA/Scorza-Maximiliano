@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, MessageSquare } from 'lucide-react';
-import { db } from '../../fireBase/dataBase';
+import db from '../../../fireBase/dataBase';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 export const ClaimDetailModal = ({ order, onClose }) => {
@@ -17,7 +17,7 @@ export const ClaimDetailModal = ({ order, onClose }) => {
 
         for (const colName of collectionsToTry) {
           const claimsRef = collection(db, colName);
-          
+
           const q1 = query(claimsRef, where('orderId', '==', order.id), limit(1));
           const snap1 = await getDocs(q1);
           if (!snap1.empty) {
