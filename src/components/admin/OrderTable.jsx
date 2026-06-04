@@ -43,7 +43,7 @@ const OrderTable = ({ orders, onUpdateStatus, updatingId }) => {
         <tbody className="divide-y divide-gray-100">
           {orders.map((order) => {
             const isRowUpdating = updatingId === order.id;
-            const isClaim = order.status?.toLowerCase() === 'reclamo' || order.status?.toLowerCase()?.startsWith('reclamo resuelto');
+            const isClaim = order.status?.toLowerCase()?.startsWith('reclamo');
 
             return (
               <tr 
