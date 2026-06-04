@@ -45,7 +45,14 @@ export const useOrdersManager = () => {
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesStatus = order.status === statusTab;
+    const currentStatus = order.status?.toLowerCase();
+    
+    // Si estamos en la pestaña de reclamos, agrupamos reclamos abiertos y sus resoluciones
+    let matchesStatus = currentStatus === statusTab.toLowerCase();
+    if (statusTab === 'reclamo') {
+      matchesStatus = currentStatus === 'reclamo' || 
+                      currentStatus?.startsWith('reclamo resuelto');
+    }
 
     const clientName = `${order.buyer?.nombre || ''} ${order.buyer?.apellido || ''}`.toLowerCase();
     const clientEmail = (order.buyer?.email || '').toLowerCase();
@@ -64,7 +71,13 @@ export const useOrdersManager = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
 
-  const getCountByStatus = (status) => orders.filter(o => o.status === status).length;
+  // Modificado para que sume todos los tipos de reclamo en el contador de la pestaña
+  const getCountByStatus = (status) => {
+    if (status === 'reclamo') {
+      return orders.filter(o => o.status?.toLowerCase() === 'reclamo' || o.status?.toLowerCase()?.startsWith('reclamo resuelto')).length;
+    }
+    return orders.filter(o => o.status === status).length;
+  };
 
   return {
     orders,
