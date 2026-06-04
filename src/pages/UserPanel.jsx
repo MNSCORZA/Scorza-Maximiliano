@@ -6,17 +6,16 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { User, MapPin, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { CartContext } from '../context/CartContext';
-import { useParams, useNavigate } from 'react-router'; // <-- Sumamos useParams y useNavigate
+import { useParams, useNavigate } from 'react-router';
 import UserAddressForm from '../components/user/UserAddressForm';
 import UserOrdersHistory from '../components/user/UserOrdersHistory';
 
 const UserPanel = () => {
   const { userData, user } = useAuth();
   const { addToCart } = useContext(CartContext);
-  const { tab } = useParams(); // <-- Leemos el parámetro de la URL (/mi-cuenta/:tab)
+  const { tab } = useParams();
   const navigate = useNavigate();
 
-  // Inicializamos el estado según lo que venga en la URL, si no viene nada va a 'datos'
   const [activeTab, setActiveTab] = useState(tab === 'compras' ? 'compras' : 'datos'); 
   const [pedidos, setPedidos] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +34,6 @@ const UserPanel = () => {
     notas: ""
   });
 
-  // Escucha cambios en la URL por si el usuario navega estando ya dentro de la pantalla
   useEffect(() => {
     if (tab === 'compras') {
       setActiveTab('compras');
@@ -44,7 +42,6 @@ const UserPanel = () => {
     }
   }, [tab]);
 
-  // Manejador para cambiar de pestaña actualizando también la URL de forma limpia
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
     if (newTab === 'compras') {
@@ -118,7 +115,7 @@ const UserPanel = () => {
         <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm grid grid-cols-2 gap-1">
           <button
             type="button"
-            onClick={() => handleTabChange('datos')} // <-- Cambiado
+            onClick={() => handleTabChange('datos')}
             className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
               activeTab === 'datos' 
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
@@ -129,7 +126,7 @@ const UserPanel = () => {
           </button>
           <button
             type="button"
-            onClick={() => handleTabChange('compras')} // <-- Cambiado
+            onClick={() => handleTabChange('compras')}
             className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
               activeTab === 'compras' 
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
