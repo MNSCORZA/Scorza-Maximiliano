@@ -12,7 +12,7 @@ export const ClaimDetailModal = ({ order, onClose }) => {
   useEffect(() => {
     const fetchClaimFromFirestore = async () => {
       try {
-        const collectionsToTry = ['reclamos', 'claims'];
+        const collectionsToTry = ['orders', 'reclamos', 'claims'];
         let foundData = null;
 
         for (const colName of collectionsToTry) {
@@ -35,6 +35,8 @@ export const ClaimDetailModal = ({ order, onClose }) => {
 
         if (foundData) {
           setClaimData(foundData);
+        } else if (order.claim) {
+          setClaimData(order);
         }
       } catch (error) {
         console.error(error);
@@ -44,10 +46,10 @@ export const ClaimDetailModal = ({ order, onClose }) => {
     };
 
     fetchClaimFromFirestore();
-  }, [order.id]);
+  }, [order.id, order]);
 
-  const motivo = claimData?.claimReason || claimData?.motivoReclamo || claimData?.motivo || claimData?.reason || order.claimReason || order.motivoReclamo || order.motivo;
-  const comentario = claimData?.claimComment || claimData?.comentarioReclamo || claimData?.comentario || claimData?.comment || order.claimComment || order.comentarioReclamo || order.comentario;
+  const motivo = order.claim?.motivo || claimData?.claim?.motivo || claimData?.motivo || order.motivo;
+  const comentario = order.claim?.comentario || claimData?.claim?.comentario || claimData?.comentario || order.comentario;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
