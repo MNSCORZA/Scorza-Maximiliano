@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrdersManager } from '../../hooks/useOrdersManager';
-import { Search, Package, Truck, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Package, Truck, CheckCircle, AlertCircle, ChevronLeft, ChevronRight, RefreshCw, FileText } from 'lucide-react';
 import OrderTable from './OrderTable';
 
 const OrdersManager = () => {
@@ -31,12 +31,11 @@ const OrdersManager = () => {
 
   return (
     <div className="space-y-6">
-      {/* Grid de Pestañas Adaptado a 4 columnas en pantallas medianas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-1 w-full lg:w-max">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:flex lg:flex-wrap bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-1 w-full">
         <button 
           type="button"
           onClick={() => setStatusTab('generada')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'generada' ? 'bg-amber-50 text-amber-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
@@ -45,7 +44,7 @@ const OrdersManager = () => {
         <button 
           type="button"
           onClick={() => setStatusTab('enviada')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'enviada' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
@@ -54,21 +53,38 @@ const OrdersManager = () => {
         <button 
           type="button"
           onClick={() => setStatusTab('entregada')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
             statusTab === 'entregada' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           <CheckCircle size={14}/> Entregadas ({getCountByStatus('entregada')})
         </button>
-        {/* Nueva Pestaña de Reclamos */}
         <button 
           type="button"
-          onClick={() => setStatusTab('reclamo')} 
-          className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
-            statusTab === 'reclamo' ? 'bg-rose-50 text-rose-600' : 'text-gray-400 hover:text-gray-600'
+          onClick={() => setStatusTab('reclamo abierto')} 
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+            statusTab === 'reclamo abierto' ? 'bg-rose-50 text-rose-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
-          <AlertCircle size={14}/> Reclamos ({getCountByStatus('reclamo') || 0})
+          <AlertCircle size={14}/> Reclamos ({getCountByStatus('reclamo abierto')})
+        </button>
+        <button 
+          type="button"
+          onClick={() => setStatusTab('resuelto_credito')} 
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+            statusTab === 'resuelto_credito' ? 'bg-purple-50 text-purple-600' : 'text-gray-400 hover:text-gray-600'
+          }`}
+        >
+          <FileText size={14}/> N. Crédito ({getCountByStatus('resuelto_credito')})
+        </button>
+        <button 
+          type="button"
+          onClick={() => setStatusTab('resuelto_reenvio')} 
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${
+            statusTab === 'resuelto_reenvio' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+          }`}
+        >
+          <RefreshCw size={14}/> Reenvíos ({getCountByStatus('resuelto_reenvio')})
         </button>
       </div>
 
@@ -82,7 +98,11 @@ const OrdersManager = () => {
                 ? 'Envíos en Curso' 
                 : statusTab === 'entregada' 
                 ? 'Historial de Entregas' 
-                : 'Incidentes y Reclamos Abiertos'}
+                : statusTab === 'reclamo abierto'
+                ? 'Incidentes y Reclamos Abiertos'
+                : statusTab === 'resuelto_credito'
+                ? 'Reclamos Resueltos con Nota de Crédito'
+                : 'Reclamos Resueltos con Reenvío de Productos'}
             </h2>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">
               {filteredOrdersLength} encontrados en esta sección
