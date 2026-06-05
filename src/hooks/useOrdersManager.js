@@ -46,10 +46,12 @@ export const useOrdersManager = () => {
 
   const filteredOrders = orders.filter(order => {
     const currentStatus = order.status?.toLowerCase() || '';
-
     let matchesStatus = currentStatus === statusTab.toLowerCase();
-    if (statusTab === 'reclamo') {
-      matchesStatus = currentStatus.startsWith('reclamo') || currentStatus.startsWith('resuelto');
+
+    if (statusTab === 'resuelto_credito') {
+      matchesStatus = currentStatus.includes('crédito') || currentStatus.includes('credito');
+    } else if (statusTab === 'resuelto_reenvio') {
+      matchesStatus = currentStatus.includes('reenvío') || currentStatus.includes('reenvio');
     }
 
     const clientName = `${order.buyer?.nombre || ''} ${order.buyer?.apellido || ''}`.toLowerCase();
@@ -70,13 +72,16 @@ export const useOrdersManager = () => {
   const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
 
   const getCountByStatus = (status) => {
-    if (status === 'reclamo') {
-      return orders.filter(o => {
-        const currentStatus = o.status?.toLowerCase() || '';
-        return currentStatus.startsWith('reclamo') || currentStatus.startsWith('resuelto');
-      }).length;
-    }
-    return orders.filter(o => o.status === status).length;
+    return orders.filter(o => {
+      const currentStatus = o.status?.toLowerCase() || '';
+      if (status === 'resuelto_credito') {
+        return currentStatus.includes('crédito') || currentStatus.includes('credito');
+      }
+      if (status === 'resuelto_reenvio') {
+        return currentStatus.includes('reenvío') || currentStatus.includes('reenvio');
+      }
+      return currentStatus === status.toLowerCase();
+    }).length;
   };
 
   return {
