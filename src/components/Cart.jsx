@@ -44,6 +44,12 @@ export const Cart = () => {
       const couponId = querySnapshot.docs[0].id;
       const couponData = querySnapshot.docs[0].data();
 
+      // 🔐 VALIDACIÓN CRÍTICA: Verificar exclusividad por ID de usuario
+      if (couponData.userId && couponData.userId !== user.uid) {
+        toast.error("Este cupón es exclusivo para otra cuenta y no podés utilizarlo acá");
+        return;
+      }
+
       if (couponData.montoMinimo && totalConReglas < couponData.montoMinimo) {
         toast.error(`Monto insuficiente. Este cupón requiere una compra mínima de $${couponData.montoMinimo.toLocaleString('es-AR')}`);
         return;
