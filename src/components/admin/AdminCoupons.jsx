@@ -12,12 +12,14 @@ export const AdminCoupons = () => {
     montoMinimo,
     fechaExpiracion,
     limiteUsos,
+    targetUserId,
     loading,
     setCodigo,
     setPorcentaje,
     setMontoMinimo,
     setFechaExpiracion,
     setLimiteUsos,
+    setTargetUserId,
     handleAgregar,
     handleBorrar
   } = useCouponsManager();
@@ -29,7 +31,7 @@ export const AdminCoupons = () => {
           <Ticket size={20} className="text-indigo-600" /> Control de Cupones Avanzado
         </h2>
         <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">
-          Configurá beneficios con expiración automática y límites comerciales
+          Configurá beneficios con expiración automática, límites comerciales o exclusivos por usuario
         </p>
       </div>
 
@@ -40,6 +42,7 @@ export const AdminCoupons = () => {
         montoMinimo={montoMinimo} setMontoMinimo={setMontoMinimo}
         fechaExpiracion={fechaExpiracion} setFechaExpiracion={setFechaExpiracion}
         limiteUsos={limiteUsos} setLimiteUsos={setLimiteUsos}
+        targetUserId={targetUserId} setTargetUserId={setTargetUserId}
         loading={loading}
       />
 
