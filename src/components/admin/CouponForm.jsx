@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Calendar, Users, DollarSign } from 'lucide-react';
+import { Plus, Calendar, Users, DollarSign, UserCheck } from 'lucide-react';
 
 export const CouponForm = ({
   onSubmit,
@@ -8,6 +8,7 @@ export const CouponForm = ({
   montoMinimo, setMontoMinimo,
   fechaExpiracion, setFechaExpiracion,
   limiteUsos, setLimiteUsos,
+  targetUserId, setTargetUserId,
   loading
 }) => {
   return (
@@ -53,7 +54,7 @@ export const CouponForm = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="space-y-1">
           <label className="text-[9px] font-black uppercase text-gray-400 ml-1 flex items-center gap-1"><Calendar size={10}/> Fecha de Vencimiento</label>
           <input
@@ -65,7 +66,7 @@ export const CouponForm = ({
           />
         </div>
         <div className="space-y-1">
-          <label className="text-[9px] font-black uppercase text-gray-400 ml-1 flex items-center gap-1"><Users size={10}/> Cantidad Máxima de usos Global</label>
+          <label className="text-[9px] font-black uppercase text-gray-400 ml-1 flex items-center gap-1"><Users size={10}/> Cantidad Máxima Usos</label>
           <input
             type="number"
             value={limiteUsos}
@@ -76,6 +77,17 @@ export const CouponForm = ({
             disabled={loading}
           />
         </div>
+        <div className="space-y-1">
+          <label className="text-[9px] font-black uppercase text-gray-400 ml-1 flex items-center gap-1 text-violet-600"><UserCheck size={10}/> Asignar a ID de Usuario (Opcional)</label>
+          <input
+            type="text"
+            value={targetUserId}
+            onChange={(e) => setTargetUserId(e.target.value)}
+            placeholder="Pegar ID de Firebase del usuario"
+            className="w-full bg-white border border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-xs font-bold outline-none tracking-wider text-gray-800"
+            disabled={loading}
+          />
+        </div>
       </div>
 
       <button
@@ -83,7 +95,7 @@ export const CouponForm = ({
         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer shadow-sm active:scale-98 mt-2"
         disabled={loading}
       >
-        <Plus size={14} /> {loading ? 'CREANDO...' : 'CREAR CUPÓN CON LIMITACIONES'}
+        <Plus size={14} /> {loading ? 'CREANDO...' : 'CREAR CUPÓN CONFIGURADO'}
       </button>
     </form>
   );
