@@ -54,7 +54,7 @@ export const Cart = () => {
         return;
       }
 
-      if (couponData?.fechaExpiracion) {
+      if (couponData?.fechaExpiracion && couponData.fechaExpiracion !== null) {
         const hoy = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
         const [fechaHoy] = hoy.split(" ");
         const [dia, mes, anio] = fechaHoy.replace(",", "").split("/");
