@@ -97,6 +97,10 @@ export const createOrder = async (buyerData, items, total, userId = null, coupon
 
     const couponData = couponSnap.data();
 
+    if (couponData.userId && couponData.userId !== userId) {
+      throw new Error("Este cupón es exclusivo para otra cuenta y no puede ser utilizado aquí.");
+    }
+
     if (couponData.fechaExpiracion) {
       const hoy = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
       const [fechaHoy] = hoy.split(" ");
@@ -159,6 +163,36 @@ export const createOrder = async (buyerData, items, total, userId = null, coupon
 
   await batch.commit();
   return newOrderRef.id;
+};
+
+export const getAvailableCouponsForUser = async (userId) => {
+  if (!userId) return [];
+  try {
+    const querySnapshot = await getDocs(collection(db, "cupones"));
+    const allCoupons = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    const ordersQuery = query(collection(db, "orders"), where("uid", "==", userId));
+    const ordersSnapshot = await getDocs(ordersQuery);
+    const usedCouponIds = ordersSnapshot.docs
+      .map(doc => doc.data().cuponAppliedId || doc.data().cuponAplicadoId)
+      .filter(id => id);
+
+    const hoy = new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+    const [fechaHoy] = hoy.split(" ");
+    const [dia, mes, anio] = fechaHoy.replace(",", "").split("/");
+    const hoyFormateado = `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+
+    return allCoupons.filter(coupon => {
+      if (usedCouponIds.includes(coupon.id)) return false;
+      if (coupon.userId && coupon.userId !== userId) return false;
+      if (coupon.fechaExpiracion && hoyFormateado > coupon.fechaExpiracion) return false;
+      if (coupon.limiteUsos !== null && coupon.usosActuales >= coupon.limiteUsos) return false;
+      return true;
+    });
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
 export const getOrdersByUserId = async (userId) => {
