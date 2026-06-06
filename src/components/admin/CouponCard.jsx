@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Eye } from 'lucide-react';
+import { Trash2, Eye, User } from 'lucide-react';
 
 export const CouponCard = ({ coupon, onBorrar }) => {
   return (
@@ -15,6 +15,11 @@ export const CouponCard = ({ coupon, onBorrar }) => {
           {coupon.montoMinimo > 0 && (
             <span className="text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg">
               MIN: ${coupon.montoMinimo.toLocaleString('es-AR')}
+            </span>
+          )}
+          {coupon.userId && (
+            <span className="text-[10px] font-black text-violet-700 bg-violet-50 border border-violet-100 px-2 py-1 rounded-lg flex items-center gap-1 uppercase">
+              <User size={10}/> Exclusivo ID: {coupon.userId.slice(-6).toUpperCase()}
             </span>
           )}
         </div>
