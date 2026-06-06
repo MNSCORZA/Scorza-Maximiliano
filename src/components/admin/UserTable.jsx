@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Shield, User } from 'lucide-react';
+import { Trash2, Shield, User, Copy, Check } from 'lucide-react';
 import { db } from '../../fireBase/config';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -7,6 +7,14 @@ import PermissionGrid from './PermissionGrid';
 
 const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) => {
   const [actionId, setActionId] = useState(null);
+  const [copiadoId, setCopiadoId] = useState(null);
+
+  const handleCopy = (id) => {
+    navigator.clipboard.writeText(id);
+    setCopiadoId(id);
+    toast.success("ID copiado al portapapeles");
+    setTimeout(() => setCopiadoId(null), 2000);
+  };
 
   const handleDelete = async (id, nombre) => {
     if (window.confirm(`¿Seguro que deseas eliminar a ${nombre}?`)) {
@@ -44,6 +52,7 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
 
   return (
     <div className="w-full">
+      {/* --- VISTA ESCRITORIO (MD+) --- */}
       <div className="hidden md:block">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50/40 text-[10px] font-black uppercase text-gray-400 tracking-widest border-b border-gray-100">
@@ -57,6 +66,7 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
             {users.map((u) => {
               const isMe = u.id === currentUser?.uid;
               const isUpdating = actionId === u.id;
+              const isCopiado = copiadoId === u.id;
 
               return (
                 <tr key={u.id} className={`transition-colors ${isUpdating ? 'bg-gray-50/50 opacity-60 pointer-events-none' : 'hover:bg-gray-50/30'}`}>
@@ -91,15 +101,30 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
                   )}
 
                   <td className="px-8 py-6 text-right">
-                    {!isMe && (
-                      <button 
-                        disabled={isUpdating}
-                        onClick={() => handleDelete(u.id, u.nombre)} 
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-xl hover:bg-red-50"
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(u.id)}
+                        className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                          isCopiado
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            : 'bg-white text-gray-400 border-gray-100 hover:text-indigo-600 hover:border-indigo-100 shadow-sm'
+                        }`}
+                        title="Copiar ID de Firebase"
                       >
-                        <Trash2 size={16} />
+                        {isCopiado ? <Check size={14} /> : <Copy size={14} />}
                       </button>
-                    )}
+
+                      {!isMe && (
+                        <button 
+                          disabled={isUpdating}
+                          onClick={() => handleDelete(u.id, u.nombre)} 
+                          className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-xl hover:bg-red-50"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -108,10 +133,12 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
         </table>
       </div>
 
+      {/* --- VISTA MOBILE (VISTA DE TU CAPTURA DE PANTALLA) --- */}
       <div className="md:hidden divide-y divide-gray-100">
         {users.map((u) => {
           const isMe = u.id === currentUser?.uid;
           const isUpdating = actionId === u.id;
+          const isCopiado = copiadoId === u.id;
 
           return (
             <div key={u.id} className={`p-5 bg-white space-y-4 transition-opacity ${isUpdating ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -132,15 +159,32 @@ const UserTable = ({ users, currentUser, isStaffView, onUpdatePerms, admin }) =>
                     <p className="text-[10px] font-bold text-gray-400 truncate mt-0.5 select-all">{u.email}</p>
                   </div>
                 </div>
-                {!isMe && (
-                  <button 
-                    disabled={isUpdating}
-                    onClick={() => handleDelete(u.id, u.nombre)} 
-                    className="p-2.5 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl shrink-0 transition-all active:scale-95"
+
+                {/* Acciones del ítem en mobile */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(u.id)}
+                    className={`p-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
+                      isCopiado
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'bg-gray-50 text-gray-400 border-gray-200 hover:text-indigo-600 shadow-sm'
+                    }`}
+                    title="Copiar ID"
                   >
-                    <Trash2 size={16} />
+                    {isCopiado ? <Check size={15} /> : <Copy size={15} />}
                   </button>
-                )}
+
+                  {!isMe && (
+                    <button 
+                      disabled={isUpdating}
+                      onClick={() => handleDelete(u.id, u.nombre)} 
+                      className="p-2.5 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl shrink-0 transition-all active:scale-95"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {isStaffView && (
